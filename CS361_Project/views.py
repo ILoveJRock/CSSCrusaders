@@ -13,6 +13,15 @@ class Login(View):
         #TODO Check login 
         return render(request, 'Login.html')
 
+class ForgotPassword(View):
+    #TODO: Check Username and Send Recovery Email when appropriate
+    def get(self, request):
+
+        return render(request, 'ForgotPassword.html')
+
+    def post(self, request):
+
+        return render(request, 'ForgotPassword.html')
 
 class Profile(View):
     def get(self, request):
