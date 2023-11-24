@@ -2,9 +2,27 @@ from django.db import models
 
 
 class Account(models.Model):
-    username = models.CharField(max_length=30, unique = True, primary_key= True)
-    password = models.CharField(max_length = 30)
-    #TODO Store role and basic info about the user
+    SUPERVISOR = 0
+    INSTRUCTOR = 1
+    TA = 2
+
+    ROLE_CHOICES = [
+        (SUPERVISOR, 'Supervisor'),
+        (INSTRUCTOR, 'Instructor'),
+        (TA, 'TA'),
+    ]
+
+    username = models.CharField(max_length=30, unique=True, primary_key=True)
+    password = models.CharField(max_length=30)
+    phone = models.CharField(max_length=15)
+    email = models.EmailField(max_length=254)
+    address = models.CharField(max_length=255)
+    office_hour_location = models.CharField(max_length=255)
+    office_hour_time = models.CharField(max_length=50)
+    role = models.IntegerField(choices=ROLE_CHOICES)
+
+    def __str__(self):
+        return self.username
 
 class Supervisor(models.Model):
     Supervisorid = models.IntegerField(primary_key = True)
