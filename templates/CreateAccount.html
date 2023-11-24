@@ -1,0 +1,20 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create an Account</title>
+</head>
+<body>
+    <h1>Create a new account</h1>
+    <form action="/createaccount/" method="post">
+        {% csrf_token %}
+        <input type="text" name="id">
+        <input type="text" name="name">
+        <input type="text" name="contact">
+        <input type="radio" name="acctype" value="TA">
+        <input type="radio" name="acctype" value="Instructor">
+        <input type="submit" value="Create">
+    </form>
+</body>
+</html>
