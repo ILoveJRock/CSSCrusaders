@@ -1,116 +1,115 @@
 <!DOCTYPE html>
-<html lang="">
+<html lang="en">
 <head>
-  <title>Admin Dashboard</title>
-  <style>
-    /* Box styles */
-    .box {
-      border: 1px solid black;
-      padding: 10px;
-      margin: 10px;
-      width: 200px;
-      height: 100px;
-      display: inline-block;
-      text-align: center;
-      cursor: pointer;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #282c35;
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
-    /* Table styles */
-    table {
-      border-collapse: collapse;
-      margin-top: 20px;
-    }
+        #dashboard {
+            text-align: center;
+            margin-bottom: 20px;
+        }
 
-    th, td {
-      border: 1px solid black;
-      padding: 10px;
-    }
+        table {
+            border-spacing: 20px;
+        }
 
-    th {
-      background-color: #ccc;
-    }
+        .box {
+            width: 250px;
+            height: 150px;
+            padding: 20px;
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin: 10px;
+        }
 
-    /* Float tables side by side */
-    .table-container {
-      display: inline-block;
-      width: 45%;
-      vertical-align: top;
-    }
-  </style>
+        .box:hover {
+            background-color: #45a049;
+        }
+
+        h1, h2 {
+            text-align: center;
+            margin: 0;
+        }
+    </style>
+    <title>Admin Dashboard</title>
 </head>
 <body>
-  <h1>Admin Dashboard</h1>
 
-  <!-- Table 1 -->
-  <div class="table-container">
-    <table>
-      <tr>
-        <th>Manage Account</th>
-        <th>Manage Course</th>
-      </tr>
-      <tr>
-        <td>
-          <div class="box" onclick="location.href='manage-account.html';">
-            <p>This section is responsible for managing the Account</p>
-          </div>
-        </td>
-        <td>
-          <div class="box" onclick="location.href='manage-course.html';">
-            <p>This section is responsible for managing the course</p>
-          </div>
-        </td>
-      </tr>
-    </table>
-  </div>
+<div id="dashboard">
+    <h1>Admin Dashboard</h1>
+</div>
 
-  <!-- Table 2 -->
-  <div class="table-container">
-    <table>
-      <tr>
-        <th>Create Account</th>
-        <th>Create Course</th>
-      </tr>
-      <tr>
+<table>
+    <tr>
         <td>
-          <div class="box" onclick="location.href='create-account.html';">
-            <p>This section is used for creating new Account within the system.</p>
-          </div>
+            <div class="box" onclick="location.href='manage_account.html';">
+                <h2>Manage Account</h2>
+            </div>
         </td>
+
         <td>
-          <div class="box" onclick="location.href='create-course.html';">
-            <p>This section is dedicated to creating new courses.</p>
-          </div>
+            <div class="box" onclick="location.href='manage_course.html';">
+                <h2>Manage Course</h2>
+            </div>
         </td>
-      </tr>
-      <tr>
-        <th>View contact info</th>
-        <th>Send Notifications</th>
-      </tr>
-      <tr>
+    </tr>
+
+    <tr>
         <td>
-          <div class="box" onclick="location.href='view-contact-info.html';">
-            <p>This section is for contact info all the account.</p>
-          </div>
+            <div class="box" onclick="location.href='create_account.html';">
+                <h2>Create Account</h2>
+            </div>
         </td>
+
         <td>
-          <div class="box" onclick="location.href='send-notifications.html';">
-            <p>This section is responsible for sending notifications to users.</p>
-          </div>
+            <div class="box" onclick="location.href='create_course.html';">
+                <h2>Create Course</h2>
+            </div>
         </td>
-      </tr>
-      <tr>
-        <th>Assign lab</th>
-        <th>Log Out</th>
-      </tr>
-      <tr>
-        <td colspan="2">
-          <div class="box" onclick="location.href='assign-lab.html';">
-            <p>This section is used to assign lab</p>
-          </div>
+    </tr>
+
+    <tr>
+        <td>
+            <div class="box" onclick="location.href='view_contact_info.html';">
+                <h2>View Contact Info</h2>
+            </div>
         </td>
-      </tr>
-    </table>
-  </div>
+
+        <td>
+            <div class="box" onclick="location.href='send_notifications.html';">
+                <h2>Send Notifications</h2>
+            </div>
+        </td>
+    </tr>
+
+    <tr>
+        <td>
+            <div class="box" onclick="location.href='assign_lab.html';">
+                <h2>Assign Lab</h2>
+            </div>
+        </td>
+
+        <td>
+            <div class="box" onclick="location.href='log_out.html';">
+                <h2>Log Out</h2>
+            </div>
+        </td>
+    </tr>
+</table>
 
 </body>
 </html>
