@@ -1,3 +1,4 @@
+
 from django.shortcuts import render
 from django.views import View
 
@@ -10,7 +11,9 @@ class Login(View):
         return render(request, 'Login.html')
 
     def post(self, request):
-        #TODO Check login 
+        #TODO Check login
+
+
         return render(request, 'Login.html')
 
 class ForgotPassword(View):
