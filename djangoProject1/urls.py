@@ -20,9 +20,9 @@ from django.urls import path
 from CS361_Project.views import *
 
 urlpatterns = [
-    path('', Login.as_view(), name="login"),
+    path('', Home.as_view(), name='home'),
+    path('login/', Login.as_view(), name="login"),
     path('logout/', Logout.as_view(), name='logout'),
-    path('home/', Home.as_view(), name='home'),
     path('manage/', ManageAccounts.as_view(), name='manage_account'),
     path('manage/createAccount/', CreateAccount.as_view(), name='create_account'),
     path('manage/editAccount/', EditAccount.as_view(), name='edit_account'),

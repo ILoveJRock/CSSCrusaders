@@ -9,7 +9,7 @@ class Login(View):
         self.missingUser = False
     def get(self, request):
         if 'LoggedIn' in request.GET:
-            return redirect('/home/')
+            return redirect('/')
 
         return render(request, 'Login.html')
 
@@ -25,7 +25,7 @@ class Login(View):
             session['name'] = user.name
             session['role'] = user.role
             session['LoggedIn'] = True
-            return redirect('/home/')
+            return redirect('/')
         else:
             e = 'User does not exist' if self.missingUser else "Incorrect Password"
             return render(request, "login.html", {"error": e})
@@ -67,6 +67,8 @@ class EditProfile(View):
 
 class Home(View):
     def get(self, request):
+        if 'LoggedIn' not in request.GET:
+            return render(request, "Login.html")
         # TODO Figure out who's logged in and what to display based on their permission levels
         return render(request, "Home.html")
 
