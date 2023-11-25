@@ -8,18 +8,19 @@ class Login(View):
         # Error Tracking
         self.missingUser = False
     def get(self, request):
+        # If the user is already logged in, redirect to home page
         if 'LoggedIn' in request.GET:
             return redirect('/')
 
         return render(request, 'Login.html')
 
     def post(self, request):
-
+        # Get login details from post request
         username = request.POST['username']
         password = request.POST['password']
-
+        # Authenticate user w/ helper method
         user = self.authenticate_user(username, password)
-
+        # If the user is authenticated, log the user in and redirect them to the home page
         if user:
             session = request.session
             session['name'] = user.name
@@ -27,8 +28,9 @@ class Login(View):
             session['LoggedIn'] = True
             return redirect('/')
         else:
-            e = 'User does not exist' if self.missingUser else "Incorrect Password"
-            return render(request, "login.html", {"error": e})
+            # If the user is not authenticated, redisplay the page with the appropriate error
+            error = 'User does not exist' if self.missingUser else "Incorrect Password"
+            return render(request, "login.html", {"error": error})
 
     def authenticate_user(self, username, password):
         try:
