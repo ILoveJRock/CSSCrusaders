@@ -4,6 +4,9 @@ from CS361_Project.models import Account
 
 
 class Login(View):
+    def __init__(self):
+        # Error Tracking
+        self.missingUser = False
     def get(self, request):
         if 'LoggedIn' in request.GET:
             return redirect('/home/')
@@ -11,24 +14,29 @@ class Login(View):
         return render(request, 'Login.html')
 
     def post(self, request):
+
         username = request.POST['username']
         password = request.POST['password']
 
-        try:
-            user = Account.objects.get(username=username)
-        except:
-            return render(request, "login.html", {"error": "User does not exist"})
+        user = self.authenticate_user(username, password)
 
-        if user.password == password:
+        if user:
             session = request.session
             session['name'] = user.name
             session['role'] = user.role
             session['LoggedIn'] = True
             return redirect('/home/')
         else:
-            return render(request, "login.html", {"error": "Incorrect Password"})
+            e = 'User does not exist' if self.missingUser else "Incorrect Password"
+            return render(request, "login.html", {"error": e})
 
-        return render(request, 'Login.html')
+    def authenticate_user(self, username, password):
+        try:
+            user = Account.objects.get(username=username)
+            if user.password == password:
+                return user
+        except Account.DoesNotExist:
+            self.missingUser = True
 
 
 class ForgotPassword(View):
