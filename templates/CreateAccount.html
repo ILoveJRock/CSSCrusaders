@@ -7,23 +7,33 @@
 </head>
 <body>
     <h1>Create a new account</h1>
-    <form action="/manage/createAccount/" method="post">
+    <form action="#" method="post">
         {% csrf_token %}
-        <input type="text" id = "id" name="id">
         <label for="id">ID</label>
-        <input type="text" id = "name" name="name">
+        <input type="text" id="id" name="id" required>
+        <br>
         <label for="name">Account name</label>
-        <input type="text" id = "phone" name="phone">
+        <input type="text" id="name" name="name" required>
+        <br>
         <label for="phone">Phone number</label>
-        <input type="text" id = "email" name="email">
+        <input type="text" id="phone" name="phone" required>
+        <br>
         <label for="email">Email address</label>
-        <input type="text" id = "address" name="address">
+        <input type="text" id="email" name="email" required>
+        <br>
         <label for="address">Home address</label>
-        <input type="radio" id = "TA" name="acctype">
+        <input type="text" id="address" name="address" required>
+        <br>
+        <label for="password">Password</label>
+        <input type="text" id="password" name="password" required>
+        <br>
         <label for="TA">TA</label>
-        <input type="radio" id = "instructor" name="acctype">
+        <input type="radio" id="TA" name="acctype" required>
+        <br>
         <label for="instructor">Instructor</label>
-        <input type="submit" id = "id" value="Create">
+        <input type="radio" id="instructor" name="acctype" required>
+        <br>
+        <input type="submit" id="id" value="Create">
     </form>
     <button type="button">
         <a href="{% url 'home' %}">Return to home screen</a>

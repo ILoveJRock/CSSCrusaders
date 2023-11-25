@@ -47,9 +47,29 @@ class ManageAccounts(View):
 
 
 class CreateAccount(View):
+    def get(self, request):
+        return render(request, 'CreateAccount.html')
+
     def post(self, request):
         #TODO Create the account
-        return render(request, 'CreateAccount.html')
+        id = request.POST.get(id)
+        formName = request.POST.get(name)
+        formPhone = request.POST.get(phone)
+        formEmail = request.POST.get(email)
+        formAddressddress = request.POST.get(address)
+        formPassword = request.POST.get(password)
+        acctype = request.POST.get(acctype)
+        newAccount = Account(
+            account_id=id,
+            username=formName,
+            password=formPassword,
+            role=(1 if acctype=="instructor" else 2),
+            name=formName,
+            phone=formPhone,
+            email=formEmail,
+            address=formAddress
+        )
+        newAccount.save()
 
 
 class EditAccount(View):
