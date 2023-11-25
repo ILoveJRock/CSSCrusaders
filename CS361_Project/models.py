@@ -6,6 +6,7 @@ class Account(models.Model):
     username = models.CharField(max_length=30, unique=True)
     password = models.CharField(max_length=30)
     role = models.IntegerField(choices=[(0, "Supervisor"), (1, "Instructor"), (2, "TA")])
+    name = models.CharField(max_length=30, null=True)
     phone = models.CharField(max_length=15, null=True)
     email = models.EmailField(max_length=254, null=True)
     address = models.CharField(max_length=255, null=True)
@@ -17,16 +18,16 @@ class Account(models.Model):
 
 
 class Supervisor(models.Model):
-    supervisor_id = models.ForeignKey("Account", on_delete=models.CASCADE, primary_key=True)
+    supervisor_id = models.OneToOneField("Account", on_delete=models.CASCADE, primary_key=True)
 
 
 class Instructor(models.Model):
-    instructor_id = models.ForeignKey("Account", on_delete=models.CASCADE, primary_key=True)
+    instructor_id = models.OneToOneField("Account", on_delete=models.CASCADE, primary_key=True)
     # TODO Store course and lab section assigned to instructors
 
 
 class TA(models.Model):
-    ta_id = models.ForeignKey("Account", on_delete=models.CASCADE, primary_key=True)
+    ta_id = models.OneToOneField("Account", on_delete=models.CASCADE, primary_key=True)
     # TODO Store course and lab section assigned to TA
 
 
