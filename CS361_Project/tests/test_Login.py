@@ -14,24 +14,24 @@ class LoginTests(TestCase):
         account.save()
 
     def test_UserDoesNotExist(self):
-        response = self.client.post('/', {'username': 'Bob', 'password': "12345"}, follow=True)
+        response = self.client.post('/login/', {'username': 'Bob', 'password': "12345"}, follow=True)
         # When the user doesn't exist the response should contain the error 'User does not exist'
         self.assertContains(response, 'User does not exist')
     def test_IncorrectPassword(self):
-        response = self.client.post('/', {'username': 'Joe', 'password': "12346"}, follow=True)
+        response = self.client.post('/login/', {'username': 'Joe', 'password': "12346"}, follow=True)
         # When the incorrect password is submitted the response should contain the error 'Incorrect Password'
         self.assertContains(response, 'Incorrect Password')
     def test_AlreadyLoggedIn(self):
-        response = self.client.get('/', {'LoggedIn' : True}, follow=True)
-        self.assertRedirects(response, '/home/')
+        response = self.client.get('/login/', {'LoggedIn' : True}, follow=True)
+        self.assertRedirects(response, '/')
     def test_SuccessfulLogin(self):
-        response = self.client.post('/', {'username': 'Joe', 'password': "12345"}, follow=True)
+        response = self.client.post('/login/', {'username': 'Joe', 'password': "12345"}, follow=True)
         # Redirects to home when user is logged in
-        self.assertRedirects(response, '/home/')
-        # When login is successful, we can check the name and role of the user
+        self.assertRedirects(response, '/')
+        # When login is successful, we can check the name and role of the user to display the information on the dashboard
         session = self.client.session
         self.assertEqual(session['name'], "Joe Schmo")
         self.assertEqual(session['role'], 0)
 
-        # Check 'is_authenticated'
+        # When logged in, the state variable
         self.assertTrue(session['LoggedIn'])
