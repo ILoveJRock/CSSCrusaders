@@ -49,7 +49,7 @@ class ManageAccounts(View):
 class CreateAccount(View):
     def post(self, request):
         #TODO Create the account
-        return render(request, 'Manage.html')
+        return render(request, 'CreateAccount.html')
 
 
 class EditAccount(View):

@@ -7,14 +7,26 @@
 </head>
 <body>
     <h1>Create a new account</h1>
-    <form action="/createaccount/" method="post">
+    <form action="/manage/createAccount/" method="post">
         {% csrf_token %}
-        <input type="text" name="id">
-        <input type="text" name="name">
-        <input type="text" name="contact">
-        <input type="radio" name="acctype" value="TA">
-        <input type="radio" name="acctype" value="Instructor">
-        <input type="submit" value="Create">
+        <input type="text" id = "id" name="id">
+        <label for="id">ID</label>
+        <input type="text" id = "name" name="name">
+        <label for="name">Account name</label>
+        <input type="text" id = "phone" name="phone">
+        <label for="phone">Phone number</label>
+        <input type="text" id = "email" name="email">
+        <label for="email">Email address</label>
+        <input type="text" id = "address" name="address">
+        <label for="address">Home address</label>
+        <input type="radio" id = "TA" name="acctype">
+        <label for="TA">TA</label>
+        <input type="radio" id = "instructor" name="acctype">
+        <label for="instructor">Instructor</label>
+        <input type="submit" id = "id" value="Create">
     </form>
+    <button type="button">
+        <a href="{% url 'home' %}">Return to home screen</a>
+    </button>
 </body>
 </html>
