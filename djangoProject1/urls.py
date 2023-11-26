@@ -41,4 +41,6 @@ urlpatterns = [
     path('profile/', Profile.as_view(), name="profile"),
     path('profile/edit/', EditProfile.as_view(), name="edit_profile"),
     path('admin/', admin.site.urls),
+    path('manage/update/', UpdateAccount.as_view(), name='update_account'),
+
 ]

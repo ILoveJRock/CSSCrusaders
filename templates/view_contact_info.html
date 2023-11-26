@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(to right, #282c35, #4CAF50);
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        #manageContact {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px 5px 0 0;
+            cursor: pointer;
+            margin-right: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .tab:hover {
+            background-color: #45a049;
+        }
+
+        .active-tab {
+            background-color: #45a049;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 80%;
+            max-width: 600px;
+        }
+
+        label {
+            margin: 10px 0;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 600px;
+            margin-top: 20px;
+        }
+
+        button {
+            width: 48%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        a {
+            color: #4CAF50;
+            text-decoration: none;
+        }
+    </style>
+    <title>Manage Contact</title>
+</head>
+<body>
+
+<div id="manageContact">
+    <h1>Manage Contact</h1>
+</div>
+
+<div class="tabs">
+    <button class="tab active-tab" onclick="switchTab('view')">View Contact</button>
+    <button class="tab" onclick="switchTab('edit')">Edit Contact</button>
+</div>
+
+<form id="viewContactForm">
+    <label for="idView">Account ID:</label>
+    <input type="text" id="idView" name="idView" required readonly>
+
+    <label for="contactView">Contact Information:</label>
+    <input type="text" id="contactView" name="contactView" required readonly>
+
+    <div class="button-container">
+        <button type="button" onclick="confirmUpdate()">Confirm</button>
+    <button><a href="AdminDashboard.html" style="color: white;">Return</a></button>
+    </div>
+</form>
+
+<form id="editContactForm" style="display: none;">
+    <label for="idEdit">Account ID:</label>
+    <input type="text" id="idEdit" name="idEdit" required>
+
+    <label for="contactEdit">New Contact Information:</label>
+    <input type="text" id="contactEdit" name="contactEdit" required>
+
+    <div class="button-container">
+        <button type="button" onclick="editContact()">Edit Contact</button>
+    <button><a href="AdminDashboard.html" style="color: white;">Return</a></button>
+    </div>
+</form>
+
+<script>
+    function switchTab(tab) {
+        if (tab === 'view') {
+            document.getElementById('viewContactForm').style.display = 'block';
+            document.getElementById('editContactForm').style.display = 'none';
+            document.querySelector('.tab.active-tab').classList.remove('active-tab');
+            document.querySelectorAll('.tab')[0].classList.add('active-tab');
+        } else if (tab === 'edit') {
+            document.getElementById('viewContactForm').style.display = 'none';
+            document.getElementById('editContactForm').style.display = 'block';
+            document.querySelector('.tab.active-tab').classList.remove('active-tab');
+            document.querySelectorAll('.tab')[1].classList.add('active-tab');
+        }
+    }
+
+    function editContact() {
+        // Add logic to edit the contact information in the database
+        // You can use JavaScript or send a request to a server-side script.
+        alert("Contact information updated successfully!");
+    }
+</script>
+
+</body>
+</html>
