@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.views import View
 from CS361_Project.models import Account
+from .models import *
 
 
 class Login(View):
@@ -52,18 +53,55 @@ class ForgotPassword(View):
 
 class Profile(View):
     def get(self, request):
-        return render(request, 'Profile.html')
+        request.session['action'] = None
+        return render(request, 'Profile.html', {'validForm': 'invalid'})
 
     def post(self, request):
+        request.session['action'] = None
+        if request.POST.get('editProfile') is not None:
+            request.session['action'] = 'edit'
+        elif request.POST.get('changePassword') is not None:
+            request.session['action'] = 'changePassword'
         return render(request, 'Profile.html')
 
 
 class EditProfile(View):
     def get(self, request):
-        return render(request, 'Profile.html')
+        return render(request, 'Profile.html', {'validForm': 'invalid'})
 
     def post(self, request):
         # TODO Edit the profile
+        username = request.session['user']['username']
+        user = Account.objects.get(username=username)
+        currentpass = user.password
+
+        if request.POST.get("NewPassword") != "":
+            if currentpass == request.POST.get("NewPassword"):
+                error = "New password cannot be the same as old password"
+                return render(request, "Profile.html", {"error": error})
+
+            if request.POST.get("NewPassword") != request.POST.get("NewPasswordRepeat"):
+                error = "Passwords do not match"
+                return render(request, "Profile.html", {"error": error})
+
+            #TODO check that new password fits password criteria
+
+            #TODO change password
+
+        if request.POST.get("Email") != "":
+            newEmail = request.POST.get("Email")
+            if type(newEmail) != str:
+                raise TypeError("Name of Numbers fails to raise ValueError")
+
+            if newEmail == "Null":
+                raise ValueError("Null value fails raise ValueError")
+
+            user.email = newEmail
+            user.save()
+
+
+
+
         return render(request, 'Profile.html')
 
 
