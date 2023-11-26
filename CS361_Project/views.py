@@ -50,9 +50,12 @@ class CreateAccount(View):
     def get(self, request):
         return render(request, 'CreateAccount.html')
 
-    def post(self, request)
+    def post(self, request):
         if len(Account.objects.filter(id=request.POST.get(id))) != 0:
-            return render(request, 'CreateAccount.html')
+            return render(request, 'CreateAccount.html', {"message": "There is already an account with that ID."})
+
+        if len(Account.objects.filter(username=request.POST.get(name))) != 0:
+            return render(request, 'CreateAccount.html', {"message": "There is already an account with that username."})
 
         id = request.POST.get(id)
         formName = request.POST.get(name)
