@@ -50,8 +50,10 @@ class CreateAccount(View):
     def get(self, request):
         return render(request, 'CreateAccount.html')
 
-    def post(self, request):
-        #TODO Create the account
+    def post(self, request)
+        if len(Account.objects.filter(id=request.POST.get(id))) != 0:
+            return render(request, 'CreateAccount.html')
+
         id = request.POST.get(id)
         formName = request.POST.get(name)
         formPhone = request.POST.get(phone)
@@ -70,6 +72,7 @@ class CreateAccount(View):
             address=formAddress
         )
         newAccount.save()
+        return render(request, 'CreateAccount.html')
 
 
 class EditAccount(View):
