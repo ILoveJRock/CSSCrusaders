@@ -1,5 +1,5 @@
 from django.test import TestCase, Client
-CS361_Project.models import Account
+from CS361_Project.models import Account
 
 class TestAddItem(TestCase):
   client = None

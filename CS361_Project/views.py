@@ -58,12 +58,13 @@ class CreateAccount(View):
             return render(request, 'CreateAccount.html', {"message": "There is already an account with that username."})
 
         id = request.POST.get(id)
-        formName = request.POST.get(name)
-        formPhone = request.POST.get(phone)
-        formEmail = request.POST.get(email)
-        formAddressddress = request.POST.get(address)
-        formPassword = request.POST.get(password)
-        acctype = request.POST.get(acctype)
+        # TODO: Fix these errors by using POST['variable'], see below
+        formName = request.POST['name']
+        formPhone = request.POST['phone']
+        formEmail = request.POST['email']
+        formAddress = request.POST['address']
+        formPassword = request.POST['password']
+        acctype = request.POST['acctype']
         newAccount = Account(
             account_id=id,
             username=formName,
