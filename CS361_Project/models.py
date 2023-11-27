@@ -23,8 +23,8 @@ class Supervisor(models.Model):
 
 class Instructor(models.Model):
     instructor_id = models.OneToOneField("Account", on_delete=models.CASCADE, primary_key=True)
-    course = models.ForeignKey("Course", on_delete=models.CASCADE)
-    section = models.ForeignKey("Course_LabSection", on_delete=models.CASCADE)
+    course = models.ForeignKey("Course", on_delete=models.SET_NULL, null=True)
+    section = models.ForeignKey("Course_LabSection", on_delete=models.SET_NULL, null=True)
 
 class TA(models.Model):
     ta_id = models.OneToOneField("Account", on_delete=models.CASCADE, primary_key=True)
