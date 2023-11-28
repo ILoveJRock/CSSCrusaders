@@ -20,9 +20,9 @@ from django.urls import path
 from CS361_Project.views import *
 
 urlpatterns = [
-    path('', Login.as_view(), name="login"),
+    path('', Home.as_view(), name='home'),
+    path('login/', Login.as_view(), name="login"),
     path('logout/', Logout.as_view(), name='logout'),
-    path('home/', Home.as_view(), name='home'),
     path('manage/', ManageAccounts.as_view(), name='manage_account'),
     path('manage/createAccount/', CreateAccount.as_view(), name='create_account'),
     path('manage/editAccount/', EditAccount.as_view(), name='edit_account'),
@@ -40,5 +40,8 @@ urlpatterns = [
     path('course/deleteLab/', DeleteLab.as_view(), name = 'delete_lab'),
     path('profile/', Profile.as_view(), name="profile"),
     path('profile/edit/', EditProfile.as_view(), name="edit_profile"),
+    path('forgotPassword/', ForgotPassword.as_view(), name="forgot_password"),
     path('admin/', admin.site.urls),
+    # path('manage/update/', UpdateAccount.as_view(), name='update_account'),
+
 ]
