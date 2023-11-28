@@ -44,3 +44,29 @@ class TestAddAccount(TestCase):
       "acctype": 1
     }, follow=True)
     self.assertEqual(1, len(Account.objects.filter(account_id=2)), "The account was not created")
+
+  def test_same_id(self):
+    resp = self.client.post("/manage/createAccount/", {
+      "id": 1,
+      "name": "joe",
+      "phone": "414",
+      "email": "@hotmail",
+      "address": "lane",
+      "password": "123",
+      "acctype": 1
+    }, follow=True)
+    self.assertEqual(0, len(Account.objects.filter(name="joe")), "The account was incorrectly created")
+    self.assertEqual("There is already an account with that ID.", resp.context["message"], "The error message didn't show up")
+
+  def test_same_name(self):
+    resp = self.client.post("/manage/createAccount/", {
+      "id": 2,
+      "name": "Joe Shmo",
+      "phone": "414",
+      "email": "@hotmail",
+      "address": "lane",
+      "password": "123",
+      "acctype": 1
+    }, follow=True)
+    self.assertEqual(0, len(Account.objects.filter(account_id=2)), "The account was incorrectly created")
+    self.assertEqual("There is already an account with that username.", resp.context["message"], "The error message didn't show up")
