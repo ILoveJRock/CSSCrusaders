@@ -5,17 +5,24 @@
     <style>
         body {
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
             height: 100vh;
             margin: 0;
+            background-color: #282c35;
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         .login-box {
             width: 300px;
             padding: 20px;
-            border: 1px solid;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin: 10px;
         }
 
         .login-box label {
@@ -32,7 +39,7 @@
         }
 
         .login-box button {
-            background-color: #218ba0;
+            background-color: #45a049;
             color: white;
             padding: 10px;
             border: none;
@@ -57,9 +64,8 @@
     </style>
 </head>
 <body>
+    <h2>Login</h2>
     <div class="login-box">
-        <h2>Login</h2>
-
         <form action="#" method="post">
             {% csrf_token %}
             <label for="username">Username:</label>
