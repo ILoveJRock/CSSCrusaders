@@ -1,7 +1,7 @@
 from django.test import TestCase, Client
 from CS361_Project.models import Account
 
-class TestAddItem(TestCase):
+class TestAddAccount(TestCase):
   client = None
   accounts = None
 
@@ -22,7 +22,7 @@ class TestAddItem(TestCase):
 
     for i in self.accounts:
       account = Account(
-        id=i["id"],
+        account_id=i["id"],
         username=i["username"],
         password=i["password"],
         role=i["role"],
@@ -34,4 +34,13 @@ class TestAddItem(TestCase):
       account.save()
 
   def test_new_account(self):
-    pass
+    resp = self.client.post("manage/createAccount/", {
+      "id": 2,
+      "name": "joe",
+      "phone": "414",
+      "email": "@hotmail",
+      "address": "lane",
+      "password": "123",
+      "acctype": 1
+    }, follow=True)
+    self.assertEqual(1, len(Account.objects.filter(account_id=2)), "The account was not created")
