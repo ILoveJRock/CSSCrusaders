@@ -34,7 +34,7 @@ class TestAddAccount(TestCase):
       account.save()
 
   def test_new_account(self):
-    resp = self.client.post("manage/createAccount/", {
+    resp = self.client.post("/manage/createAccount/", {
       "id": 2,
       "name": "joe",
       "phone": "414",
