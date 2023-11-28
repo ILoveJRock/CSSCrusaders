@@ -16,7 +16,6 @@ class Account(models.Model):
     def __str__(self):
         return self.username
 
-
 class Supervisor(models.Model):
     supervisor_id = models.OneToOneField("Account", on_delete=models.CASCADE, primary_key=True)
 
