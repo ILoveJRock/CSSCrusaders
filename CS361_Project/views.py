@@ -84,19 +84,49 @@ class ManageAccounts(View):
 
 
 class CreateAccount(View):
+    def get(self, request):
+        return render(request, 'CreateAccount.html')
+
     def post(self, request):
-        # TODO Create the account
-        return render(request, 'ManageAccount.html')
+        if len(Account.objects.filter(account_id=request.POST["id"])) != 0:
+            return render(request, 'CreateAccount.html', {"message": "There is already an account with that ID."})
+
+        if len(Account.objects.filter(username=request.POST["name"])) != 0:
+            return render(request, 'CreateAccount.html', {"message": "There is already an account with that username."})
+
+        formId = request.POST["id"]
+        # TODO: Fix these errors by using POST['variable'], see below
+        formName = request.POST['name']
+        formPhone = request.POST['phone']
+        formEmail = request.POST['email']
+        formAddress = request.POST['address']
+        formPassword = request.POST['password']
+        acctype = request.POST['acctype']
+        newAccount = Account(
+            account_id=formId,
+            username=formName,
+            password=formPassword,
+            role=(1 if acctype=="instructor" else 2),
+            name=formName,
+            phone=formPhone,
+            email=formEmail,
+            address=formAddress
+        )
+        newAccount.save()
+        return render(request, 'CreateAccount.html')
+
 
 
 class EditAccount(View):
     def post(self, request):
+        user_id = request.GET.get('userId')
         # TODO Edit the account information
         return render(request, 'ManageAccount.html')
 
 
 class DeleteAccount(View):
     def post(self, request):
+        user_id = request.GET.get('userId')
         # TODO Delete the account
         return render(request, 'ManageAccount.html')
 
