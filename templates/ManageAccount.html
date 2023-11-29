@@ -8,7 +8,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start; /* Vertically align to the top */
             height: 100vh;
             margin: 0;
             background: linear-gradient(to right, #282c35, #4CAF50);
@@ -18,28 +18,37 @@
 
         #manageAccount {
             text-align: center;
-            margin-bottom: 20px;
+            width: 100%; /* Take up the full width */
+            background-color: #4CAF50;
+            padding: 10px;
+            box-sizing: border-box;
         }
 
-      .container {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-}
+        .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            box-sizing: border-box;
+        }
 
-.scrollable-table {
-    width: 70%; /* Adjust the width as needed */
-    max-height: 500px;
-    overflow-y: auto;
-    display: block;
-}
+        .scrollable-table {
+            width: 70%;
+            max-height: 500px;
+            overflow-y: auto;
+            display: block;
+        }
 
-.user-overview {
-    width: 30%; /* Adjust the width as needed */
-    padding: 10px;
-
-    border-radius: 5px;
-}
+        .user-overview {
+            width: 30%;
+            margin-left: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #4CAF50;
+            color: white;
+        }
 
         table {
             width: 100%;
@@ -53,9 +62,8 @@
             text-align: left;
             border-bottom: 1px solid #ddd;
             white-space: nowrap;
-            word-wrap: break-word; /* Prevent long words from causing issues */
+            word-wrap: break-word;
             overflow: hidden;
-
         }
 
         th {
@@ -65,13 +73,18 @@
             top: 0;
             z-index: 1;
         }
+        td{
+           background-color: #4CAF50;
+            color: white;
+        }
 
         .button-container {
             display: flex;
             justify-content: space-between;
             width: 100%;
-            max-width: 600px;
+            max-width: 500px;
             margin-top: 20px;
+
         }
 
         button {
@@ -102,44 +115,45 @@
     <h1>Manage Accounts</h1>
 </div>
 <div class="container">
-<div class="scrollable-table">
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Username</th>
-                <th>Role</th>
-                <th>Name</th>
-                <th>Phone</th>
-                <th>Email</th>
-                <th>Address</th>
-                <th>Hours</th>
-                <th>Place</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for account in accounts %}
-            <tr>
-                <td>{{ account.account_id }}</td>
-                <td>{{ account.username }}</td>
-                <td>{{ account.role }}</td>
-                <td>{{ account.name }}</td>
-                <td>{{ account.phone }}</td>
-                <td>{{ account.email }}</td>
-                <td>{{ account.address }}</td>
-                <td>{{ account.office_hour_time }}</td>
-                <td>{{ account.office_hour_location }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
-<div class="user-overview">
-    <h2>Selected User</h2>
-    <p><strong>ID:</strong> <span id="selectedUserId"></span></p>
-    <p><strong>Name:</strong> <span id="selectedUserName"></span></p>
-    <p><strong>Role:</strong> <span id="selectedUserRole"></span></p>
-</div>
+    <div class="scrollable-table">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Role</th>
+                    <th>Name</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                    <th>Address</th>
+                    <th>Hours</th>
+                    <th>Place</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for account in accounts %}
+                <tr>
+                    <td>{{ account.account_id }}</td>
+                    <td>{{ account.username }}</td>
+                    <td>{{ account.role }}</td>
+                    <td>{{ account.name }}</td>
+                    <td>{{ account.phone }}</td>
+                    <td>{{ account.email }}</td>
+                    <td>{{ account.address }}</td>
+                    <td>{{ account.office_hour_time }}</td>
+                    <td>{{ account.office_hour_location }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="user-overview">
+        <h2>Selected User</h2>
+        <hr>
+        <p><strong>ID:</strong> <span id="selectedUserId"></span></p>
+        <p><strong>Name:</strong> <span id="selectedUserName"></span></p>
+        <p><strong>Role:</strong> <span id="selectedUserRole"></span></p>
+    </div>
 </div>
 
 <div class="button-container">
@@ -150,32 +164,27 @@
 </div>
 
 <script>
-   document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", function () {
         var tableRows = document.querySelectorAll("tbody tr");
         var editLink = document.getElementById("editLink");
         var deleteLink = document.getElementById("deleteLink");
 
         tableRows.forEach(function (row) {
             row.addEventListener("click", function () {
-                // Get the data from the clicked row
                 var selectedUserId = row.querySelector("td:first-child").textContent;
                 var selectedUserName = row.querySelector("td:nth-child(2)").textContent;
-                var selectedUserRole = row.querySelector("td:nth-child(3)").textContent; // You may need to modify this based on your data
+                var selectedUserRole = row.querySelector("td:nth-child(3)").textContent;
 
-                // Update the "Selected User Overview" section
                 document.getElementById("selectedUserId").textContent = selectedUserId;
                 document.getElementById("selectedUserName").textContent = selectedUserName;
                 document.getElementById("selectedUserRole").textContent = selectedUserRole;
 
-
-                // Enable or disable the edit and delete links based on user selection
                 if (selectedUserId) {
                     editLink.href = 'manage/editAccount/?userId=' + selectedUserId;
                     deleteLink.href = 'manage/deleteAccount/?userId=' + selectedUserId;
                     editLink.style.pointerEvents = 'auto';
                     deleteLink.style.pointerEvents = 'auto';
                 } else {
-                    // If no user is selected, disable the links
                     editLink.href = '#';
                     deleteLink.href = '#';
                     editLink.style.pointerEvents = 'none';
