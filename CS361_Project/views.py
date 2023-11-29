@@ -77,29 +77,29 @@ class Home(View):
 
 class ManageAccounts(View):
     def get(self, request):
-        return render(request, 'Manage.html')
+        return render(request, 'ManageAccount.html')
 
     def post(self, request):
         # TODO Figure out if it's a create/edit/delete operation
-        return render(request, 'Manage.html')
+        return render(request, 'ManageAccount.html')
 
 
 class CreateAccount(View):
     def post(self, request):
         # TODO Create the account
-        return render(request, 'Manage.html')
+        return render(request, 'ManageAccount.html')
 
 
 class EditAccount(View):
     def post(self, request):
         # TODO Edit the account information
-        return render(request, 'Manage.html')
+        return render(request, 'ManageAccount.html')
 
 
 class DeleteAccount(View):
     def post(self, request):
         # TODO Delete the account
-        return render(request, 'Manage.html')
+        return render(request, 'ManageAccount.html')
 
 
 class Notification(View):
@@ -118,7 +118,7 @@ class ManageCourse(View):
 
     def post(self, request):
         # TODO Post actions for every single action to the courses
-        return render(request, 'ManageCourse.html', {"courses": courses, "labs": labs})
+        return render(request, 'ManageCourse.html')
 
 
 # TODO For all of these, persist the course and/or lab selected back to manage course
@@ -161,11 +161,11 @@ class DeleteLab(View):
 class ManageAssign(View):
     def get(self, request):
         # TODO Ensure only logged in users can see this
-        return render(request, 'Assign.html', {"selectedUsers": users, "courses": courses, "labs": labs})
+        return render(request, 'Assign.html')
 
     def post(self, request):
         # TODO Figure out if we're assigning or removing a user
-        return render(request, 'Assign.html', {"selectedUsers": users, "courses": courses, "labs": labs})
+        return render(request, 'Assign.html')
 
 
 class AssignUser(View):

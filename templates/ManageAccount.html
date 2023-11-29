@@ -21,25 +21,25 @@
             margin-bottom: 20px;
         }
 
-        .container {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-        }
+      .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
 
-        .scrollable-table {
-            width: 70%; /* Adjust the width as needed */
-            max-height: 500px;
-            overflow-y: auto;
-            display: block;
-        }
+.scrollable-table {
+    width: 70%; /* Adjust the width as needed */
+    max-height: 500px;
+    overflow-y: auto;
+    display: block;
+}
 
-        .user-overview {
-            width: 30%; /* Adjust the width as needed */
-            padding: 10px;
+.user-overview {
+    width: 30%; /* Adjust the width as needed */
+    padding: 10px;
 
-            border-radius: 5px;
-        }
+    border-radius: 5px;
+}
 
         table {
             width: 100%;
@@ -102,9 +102,9 @@
     <h1>Manage Accounts</h1>
 </div>
 <div class="container">
-    <div class="scrollable-table">
-        <table>
-            <thead>
+<div class="scrollable-table">
+    <table>
+        <thead>
             <tr>
                 <th>ID</th>
                 <th>Username</th>
@@ -116,30 +116,30 @@
                 <th>Hours</th>
                 <th>Place</th>
             </tr>
-            </thead>
-            <tbody>
+        </thead>
+        <tbody>
             {% for account in accounts %}
-                <tr>
-                    <td>{{ account.account_id }}</td>
-                    <td>{{ account.username }}</td>
-                    <td>{{ account.role }}</td>
-                    <td>{{ account.name }}</td>
-                    <td>{{ account.phone }}</td>
-                    <td>{{ account.email }}</td>
-                    <td>{{ account.address }}</td>
-                    <td>{{ account.office_hour_time }}</td>
-                    <td>{{ account.office_hour_location }}</td>
-                </tr>
+            <tr>
+                <td>{{ account.account_id }}</td>
+                <td>{{ account.username }}</td>
+                <td>{{ account.role }}</td>
+                <td>{{ account.name }}</td>
+                <td>{{ account.phone }}</td>
+                <td>{{ account.email }}</td>
+                <td>{{ account.address }}</td>
+                <td>{{ account.office_hour_time }}</td>
+                <td>{{ account.office_hour_location }}</td>
+            </tr>
             {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    <div class="user-overview">
-        <h2>Selected User</h2>
-        <p><strong>ID:</strong> <span id="selectedUserId"></span></p>
-        <p><strong>Name:</strong> <span id="selectedUserName"></span></p>
-        <p><strong>Role:</strong> <span id="selectedUserRole"></span></p>
-    </div>
+        </tbody>
+    </table>
+</div>
+<div class="user-overview">
+    <h2>Selected User</h2>
+    <p><strong>ID:</strong> <span id="selectedUserId"></span></p>
+    <p><strong>Name:</strong> <span id="selectedUserName"></span></p>
+    <p><strong>Role:</strong> <span id="selectedUserRole"></span></p>
+</div>
 </div>
 
 <div class="button-container">
@@ -150,7 +150,7 @@
 </div>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
+   document.addEventListener("DOMContentLoaded", function () {
         var tableRows = document.querySelectorAll("tbody tr");
         var editLink = document.getElementById("editLink");
         var deleteLink = document.getElementById("deleteLink");
