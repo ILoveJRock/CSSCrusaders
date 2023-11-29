@@ -95,7 +95,8 @@
     <h1>Manage Account</h1>
 </div>
 
-<form>
+<form method="POST">
+    {% csrf_token %}
     <table>
         <tr>
             <td><label for="name">Name:</label></td>
