@@ -80,7 +80,6 @@ class ManageAccounts(View):
         return render(request, 'ManageAccount.html')
 
     def post(self, request):
-        # TODO Figure out if it's a create/edit/delete operation
         return render(request, 'ManageAccount.html')
 
 
