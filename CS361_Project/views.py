@@ -142,6 +142,13 @@ class EditAccount(View):
         if Account.objects.filter(username=request.POST['username']).exclude(account_id=user_id).exists():
             return render(request, 'edit_account.html', {'error': 'An account with that username already exists.'})
 
+        self.updateAccount(request, selected_account)
+
+        # Redirect to ManageAccount view
+        return redirect('/manage/')
+
+    #Helper Method for EditAccount POST
+    def updateAccount(self, request, selected_account):
         # Update user information with form data
         selected_account.username = request.POST['username']
         selected_account.password = request.POST['password']
@@ -155,9 +162,6 @@ class EditAccount(View):
 
         # Save the changes
         selected_account.save()
-
-        # Redirect to ManageAccount view
-        return redirect('/manage/')
 
 
 class DeleteAccount(View):
