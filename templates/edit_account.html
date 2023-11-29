@@ -107,7 +107,12 @@
 
 <form method="post" action="{% url 'edit_account' %}">
     {% csrf_token %}
-
+# TODO Cleanup Error message
+    <div class="form-section">
+        {% if error %}
+            <p>{{ error }}</p>
+        {% endif %}
+    </div>
     <div class="form-section">
         <label for="username">Username:</label>
         <input type="text" id="username" name="username" value="{{ user.username }}" required maxlength="30">
