@@ -8,41 +8,35 @@ Make sure this is right below the <body> for it to work correctly.
 <html>
 <head>
 <style>
-
-    body {
-        background-color: white;
+    ul {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        background-color: #282c35;
     }
-ul {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-    background-color: #04AA6D;
-}
 
-li {
-    float: left;
-}
+    li {
+        float: left;
+    }
 
-a {
-    display: block;
-    padding: 10px;
-}
+    a {
+        display: block;
+        padding: 10px;
+    }
 
-a:link {
-  color: white;
-  background-color: transparent;
-  text-decoration: none;
-}
+    a:link {
+      color: white;
+      background-color: transparent;
+      text-decoration: none;
+    }
 </style>
 </head>
-<body>
-
-<ul>
-    <!-- TODO change Dashboard to direct to correct place -->
-    <li><a href="Home.html">Dashboard</a></li>
-    <li style="float:right"><a class="active" href="Home.html">Logout</a></li>
-</ul>
-
-</body>
+<nav class="navbar">
+    <ul>
+        <!-- TODO change Dashboard to direct to correct place -->
+        <li><a href="AdminDashboard.html">Dashboard</a></li>
+        <li style="float:right"><a class="active" href="Home.html">Logout</a></li>
+    </ul>
+</nav>
 </html>

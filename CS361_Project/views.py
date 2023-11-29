@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.views import View
 from CS361_Project.models import Account
 from .models import *
+from datetime import datetime
 
 
 class Login(View):
@@ -57,11 +58,6 @@ class Profile(View):
         return render(request, 'Profile.html', {'validForm': 'invalid'})
 
     def post(self, request):
-        request.session['action'] = None
-        if request.POST.get('editProfile') is not None:
-            request.session['action'] = 'edit'
-        elif request.POST.get('changePassword') is not None:
-            request.session['action'] = 'changePassword'
         return render(request, 'Profile.html')
 
 
@@ -74,6 +70,7 @@ class EditProfile(View):
         user = Account.objects.get(username=username)
         currentpass = user.password
 
+        #TODO move password to own class
         if request.POST.get("NewPassword") != "":
             newPass = request.POST.get("NewPassword")
             if currentpass == newPass:
