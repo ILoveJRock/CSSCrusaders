@@ -118,9 +118,20 @@ class CreateAccount(View):
 
 
 class EditAccount(View):
-    def post(self, request):
+    def get(self,request):
         user_id = request.GET.get('userId')
-        # TODO Edit the account information
+        try:
+            selected_user = Account.objects.get(id=user_id)
+            return render(request, self.template_name, {'user': selected_user})
+        except Account.DoesNotExist:
+            # Handle the case where the account with the specified ID does not exist
+            return render(request, 'error_page.html', {'error_message': f"Account with ID {user_id} does not exist."})
+    def post(self, request):
+
+        # TODO Edit the account information and redirect to Manage Account
+
+
+
         return render(request, 'ManageAccount.html')
 
 
