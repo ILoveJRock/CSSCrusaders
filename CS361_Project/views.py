@@ -313,7 +313,7 @@ class RemoveAssign(View):
 
 class Logout(View):
     def get(self, request):
-        # TODO Log out and clear all data stored
+        request.session.clear()
         return render(request, 'login.html')
 
 
