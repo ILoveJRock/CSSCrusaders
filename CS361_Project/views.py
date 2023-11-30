@@ -234,3 +234,11 @@ class AdminDashboard(View):
 
     def post(self, request):
         return render(request, 'AdminDashboard.html')
+
+        
+class ViewContact(View):
+    def get(self, request):
+        return render(request, 'view_contact_info.html')
+
+    def post(self, request):
+        return render(request, 'view_contact_info.html')
