@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profile Page</title>
+    <title>Edit Profile</title>
     <style>
         body {
             display: flex;
@@ -56,44 +55,35 @@
     </style>
 </head>
 <body>
-    {% include 'NavBar.html' %}
-
-    <article>
-        <div>
-            <h1>Your Profile</h1>
-        </div>
-        <div class="container">
-            <div class="center">
-                <a href="ChangePassword.html" class="button">Change Password</a>
-            </div>
-        </div>
+    {% include 'NavBar.html'  %}
+    <form method="post" action="#">
+		{% csrf_token %}
         <table>
             <tr>
-                <th>Name: </th><th>{{user.name}}</th>
+                <th>Name: </th><th><input name="Name" type="text"/></th>
             </tr>
             <tr>
-                <th>Phone: </th><th>{{user.phone}}</th>
+                <th>Phone: </th><th><input name="Phone" type="text"/></th>
             </tr>
             <tr>
-                <th>Email: </th><th>{{user.email}}</th>
+                <th>Email: </th><th><input name="Email" type="text"/></th>
             </tr>
             <tr>
-                <th>Address: </th><th>{{user.address}}</th>
+                <th>Address: </th><th><input name="Address" type="text"/></th>
             </tr>
             <tr>
-                <th>Office Hour Location: </th><th>{{user.office_hour_location}}</th>
+                <th>Office Hour Location: </th><th><input name="Location" type="text"/></th>
             </tr>
             <tr>
-                <th>Office Hour Time: </th><th>{{user.office_hour_time}}</th>
+                <th>Office Hour Time: </th><th><input name="Time" type="text"/></th>
             </tr>
         </table>
 
         <div class="container">
             <div class="center">
-                <a href="EditProfile.html" class="button">Edit Information</a>
+                <a type="submit" class="button">Edit</a>
             </div>
         </div>
-    </article>
-
-
+    </form>
 </body>
+</html>

@@ -22,23 +22,23 @@ class Supervisor(models.Model):
 
 class Instructor(models.Model):
     instructor_id = models.OneToOneField("Account", on_delete=models.CASCADE, primary_key=True)
-    # TODO Store course and lab section assigned to instructors
-
+    course = models.ForeignKey("Course", on_delete=models.SET_NULL, null=True)
+    section = models.ForeignKey("Course_LabSection", on_delete=models.SET_NULL, null=True)
 
 class TA(models.Model):
     ta_id = models.OneToOneField("Account", on_delete=models.CASCADE, primary_key=True)
-    # TODO Store course and lab section assigned to TA
-
+    course = models.ForeignKey("Course", on_delete=models.SET_NULL, null=True)
+    section = models.ForeignKey("Course_LabSection", on_delete=models.SET_NULL, null=True)
 
 class LabSection(models.Model):
     Labid = models.IntegerField(primary_key=True)
-    # TODO Store name and department of lab
-
+    name = models.CharField(max_length=40)
+    dept = models.CharField(max_length=40)
 
 class Course(models.Model):
     Labid = models.IntegerField(primary_key=True)
-    # TODO Store name and department of course
-
+    name = models.CharField(max_length=40)
+    dept = models.CharField(max_length=40)
 
 class Course_LabSection(models.Model):
     course = models.ForeignKey("Course", on_delete=models.CASCADE)

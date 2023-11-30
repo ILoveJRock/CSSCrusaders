@@ -4,5 +4,39 @@
 
 Make sure this is right below the <body> for it to work correctly.
  -->
-{% load static %}
-<!-- Put navigation related content here, this will dynamically change based on the user logged in -->>
+<!-- Put navigation related content here, this will dynamically change based on the user logged in -->
+<html>
+<head>
+<style>
+    ul {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        background-color: #282c35;
+    }
+
+    li {
+        float: left;
+    }
+
+    a {
+        display: block;
+        padding: 10px;
+    }
+
+    a:link {
+      color: white;
+      background-color: transparent;
+      text-decoration: none;
+    }
+</style>
+</head>
+<nav class="navbar">
+    <ul>
+        <!-- TODO change Dashboard to direct to correct place -->
+        <li><a href="AdminDashboard.html">Dashboard</a></li>
+        <li style="float:right"><a class="active" href="Home.html">Logout</a></li>
+    </ul>
+</nav>
+</html>
