@@ -57,12 +57,17 @@ class ForgotPassword(View):
 class Profile(View):
     def get(self, request):
         request.session['action'] = None
-        return render(request, 'Profile.html', {'validForm': 'invalid'})
+        user = Account.objects.get(username=request.session['name'])
+        named = user.name
+        phone = user.phone
+        email = user.email
+        address = user.address
+        office_hour_location = user.office_hour_location
+        office_hour_time = user.office_hour_time
+        return render(request, 'Profile.html', {"named": named, "phone": phone, "email": email, "address": address, "office_hour_location": office_hour_location, "office_hour_time": office_hour_time, 'validForm': 'invalid'})
 
     def post(self, request):
         request.session['action'] = None
-        username = request.session['user']['username']
-        user = Account.objects.get(username=username)
         return render(request, 'Profile.html')
 
 
@@ -71,9 +76,7 @@ class EditProfile(View):
         return render(request, 'EditProfile.html', {'validForm': 'invalid'})
 
     def post(self, request):
-        username = request.session['user']['username']
-        user = Account.objects.get(username=username)
-
+        user = Account.objects.get(username=request.session['name'])
         if request.POST.get("Name") != "":
             newName = request.POST.get("Name")
             if type(newName) != str:
@@ -150,8 +153,7 @@ class EditPassword(View):
         return render(request, 'Profile.html', {'validForm': 'invalid'})
 
     def post(self, request):
-        username = request.session['user']['username']
-        user = Account.objects.get(username=username)
+        user = Account.objects.get(username=request.session['name'])
         currentpass = user.password
 
         # TODO move password to own class
@@ -179,15 +181,15 @@ class EditPassword(View):
 
 class Home(View):
     def get(self, request):
-        if 'LoggedIn' not in request.GET:
-            return render(request, "Login.html")
         # TODO Figure out who's logged in and what to display based on their permission levels
         return render(request, "Home.html")
 
 
 class ManageAccounts(View):
     def get(self, request):
-        return render(request, 'ManageAccount.html')
+        accounts = Account.objects.all()
+        query = [{"role": account.role, "named": account.name, "phone": account.phone, "email": account.email, "address": account.address, "office_hour_location": account.office_hour_location, "office_hour_time": account.office_hour_time} for account in accounts]
+        return render(request, 'ManageAccount.html',  {"accounts": query})
 
     def post(self, request):
         return render(request, 'ManageAccount.html')
@@ -222,6 +224,9 @@ class CreateAccount(View):
 
 
 class EditAccount(View):
+    def get(self, request):
+
+        return render(request, 'CreateAccount.html')
     def post(self, request):
         user_id = request.GET.get('userId')
         # TODO Edit the account information
