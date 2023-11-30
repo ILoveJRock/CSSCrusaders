@@ -51,13 +51,9 @@ class CreateAccount(View):
         return render(request, 'CreateAccount.html')
 
     def post(self, request):
-        if len(Account.objects.filter(account_id=request.POST["id"])) != 0:
-            return render(request, 'CreateAccount.html', {"message": "There is already an account with that ID."})
-
         if len(Account.objects.filter(username=request.POST["name"])) != 0:
             return render(request, 'CreateAccount.html', {"message": "There is already an account with that username."})
 
-        formId = request.POST["id"]
         # TODO: Fix these errors by using POST['variable'], see below
         formName = request.POST['name']
         formPhone = request.POST['phone']
@@ -66,7 +62,6 @@ class CreateAccount(View):
         formPassword = request.POST['password']
         acctype = request.POST['acctype']
         newAccount = Account(
-            account_id=formId,
             username=formName,
             password=formPassword,
             role=(1 if acctype=="instructor" else 2),
