@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(to right, #282c35, #4CAF50);
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        #manageAccount {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            max-width: 600px;
+            margin-bottom: 20px;
+        }
+
+        table, th, td {
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        label {
+            margin: 10px 0;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        button {
+            width: 48%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        a {
+            color: #4CAF50;
+            text-decoration: none;
+        }
+    </style>
+    <title>Manage Account</title>
+</head>
+<body>
+
+<div id="manageAccount">
+    <h1>Manage Account</h1>
+</div>
+
+<form>
+    <table>
+        <tr>
+            <td><label for="name">Name:</label></td>
+            <td><input type="text" id="name" name="name" required></td>
+        </tr>
+        <tr>
+            <td><label for="contact">Contact:</label></td>
+            <td><input type="text" id="contact" name="contact" required></td>
+        </tr>
+        <tr>
+            <td><label for="addy">Address:</label></td>
+            <td><input type="text" id="addy" name="addy"></td>
+        </tr>
+        <tr>
+            <td><label for="hours">Hours:</label></td>
+            <td><input type="text" id="hours" name="hours"></td>
+        </tr>
+        <tr>
+            <td><label for="place">Place:</label></td>
+            <td><input type="text" id="place" name="place"></td>
+        </tr>
+        <tr>
+            <td><label for="id">ID:</label></td>
+            <td><input type="text" id="id" name="id" required></td>
+        </tr>
+    </table>
+
+  <div class="button-container">
+      <button type="button" onclick="confirmUpdate()">Confirm</button>
+      <button><a href="dashboard.html" style="color: white;">Return</a></button>
+  </div>
+
+</form>
+
+<script>
+    function confirmUpdate() {
+        // Add logic to update the database with the provided information
+        // You can use JavaScript or send a request to a server-side script.
+        alert("Account information updated successfully!");
+    }
+</script>
+
+</body>
+</html>
