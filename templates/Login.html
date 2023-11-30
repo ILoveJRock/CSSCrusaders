@@ -1,9 +1,87 @@
-{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <title>Login Page</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #282c35;
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .login-box {
+            width: 300px;
+            padding: 20px;
+            background-color: #05DC8D;
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin: 10px;
+        }
+
+        .login-box label {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .login-box input,
+        .login-box select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 16px;
+            box-sizing: border-box;
+        }
+
+        .login-box button {
+            background-color: #04AA6D;
+            color: white;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .error-message {
+            color: red;
+            margin-top: 0;
+            text-align: center;
+        }
+        .forgot-password {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .forgot-password a {
+            color: #007BFF;
+            text-decoration: none;
+        }
+    </style>
 </head>
 <body>
+    <h2>Login</h2>
+    <div class="login-box">
+        <form action="/login/" method="post">
+            {% csrf_token %}
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+            {% if error %}
+            <p class="error-message">{{ error }}</p>
+            {% endif %}
+
+            <button type="submit">Login</button>
+        </form>
+        <div class="forgot-password">
+            <a href="/forgotPassword/">Forgot Password?</a>
+        </div>
+    </div>
 </body>
 </html>

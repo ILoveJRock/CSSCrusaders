@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #282c35;
+
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        #dashboard {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        table {
+            border-spacing: 20px;
+        }
+
+        .box {
+            width: 250px;
+            height: 150px;
+            padding: 20px;
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin: 10px;
+        }
+
+        .box:hover {
+            background-color: #45a049;
+        }
+
+        h1, h2 {
+            text-align: center;
+            margin: 0;
+            color: #fff;
+        }
+    </style>
+    <title>Admin Dashboard</title>
+</head>
+<body>
+
+<div id="dashboard">
+    <h1>Admin Dashboard</h1>
+</div>
+
+<table>
+    <tr>
+        <td>
+            <div class="box" onclick="location.href='ManageAccount.html';">
+                <h2>Manage Account</h2>
+            </div>
+        </td>
+
+        <td>
+            <div class="box" onclick="location.href='ManageCourse.html';">
+                <h2>Manage Course</h2>
+            </div>
+        </td>
+    </tr>
+
+    <tr>
+        <td>
+            <div class="box" onclick="location.href='view_contact_info.html';">
+                <h2>View Contact Info</h2>
+            </div>
+        </td>
+
+        <td>
+            <div class="box" onclick="location.href='send_notifications.html';">
+                <h2>Send Notifications</h2>
+            </div>
+        </td>
+    </tr>
+
+    <tr>
+        <td>
+            <div class="box" onclick="location.href='assign_lab.html';">
+                <h2>Assign Lab</h2>
+            </div>
+        </td>
+
+        <td>
+            <div class="box" onclick="location.href='log_out.html';">
+                <h2>Log Out</h2>
+            </div>
+        </td>
+    </tr>
+
+</table>
+
+</body>
+</html>
