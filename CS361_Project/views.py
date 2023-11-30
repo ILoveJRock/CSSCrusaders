@@ -12,7 +12,7 @@ class Login(View):
     def get(self, request):
         # If the user is already logged in, redirect to home page
         if 'LoggedIn' in request.GET:
-            return redirect('/')
+            return redirect('/dashboard/')
 
         return render(request, 'Login.html')
 
@@ -22,13 +22,13 @@ class Login(View):
         password = request.POST['password']
         # Authenticate user w/ helper method
         user = self.authenticate_user(username, password)
-        # If the user is authenticated, log the user in and redirect them to the home page
+        # If the user is authenticated, log the user in and redirect them to the ADMIN DASHBOARD page
         if user:
             session = request.session
             session['name'] = user.name
             session['role'] = user.role
             session['LoggedIn'] = True
-            return redirect('/')
+            return redirect('/dashboard/')
         else:
             # If the user is not authenticated, redisplay the page with the appropriate error
             error = 'User does not exist' if self.missingUser else "Incorrect Password"
@@ -211,7 +211,6 @@ class CreateAccount(View):
         return render(request, 'CreateAccount.html')
 
 
-
 class EditAccount(View):
     def post(self, request):
         user_id = request.GET.get('userId')
@@ -316,3 +315,11 @@ class Logout(View):
     def get(self, request):
         # TODO Log out and clear all data stored
         return render(request, 'login.html')
+
+
+class AdminDashboard(View):
+    def get(self, request):
+        return render(request, 'AdminDashboard.html')
+
+    def post(self, request):
+        return render(request, 'AdminDashboard.html')
