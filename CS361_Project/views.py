@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect
 from django.views import View
 from CS361_Project.models import Account
+from django.core.mail import send_mail
+
 
 
 class Login(View):
@@ -136,7 +138,11 @@ class Notification(View):
 
     def post(self, request):
         # TODO Send email to all the users in the email list
-        return render(request, 'NotificationForm.html')
+        email = request.POST['email']
+        subject = request.POST['subject']
+        body = request.POST['body']
+        send_mail(subject, body, "JoeBidenSaysGiveThisGroupAnA@example.com", [email], fail_silently=False,)
+        return redirect('/dashboard/')
 
 
 class ManageCourse(View):
