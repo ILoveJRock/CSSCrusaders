@@ -1,14 +1,16 @@
 from django.shortcuts import render, redirect
 from django.views import View
 from CS361_Project.models import Account
+from .models import *
+from datetime import datetime
 from django.core.mail import send_mail
-
 
 
 class Login(View):
     def __init__(self):
         # Error Tracking
         self.missingUser = False
+
     def get(self, request):
         # If the user is already logged in, redirect to home page
         if 'LoggedIn' in request.GET:
@@ -54,7 +56,8 @@ class ForgotPassword(View):
 
 class Profile(View):
     def get(self, request):
-        return render(request, 'Profile.html')
+        request.session['action'] = None
+        return render(request, 'Profile.html', {'validForm': 'invalid'})
 
     def post(self, request):
         return render(request, 'Profile.html')
@@ -62,10 +65,102 @@ class Profile(View):
 
 class EditProfile(View):
     def get(self, request):
-        return render(request, 'Profile.html')
+        return render(request, 'Profile.html', {'validForm': 'invalid'})
 
     def post(self, request):
-        # TODO Edit the profile
+        username = request.session['user']['username']
+        user = Account.objects.get(username=username)
+        currentpass = user.password
+
+        #TODO move password to own class
+        if request.POST.get("NewPassword") != "":
+            newPass = request.POST.get("NewPassword")
+            if currentpass == newPass:
+                error = "New password cannot be the same as old password"
+                return render(request, "Profile.html", {"error": error})
+
+            if type(newPass) != str:
+                raise TypeError("Password not string fails to raise TypeError")
+
+            if newPass == "Null":
+                raise ValueError("Null value fails raise ValueError")
+
+            # TODO check that new password fits password criteria
+            if newPass != request.POST.get("NewPasswordRepeat"):
+                error = "Passwords do not match"
+                return render(request, "Profile.html", {"error": error})
+
+            user.password = newPass
+            user.save()
+
+        if request.POST.get("Name") != "":
+            newName = request.POST.get("Name")
+            if type(newName) != str:
+                raise TypeError("Name not string fails to raise TypeError")
+
+            if newName == "Null":
+                raise ValueError("Null value fails raise ValueError")
+
+            user.name = newName
+            user.save()
+
+        if request.POST.get("Phone") != "":
+            newNum = request.POST.get("Phone")
+            if type(newNum) != int:
+                raise TypeError("Number not integer fails to raise TypeError")
+
+            if newNum == "Null":
+                raise ValueError("Null value fails raise ValueError")
+
+            user.phone = newNum
+            user.save()
+
+        if request.POST.get("Email") != "":
+            #TODO valid email check (contains @ and .)
+            newEmail = request.POST.get("Email")
+            if type(newEmail) != str:
+                raise TypeError("Email not string fails to raise TypeError")
+
+            if newEmail == "Null":
+                raise ValueError("Null value fails raise ValueError")
+
+            user.email = newEmail
+            user.save()
+
+        if request.POST.get("Address") != "":
+            newAddress = request.POST.get("Address")
+            if type(newAddress) != str:
+                raise TypeError("Address not string fails to raise TypeError")
+
+            if newAddress == "Null":
+                raise ValueError("Null value fails raise ValueError")
+
+            user.address = newAddress
+            user.save()
+
+        if request.POST.get("Location") != "":
+            newLocation = request.POST.get("Location")
+            if type(newLocation) != str:
+                raise TypeError("Location not string fails to raise TypeError")
+
+            if newLocation == "Null":
+                raise ValueError("Null value fails raise ValueError")
+
+            user.office_hour_location = newLocation
+            user.save()
+
+        if request.POST.get("Time") != "":
+            #TODO valid time check
+            newTime = request.POST.get("Time")
+            if type(newTime) != str:
+                raise TypeError("Time not string fails to raise TypeError")
+
+            if newTime == "Null":
+                raise ValueError("Null value fails raise ValueError")
+
+            user.office_hour_time = newTime
+            user.save()
+
         return render(request, 'Profile.html')
 
 
@@ -90,13 +185,9 @@ class CreateAccount(View):
         return render(request, 'CreateAccount.html')
 
     def post(self, request):
-        if len(Account.objects.filter(account_id=request.POST["id"])) != 0:
-            return render(request, 'CreateAccount.html', {"message": "There is already an account with that ID."})
-
         if len(Account.objects.filter(username=request.POST["name"])) != 0:
             return render(request, 'CreateAccount.html', {"message": "There is already an account with that username."})
 
-        formId = request.POST["id"]
         # TODO: Fix these errors by using POST['variable'], see below
         formName = request.POST['name']
         formPhone = request.POST['phone']
@@ -105,10 +196,9 @@ class CreateAccount(View):
         formPassword = request.POST['password']
         acctype = request.POST['acctype']
         newAccount = Account(
-            account_id=formId,
             username=formName,
             password=formPassword,
-            role=(1 if acctype=="instructor" else 2),
+            role=(1 if acctype == "instructor" else 2),
             name=formName,
             phone=formPhone,
             email=formEmail,
@@ -119,10 +209,50 @@ class CreateAccount(View):
 
 
 class EditAccount(View):
-    def post(self, request):
+    def get(self, request):
         user_id = request.GET.get('userId')
-        # TODO Edit the account information
-        return render(request, 'ManageAccount.html')
+        try:
+            selected_user = Account.objects.get(account_id=user_id)
+            return render(request, 'edit_account.html', {'user': selected_user})
+        except Account.DoesNotExist:
+            # Handle the case where the account with the specified ID does not exist
+            return render(request, 'error_page.html', {'error_message': f"Account with ID {user_id} does not exist."})
+
+    def post(self, request):
+        # Get user to edit from accountID
+        user_id = request.POST.get('userId')
+        selected_account = Account.objects.get(account_id=user_id)
+
+        # Catch errors before changes are made
+
+        # Case 1: emptyLogin
+        if request.POST['username'] == '' or request.POST['password'] == '':
+            return render(request, 'edit_account.html', {'error': 'Login fields cannot be empty'})
+
+        # Case 2: usernameTaken
+        if Account.objects.filter(username=request.POST['username']).exclude(account_id=user_id).exists():
+            return render(request, 'edit_account.html', {'error': 'An account with that username already exists.'})
+
+        self.updateAccount(request, selected_account)
+
+        # Redirect to ManageAccount view
+        return redirect('/manage/')
+
+    #Helper Method for EditAccount POST
+    def updateAccount(self, request, selected_account):
+        # Update user information with form data
+        selected_account.username = request.POST['username']
+        selected_account.password = request.POST['password']
+        selected_account.role = request.POST['role']
+        selected_account.name = request.POST['name']
+        selected_account.phone = request.POST['phone']
+        selected_account.email = request.POST['email']
+        selected_account.address = request.POST['address']
+        selected_account.office_hour_location = request.POST['office_hour_location']
+        selected_account.office_hour_time = request.POST['office_hour_time']
+
+        # Save the changes
+        selected_account.save()
 
 
 class DeleteAccount(View):
@@ -224,7 +354,7 @@ class RemoveAssign(View):
 
 class Logout(View):
     def get(self, request):
-        # TODO Log out and clear all data stored
+        request.session.clear()
         return render(request, 'login.html')
 
 

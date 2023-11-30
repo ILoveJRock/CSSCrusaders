@@ -14,7 +14,7 @@ class LoginAcceptance(TestCase):
 
     def test_criteriaOne(self):
         # GIVEN no one is logged in
-        # TODO ???
+        self.client.post('/logout/', follow=True)
         # WHEN a user enters a username and password that matches a pair in the database
         response = self.client.post('/login/', {'username': 'Joe', 'password': '12345'}, follow=True)
 
@@ -26,7 +26,7 @@ class LoginAcceptance(TestCase):
 
     def test_criteriaTwo(self):
         # GIVEN no one is logged in
-        # TODO ???
+        self.client.post('/logout/', follow=True)
         # WHEN a user enters a username and password pair not in the database
         response = self.client.post('/login/', {'username': 'InvalidUser', 'password': 'InvalidPassword'}, follow=True)
 
