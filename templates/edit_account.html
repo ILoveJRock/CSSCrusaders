@@ -107,7 +107,7 @@
 
 <form method="post" action="{% url 'edit_account' %}">
     {% csrf_token %}
-# TODO Cleanup Error message
+<!-- TODO Cleanup Error message -->
     <div class="form-section">
         {% if error %}
             <p>{{ error }}</p>
