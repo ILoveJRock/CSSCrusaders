@@ -9,7 +9,6 @@ class TestAddAccount(TestCase):
     self.client = Client()
     self.accounts = [
       {
-        "id": 1,
         "username": "Joe Shmo",
         "password": "123",
         "role": 1,
@@ -22,7 +21,6 @@ class TestAddAccount(TestCase):
 
     for i in self.accounts:
       account = Account(
-        account_id=i["id"],
         username=i["username"],
         password=i["password"],
         role=i["role"],
@@ -35,7 +33,6 @@ class TestAddAccount(TestCase):
 
   def test_new_account(self):
     resp = self.client.post("/manage/createAccount/", {
-      "id": 2,
       "name": "joe",
       "phone": "414",
       "email": "@hotmail",
@@ -43,30 +40,16 @@ class TestAddAccount(TestCase):
       "password": "123",
       "acctype": 1
     }, follow=True)
-    self.assertEqual(1, len(Account.objects.filter(account_id=2)), "The account was not created")
-
-  def test_same_id(self):
-    resp = self.client.post("/manage/createAccount/", {
-      "id": 1,
-      "name": "joe",
-      "phone": "414",
-      "email": "@hotmail",
-      "address": "lane",
-      "password": "123",
-      "acctype": 1
-    }, follow=True)
-    self.assertEqual(0, len(Account.objects.filter(name="joe")), "The account was incorrectly created")
-    self.assertEqual("There is already an account with that ID.", resp.context["message"], "The error message didn't show up")
+    self.assertEqual(1, len(Account.objects.filter(username="joe")), "The account was not created")
 
   def test_same_name(self):
     resp = self.client.post("/manage/createAccount/", {
-      "id": 2,
       "name": "Joe Shmo",
-      "phone": "414",
+      "phone": "555",
       "email": "@hotmail",
       "address": "lane",
       "password": "123",
       "acctype": 1
     }, follow=True)
-    self.assertEqual(0, len(Account.objects.filter(account_id=2)), "The account was incorrectly created")
+    self.assertEqual(0, len(Account.objects.filter(phone="555")), "The account was incorrectly created")
     self.assertEqual("There is already an account with that username.", resp.context["message"], "The error message didn't show up")
