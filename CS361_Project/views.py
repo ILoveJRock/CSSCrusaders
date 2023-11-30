@@ -11,6 +11,7 @@ class Login(View):
     def __init__(self):
         # Error Tracking
         self.missingUser = False
+
     def get(self, request):
         # If the user is already logged in, redirect to home page
         if 'LoggedIn' in request.GET:
@@ -211,7 +212,7 @@ class CreateAccount(View):
         newAccount = Account(
             username=formName,
             password=formPassword,
-            role=(1 if acctype=="instructor" else 2),
+            role=(1 if acctype == "instructor" else 2),
             name=formName,
             phone=formPhone,
             email=formEmail,
@@ -222,10 +223,50 @@ class CreateAccount(View):
 
 
 class EditAccount(View):
-    def post(self, request):
+    def get(self, request):
         user_id = request.GET.get('userId')
-        # TODO Edit the account information
-        return render(request, 'ManageAccount.html')
+        try:
+            selected_user = Account.objects.get(account_id=user_id)
+            return render(request, 'edit_account.html', {'user': selected_user})
+        except Account.DoesNotExist:
+            # Handle the case where the account with the specified ID does not exist
+            return render(request, 'error_page.html', {'error_message': f"Account with ID {user_id} does not exist."})
+
+    def post(self, request):
+        # Get user to edit from accountID
+        user_id = request.POST.get('userId')
+        selected_account = Account.objects.get(account_id=user_id)
+
+        # Catch errors before changes are made
+
+        # Case 1: emptyLogin
+        if request.POST['username'] == '' or request.POST['password'] == '':
+            return render(request, 'edit_account.html', {'error': 'Login fields cannot be empty'})
+
+        # Case 2: usernameTaken
+        if Account.objects.filter(username=request.POST['username']).exclude(account_id=user_id).exists():
+            return render(request, 'edit_account.html', {'error': 'An account with that username already exists.'})
+
+        self.updateAccount(request, selected_account)
+
+        # Redirect to ManageAccount view
+        return redirect('/manage/')
+
+    #Helper Method for EditAccount POST
+    def updateAccount(self, request, selected_account):
+        # Update user information with form data
+        selected_account.username = request.POST['username']
+        selected_account.password = request.POST['password']
+        selected_account.role = request.POST['role']
+        selected_account.name = request.POST['name']
+        selected_account.phone = request.POST['phone']
+        selected_account.email = request.POST['email']
+        selected_account.address = request.POST['address']
+        selected_account.office_hour_location = request.POST['office_hour_location']
+        selected_account.office_hour_time = request.POST['office_hour_time']
+
+        # Save the changes
+        selected_account.save()
 
 
 class DeleteAccount(View):
@@ -327,6 +368,8 @@ class RemoveAssign(View):
 
 class Logout(View):
     def get(self, request):
+
+        request.session.clear()
         return render(request, 'login.html')
 
 
@@ -336,3 +379,11 @@ class AdminDashboard(View):
 
     def post(self, request):
         return render(request, 'AdminDashboard.html')
+
+        
+class ViewContact(View):
+    def get(self, request):
+        return render(request, 'view_contact_info.html')
+
+    def post(self, request):
+        return render(request, 'view_contact_info.html')

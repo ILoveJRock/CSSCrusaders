@@ -16,17 +16,36 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        #createAccount {
+        #manageAccount {
             text-align: center;
             margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            max-width: 600px;
+            margin-bottom: 20px;
+        }
+
+        table, th, td {
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
         }
 
         form {
             display: flex;
             flex-direction: column;
             align-items: center;
-            width: 80%;
-            max-width: 600px;
         }
 
         label {
@@ -46,7 +65,6 @@
             justify-content: space-between;
             width: 100%;
             max-width: 600px;
-            margin-top: 20px;
         }
 
         button {
@@ -69,36 +87,54 @@
             text-decoration: none;
         }
     </style>
-    <title>Create Account</title>
+    <title>Manage Account</title>
 </head>
 <body>
 
-<div id="createAccount">
-    <h1>Create Account</h1>
+<div id="manageAccount">
+    <h1>Manage Account</h1>
 </div>
 
 <form>
-    <label for="name">Name:</label>
-    <input type="text" id="name" name="name" required>
-
-    <label for="contact">Contact:</label>
-    <input type="text" id="contact" name="contact" required>
-
-    <label for="id">ID:</label>
-    <input type="text" id="id" name="id" required>
+    <table>
+        <tr>
+            <td><label for="name">Name:</label></td>
+            <td><input type="text" id="name" name="name" required></td>
+        </tr>
+        <tr>
+            <td><label for="contact">Contact:</label></td>
+            <td><input type="text" id="contact" name="contact" required></td>
+        </tr>
+        <tr>
+            <td><label for="addy">Address:</label></td>
+            <td><input type="text" id="addy" name="addy"></td>
+        </tr>
+        <tr>
+            <td><label for="hours">Hours:</label></td>
+            <td><input type="text" id="hours" name="hours"></td>
+        </tr>
+        <tr>
+            <td><label for="place">Place:</label></td>
+            <td><input type="text" id="place" name="place"></td>
+        </tr>
+        <tr>
+            <td><label for="id">ID:</label></td>
+            <td><input type="text" id="id" name="id" required></td>
+        </tr>
+    </table>
 
   <div class="button-container">
       <button type="button" onclick="confirmUpdate()">Confirm</button>
-      # BUG CANT RETURN W/ EMPTY FORM
-      <button><a href="/manage/" style="color: white;">Return</a></button>
+      <button><a href="{% url 'admin_dashboard' %}" style="color: white;">Return</a></button>
   </div>
+
 </form>
 
 <script>
-    function createAccount() {
-        // Add logic to create a new account in the database
+    function confirmUpdate() {
+        // Add logic to update the database with the provided information
         // You can use JavaScript or send a request to a server-side script.
-        alert("Account created successfully!");
+        alert("Account information updated successfully!");
     }
 </script>
 

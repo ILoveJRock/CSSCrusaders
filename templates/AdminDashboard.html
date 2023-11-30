@@ -56,57 +56,73 @@
 <table>
     <tr>
         <td>
-            <div class="box" onclick="location.href='/manage/createAccount';">
-                <h2>Manage Account</h2>
-            </div>
+            <a href="{% url 'manage_account' %}">
+                <div class="box">
+                    <h2>Manage Account</h2>
+                </div>
+            </a>
         </td>
 
         <td>
-            <div class="box" onclick="location.href='ManageCourse.html';">
-                <h2>Manage Course</h2>
-            </div>
-        </td>
-    </tr>
-
-    <tr>
-        <td>
-            <div class="box" onclick="location.href='/manage/createAccount';">
-                <h2>Create Account</h2>
-            </div>
-        </td>
-
-        <td>
-            <div class="box" onclick="location.href='create_course.html';">
-                <h2>Create Course</h2>
-            </div>
+            <a href="{% url 'course' %}">
+                <div class="box">
+                    <h2>Manage Course</h2>
+                </div>
+            </a>
         </td>
     </tr>
 
     <tr>
         <td>
-            <div class="box" onclick="location.href='/profile';">
-                <h2>View Contact Info</h2>
-            </div>
+            <a href="{% url 'create_account' %}">
+                <div class="box">
+                    <h2>Create Account</h2>
+                </div>
+            </a>
         </td>
 
         <td>
-            <div class="box" onclick="location.href='send_notifications.html';">
-                <h2>Send Notifications</h2>
-            </div>
+            <a href="{% url 'course' %}">
+                <div class="box">
+                    <h2>Create Course</h2>
+                </div>
+            </a>
         </td>
     </tr>
 
     <tr>
         <td>
-            <div class="box" onclick="location.href='assign_lab.html';">
-                <h2>Assign Lab</h2>
-            </div>
+            <a href="{% url 'view_contact' %}">
+                <div class="box">
+                    <h2>View Contact Info</h2>
+                </div>
+            </a>
         </td>
 
         <td>
-            <div class="box" onclick="location.href='/logout';">
-                <h2>Log Out</h2>
-            </div>
+            <a href="{% url 'create_notification' %}">
+                <div class="box">
+                    <h2>Send Notification</h2>
+                </div>
+            </a>
+        </td>
+    </tr>
+
+    <tr>
+        <td>
+            <a href="{% url 'manage_assign' %}">
+                <div class="box">
+                    <h2>Assign Lab</h2>
+                </div>
+            </a>
+        </td>
+
+        <td>
+            <a href="{% url 'logout' %}">
+                <div class="box">
+                    <h2>Log Out</h2>
+                </div>
+          </a>
         </td>
     </tr>
 </table>
