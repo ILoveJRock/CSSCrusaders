@@ -1,3 +1,4 @@
+from django.middleware.csrf import rotate_token
 from django.shortcuts import render, redirect
 from django.views import View
 from CS361_Project.models import Account
@@ -30,7 +31,7 @@ class Login(View):
             session['name'] = user.name
             session['role'] = user.role
             session['LoggedIn'] = True
-            return redirect('/dashboard/')
+            return redirect('/dashboard')
         else:
             # If the user is not authenticated, redisplay the page with the appropriate error
             error = 'User does not exist' if self.missingUser else "Incorrect Password"
@@ -60,38 +61,19 @@ class Profile(View):
         return render(request, 'Profile.html', {'validForm': 'invalid'})
 
     def post(self, request):
+        request.session['action'] = None
+        username = request.session['user']['username']
+        user = Account.objects.get(username=username)
         return render(request, 'Profile.html')
 
 
 class EditProfile(View):
     def get(self, request):
-        return render(request, 'Profile.html', {'validForm': 'invalid'})
+        return render(request, 'EditProfile.html', {'validForm': 'invalid'})
 
     def post(self, request):
         username = request.session['user']['username']
         user = Account.objects.get(username=username)
-        currentpass = user.password
-
-        #TODO move password to own class
-        if request.POST.get("NewPassword") != "":
-            newPass = request.POST.get("NewPassword")
-            if currentpass == newPass:
-                error = "New password cannot be the same as old password"
-                return render(request, "Profile.html", {"error": error})
-
-            if type(newPass) != str:
-                raise TypeError("Password not string fails to raise TypeError")
-
-            if newPass == "Null":
-                raise ValueError("Null value fails raise ValueError")
-
-            # TODO check that new password fits password criteria
-            if newPass != request.POST.get("NewPasswordRepeat"):
-                error = "Passwords do not match"
-                return render(request, "Profile.html", {"error": error})
-
-            user.password = newPass
-            user.save()
 
         if request.POST.get("Name") != "":
             newName = request.POST.get("Name")
@@ -161,6 +143,38 @@ class EditProfile(View):
             user.office_hour_time = newTime
             user.save()
 
+        return render(request, 'EditProfile.html')
+
+class EditPassword(View):
+    def get(self, request):
+        request.session['action'] = None
+        return render(request, 'Profile.html', {'validForm': 'invalid'})
+
+    def post(self, request):
+        username = request.session['user']['username']
+        user = Account.objects.get(username=username)
+        currentpass = user.password
+
+        # TODO move password to own class
+        if request.POST.get("NewPassword") != "":
+            newPass = request.POST.get("NewPassword")
+            if currentpass == newPass:
+                error = "New password cannot be the same as old password"
+                return render(request, "Profile.html", {"error": error})
+
+            if type(newPass) != str:
+                raise TypeError("Password not string fails to raise TypeError")
+
+            if newPass == "Null":
+                raise ValueError("Null value fails raise ValueError")
+
+            # TODO check that new password fits password criteria
+            if newPass != request.POST.get("NewPasswordRepeat"):
+                error = "Passwords do not match"
+                return render(request, "Profile.html", {"error": error})
+
+            user.password = newPass
+            user.save()
         return render(request, 'Profile.html')
 
 
@@ -354,6 +368,7 @@ class RemoveAssign(View):
 
 class Logout(View):
     def get(self, request):
+
         request.session.clear()
         return render(request, 'login.html')
 

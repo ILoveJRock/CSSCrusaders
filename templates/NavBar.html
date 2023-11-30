@@ -22,6 +22,7 @@ Make sure this is right below the <body> for it to work correctly.
 
     a {
         display: block;
+        flex-direction: column;
         padding: 10px;
     }
 
@@ -30,13 +31,19 @@ Make sure this is right below the <body> for it to work correctly.
       background-color: transparent;
       text-decoration: none;
     }
+
+    a:visited {
+        color: white;
+        background-color: transparent;
+        text-decoration: none;
+    }
 </style>
 </head>
 <nav class="navbar">
     <ul>
         <!-- TODO change Dashboard to direct to correct place -->
-        <li><a href="AdminDashboard.html">Dashboard</a></li>
-        <li style="float:right"><a class="active" href="Home.html">Logout</a></li>
+        <li><a href='/dashboard/'>Dashboard</a></li>
+        <li style="float:right"><form action = '{% url 'logout' %}' method = 'get'><a class="active" href="/">Logout</a></form></li>
     </ul>
 </nav>
 </html>
