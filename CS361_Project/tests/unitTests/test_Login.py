@@ -23,11 +23,11 @@ class LoginTests(TestCase):
         self.assertContains(response, 'Incorrect Password')
     def test_AlreadyLoggedIn(self):
         response = self.client.get('/login/', {'LoggedIn' : True}, follow=True)
-        self.assertRedirects(response, '/')
+        self.assertRedirects(response, '/dashboard/')
     def test_SuccessfulLogin(self):
         response = self.client.post('/login/', {'username': 'Joe', 'password': "12345"}, follow=True)
         # Redirects to home when user is logged in
-        self.assertRedirects(response, '/')
+        self.assertRedirects(response, '/dashboard/')
         # When login is successful, we can check the name and role of the user to display the information on the dashboard
         session = self.client.session
         self.assertEqual(session['name'], "Joe Schmo")
