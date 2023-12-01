@@ -76,75 +76,27 @@ class EditProfile(View):
         username = request.session['user']['username']
         user = Account.objects.get(username=username)
 
-        if request.POST.get("Name") != "":
-            newName = request.POST.get("Name")
-            if type(newName) != str:
-                raise TypeError("Name not string fails to raise TypeError")
-
-            if newName == "Null":
-                raise ValueError("Null value fails raise ValueError")
-
-            user.name = newName
-            user.save()
-
-        if request.POST.get("Phone") != "":
-            newNum = request.POST.get("Phone")
-            if type(newNum) != int:
-                raise TypeError("Number not integer fails to raise TypeError")
-
-            if newNum == "Null":
-                raise ValueError("Null value fails raise ValueError")
-
-            user.phone = newNum
-            user.save()
-
-        if request.POST.get("Email") != "":
-            #TODO valid email check (contains @ and .)
-            newEmail = request.POST.get("Email")
-            if type(newEmail) != str:
-                raise TypeError("Email not string fails to raise TypeError")
-
-            if newEmail == "Null":
-                raise ValueError("Null value fails raise ValueError")
-
-            user.email = newEmail
-            user.save()
-
-        if request.POST.get("Address") != "":
-            newAddress = request.POST.get("Address")
-            if type(newAddress) != str:
-                raise TypeError("Address not string fails to raise TypeError")
-
-            if newAddress == "Null":
-                raise ValueError("Null value fails raise ValueError")
-
-            user.address = newAddress
-            user.save()
-
-        if request.POST.get("Location") != "":
-            newLocation = request.POST.get("Location")
-            if type(newLocation) != str:
-                raise TypeError("Location not string fails to raise TypeError")
-
-            if newLocation == "Null":
-                raise ValueError("Null value fails raise ValueError")
-
-            user.office_hour_location = newLocation
-            user.save()
-
-        if request.POST.get("Time") != "":
-            #TODO valid time check
-            newTime = request.POST.get("Time")
-            if type(newTime) != str:
-                raise TypeError("Time not string fails to raise TypeError")
-
-            if newTime == "Null":
-                raise ValueError("Null value fails raise ValueError")
-
-            user.office_hour_time = newTime
-            user.save()
+        self.editProfileData(request, user, "Name", str, "Name")
+        self.editProfileData(request, user, "Phone", int, "Number")
+        self.editProfileData(request, user, "Email", str, "Email")
+        self.editProfileData(request, user, "Address", str, "Address")
+        self.editProfileData(request, user, "Location", str, "Location")
+        self.editProfileData(request, user, "Time", str, "Time")
 
         return render(request, 'EditProfile.html')
+
+    def editProfileData(self, request, user, field_name, field_type, error_name):
+        if request.POST.get(field_name) != "":
+            new_data = request.POST.get(field_name)
+            if not isinstance(new_data, field_type):
+                raise TypeError(f"{error_name} not {field_type.__name__} fails to raise TypeError")
+
+            if new_data == "Null":
+                raise ValueError("Null value fails raise ValueError")
+
+            setattr(user, field_name.lower(), new_data)
+            user.save()
+
 
 class EditPassword(View):
     def get(self, request):
@@ -237,7 +189,7 @@ class EditAccount(View):
         # Redirect to ManageAccount view
         return redirect('/manage/')
 
-    #Helper Method for EditAccount POST
+    # Helper Method for EditAccount POST
     def updateAccount(self, request, selected_account):
         # Update user information with form data
         selected_account.username = request.POST['username']
@@ -270,7 +222,7 @@ class Notification(View):
         email = request.POST['email']
         subject = request.POST['subject']
         body = request.POST['body']
-        send_mail(subject, body, "JoeBidenSaysGiveThisGroupAnA@example.com", [email], fail_silently=False,)
+        send_mail(subject, body, "JoeBidenSaysGiveThisGroupAnA@example.com", [email], fail_silently=False, )
         return redirect('/dashboard/')
 
 
@@ -353,7 +305,6 @@ class RemoveAssign(View):
 
 class Logout(View):
     def get(self, request):
-
         request.session.clear()
         return render(request, 'login.html')
 
@@ -365,7 +316,7 @@ class AdminDashboard(View):
     def post(self, request):
         return render(request, 'AdminDashboard.html')
 
-        
+
 class ViewContact(View):
     def get(self, request):
         return render(request, 'view_contact_info.html')
