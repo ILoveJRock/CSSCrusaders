@@ -5,6 +5,7 @@ from CS361_Project.models import Account
 from .models import *
 from datetime import datetime
 from django.core.mail import send_mail
+from funcs_for_views import *
 
 
 class Login(View):
@@ -202,23 +203,7 @@ class CreateAccount(View):
         if len(Account.objects.filter(username=request.POST["name"])) != 0:
             return render(request, 'CreateAccount.html', {"message": "There is already an account with that username."})
 
-        # TODO: Fix these errors by using POST['variable'], see below
-        formName = request.POST['name']
-        formPhone = request.POST['phone']
-        formEmail = request.POST['email']
-        formAddress = request.POST['address']
-        formPassword = request.POST['password']
-        acctype = request.POST['acctype']
-        newAccount = Account(
-            username=formName,
-            password=formPassword,
-            role=(1 if acctype == "instructor" else 2),
-            name=formName,
-            phone=formPhone,
-            email=formEmail,
-            address=formAddress
-        )
-        newAccount.save()
+        create_account(request)
         return render(request, 'CreateAccount.html')
 
 
