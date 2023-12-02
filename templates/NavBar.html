@@ -8,42 +8,48 @@ Make sure this is right below the <body> for it to work correctly.
 <html>
 <head>
 <style>
-    ul {
-        list-style-type: none;
+    body {
         margin: 0;
-        padding: 0;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .navbar {
         overflow: hidden;
         background-color: #282c35;
     }
 
+    ul {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: space-between;
+    }
+
     li {
-        float: left;
+        display: inline;
     }
 
-    a {
+    .navbar a {
         display: block;
-        flex-direction: column;
         padding: 10px;
-    }
-
-    a:link {
-      color: white;
-      background-color: transparent;
-      text-decoration: none;
-    }
-
-    a:visited {
-        color: white;
-        background-color: transparent;
         text-decoration: none;
+        color: white;
+        background-color: #4CAF50;
+    }
+
+    .navbar a:hover {
+        background-color: #45a049;
     }
 </style>
 </head>
-<nav class="navbar">
-    <ul>
-        <!-- TODO change Dashboard to direct to correct place -->
-        <li><a href='/dashboard/'>Dashboard</a></li>
-        <li style="float:right"><form action = '{% url 'logout' %}' method = 'get'><a class="active" href="/">Logout</a></form></li>
-    </ul>
-</nav>
+<body>
+    <div class="navbar">
+        <ul>
+            <!-- TODO change Dashboard to direct to correct place -->
+            <li><a href='/dashboard/'>Dashboard</a></li>
+            <li><a href="/">Logout</a></li>
+        </ul>
+    </div>
+</body>
 </html>
