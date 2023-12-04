@@ -181,7 +181,6 @@ class EditPassword(View):
 
 class Home(View):
     def get(self, request):
-        # TODO Figure out who's logged in and what to display based on their permission levels
         return render(request, "Home.html")
 
 
@@ -213,14 +212,14 @@ class CreateAccount(View):
         newAccount = Account(
             username=formName,
             password=formPassword,
-            role=(1 if acctype=="instructor" else 2),
+            role=(1 if (acctype=="instructor") else 2),
             name=formName,
             phone=formPhone,
             email=formEmail,
             address=formAddress
         )
         newAccount.save()
-        return render(request, 'CreateAccount.html')
+        return render(request, 'CreateAccount.html', {"message": "Account for " + formName + " sucessfully created"})
 
 
 class EditAccount(View):
@@ -265,9 +264,12 @@ class ManageCourse(View):
 
 # TODO For all of these, persist the course and/or lab selected back to manage course
 class CreateCourse(View):
+
+    def get(self, request):
+        return render(request, 'CreateCourse.html')
     def post(self, request):
         # TODO Create the course
-        return render(request, 'ManageCourse.html')
+        return render(request, 'CreateCourse.html')
 
 
 class CreateLab(View):
