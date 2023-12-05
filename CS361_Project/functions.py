@@ -1,4 +1,34 @@
+from django.shortcuts import render
 from .models import *
+
+# call this as loginCheck(request, x) with x being the int value of the role needed to access
+def loginCheck(request, role):
+  session = request.session
+  logged_in = session.get('LoggedIn', False)
+  user_role = session.get('role', 3)
+  if logged_in:
+    if user_role > role:
+      print("perm error")
+      error = 'You do not have permission to view this page'
+      return render(request, "login.html", {"error": error})
+    else:
+      print("pass")
+      pass
+  else:
+    print("not logged in")
+    error = 'You need to be logged in to view this resource'
+    return render(request, "login.html", {"error": error})
+
+
+
+def authenticate_user(self, username, password):
+    try:
+        user = Account.objects.get(username=username)
+        if user.password == password:
+            return user
+    except Account.DoesNotExist:
+        self.missingUser = True
+
 
 def create_account(request):
   formName = request.POST['name']
