@@ -1,6 +1,6 @@
 from django.test import TestCase
 from unittest.mock import Mock
-from CS361_Project.funcs_for_views import *
+from CS361_Project.functions import *
 from CS361_Project.models import Account
 
 

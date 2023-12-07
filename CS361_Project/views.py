@@ -5,7 +5,7 @@ from CS361_Project.models import Account
 from .models import *
 from datetime import datetime
 from django.core.mail import send_mail
-from .funcs_for_views import *
+from .functions import *
 
 
 class Login(View):
