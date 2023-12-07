@@ -26,17 +26,17 @@ class TestLogin(TestCase):
         self.assertEqual(mock_request.session['role'], self.mock_user.role)
         self.assertTrue(mock_request.session['LoggedIn'])
     def test_authenticate_user(self):
-         mock_user = Mock()
-         mock_user.username = "test_user"
-         mock_user.password = "test_password"
-         #TODO: not sure if this is even correct, any other way to mock an account that will show in get?
-         Account.objects.get = Mock(return_value=mock_user)
+        mock_user = Mock()
+        mock_user.username = "test_user"
+        mock_user.password = "test_password"
+        #TODO: not sure if this is even correct, any other way to mock an account that will show in get?
+        Account.objects.get = Mock(return_value=mock_user)
 
-         # Test authentication with valid credentials
-         result = Management.User.authenticate_user(mock_user.username, mock_user.password)
+        # Test authentication with valid credentials
+        result = Management.User.authenticate_user(mock_user.username, mock_user.password)
 
-         # Assert that the correct user is returned
-         self.assertEqual(result, mock_user)
+        # Assert that the correct user is returned
+        self.assertEqual(result, mock_user)
         
 # TODO: After main merge with fixed logout
 class TestLogout(TestCase):
