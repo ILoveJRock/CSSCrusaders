@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start; /* Vertically align to the top */
+            height: 100vh;
+            margin: 0;
+            background-color: #282c35;
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        #manageAccount {
+            text-align: center;
+            width: 100%; /* Take up the full width */
+            background-color: #4CAF50;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .scrollable-table {
+            width: 70%;
+            max-height: 500px;
+            overflow-y: auto;
+            display: block;
+        }
+
+        .user-overview {
+            width: 30%;
+            margin-left: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        table {
+            width: 100%;
+            max-width: 1000px;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            white-space: nowrap;
+            word-wrap: break-word;
+            overflow: hidden;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+        td{
+           background-color: #4CAF50;
+            color: white;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 500px;
+            margin-top: 20px;
+
+        }
+
+        button {
+            width: calc(24% - 5px);
+            margin-right: 5px;
+            padding: 8px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            text-align: center;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        a {
+            color: #4CAF50;
+            text-decoration: none;
+        }
+    </style>
+    <title>Manage Accounts</title>
+</head>
+<body>
+{% include 'NavBar.html' %}
+<div id="manageAccount">
+    <h1>Manage Accounts</h1>
+</div>
+<div class="container">
+    <div class="scrollable-table">
+        <table>
+            <thead>
+                <tr>
+                    <th>Role</th>
+                    <th>Name</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                    <th>Address</th>
+                    <th>Hours</th>
+                    <th>Place</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for account in accounts %}
+                <tr>
+                    <td>{{ account.role }}</td>
+                    <td>{{ account.named }}</td>
+                    <td>{{ account.phone }}</td>
+                    <td>{{ account.email }}</td>
+                    <td>{{ account.address }}</td>
+                    <td>{{ account.office_hour_time }}</td>
+                    <td>{{ account.office_hour_location }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="user-overview">
+        <h2>Selected User</h2>
+        <hr>
+        <p><strong>ID:</strong> <span id="selectedUserId"></span></p>
+        <p><strong>Name:</strong> <span id="selectedUserName"></span></p>
+        <p><strong>Role:</strong> <span id="selectedUserRole"></span></p>
+    </div>
+</div>
+
+<div class="button-container">
+    <button><a id="editLink" style="color: white;">Edit Selected User</a></button>
+    <button><a id="deleteLink" style="color: white;">Delete Selected User</a></button>
+    <button><a href='manage/createAccount/' style="color: white;">Add New User</a></button>
+</div>
+
+</body>
+</html>
