@@ -21,6 +21,7 @@ class Management:
         @staticmethod
         def logout(request):
             request.session.clear()
+            request.session['LoggedIn'] = False
     class Account:
         @staticmethod
         def create_account(request):
