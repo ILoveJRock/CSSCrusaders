@@ -38,13 +38,7 @@ class Login(View):
             error = 'User does not exist' if self.missingUser else "Incorrect Password"
             return render(request, "login.html", {"error": error})
 
-    def authenticate_user(self, username, password):
-        try:
-            user = Account.objects.get(username=username)
-            if user.password == password:
-                return user
-        except Account.DoesNotExist:
-            self.missingUser = True
+
 
 
 class ForgotPassword(View):
