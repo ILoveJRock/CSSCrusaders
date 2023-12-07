@@ -25,7 +25,7 @@ class Login(View):
         username = request.POST['username']
         password = request.POST['password']
         # Authenticate user w/ helper method
-        user = self.authenticate_user(username, password)
+        user = Management.Login.authenticate_user(username, password)
         # If the user is authenticated, log the user in and redirect them to the ADMIN DASHBOARD page
         if user:
             session = request.session

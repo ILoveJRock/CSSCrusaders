@@ -2,6 +2,24 @@ from django.shortcuts import render
 from .models import Account
 
 class Management:
+    class Login:
+        @staticmethod
+        def login(request):
+            session = request.session
+            session['name'] = user.name
+            session['role'] = user.role
+            session['LoggedIn'] = True
+        @staticmethod    
+        def authenticate_user(self, username, password):
+            try:
+                user = Account.objects.get(username=username)
+                if user.password == password:
+                    return user
+            except Account.DoesNotExist:
+                self.missingUser = True
+        @staticmethod
+        def logout():
+            pass
     class Account:
         @staticmethod
         def create_account(request):
