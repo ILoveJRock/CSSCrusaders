@@ -74,8 +74,11 @@ class Management:
 
         @staticmethod
         def delete_account(selected_account):
-            # Implement the logic to delete the account based on the provided user_id
-            pass
+            try:
+                existing_account = Account.objects.get(username=selected_account.username)
+                existing_account.delete()
+            except Account.DoesNotExist:
+                return 'Cannot delete an account that does not exist'
     class Profile: 
         @staticmethod
         def edit_profile_data(request, user, field_name, field_type, error_name):

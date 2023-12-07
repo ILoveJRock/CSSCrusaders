@@ -28,6 +28,7 @@ class TestCreateAccount(TestCase):
             "password": "123",
             "acctype": 1
         }
+        
         Management.Account.create_account(mock_request)
         Management.Account.create_account(mock_request)
         self.assertEqual(1, len(Account.objects.filter(username="joe")), "Duplicate accounts are not allowed")
@@ -145,3 +146,14 @@ class TestDeleteAccount(TestCase):
 
         # Assert that the account has been deleted
         self.assertFalse(Account.objects.filter(username="existing_username").exists(), "The account was not deleted")
+    def test_deleteNonExistantUser(self):
+        # Mock a non_existant account 
+        non_existent_account = Mock(username="non_existent_username")
+
+        # Call the deleteAccount method with the mock account
+        Management.Account.delete_account(non_existent_account)
+
+        # Assert that the account with non-existent username does not exist
+        self.assertFalse(Account.objects.filter(username="non_existent_username").exists(), "Non-existent account was deleted")
+    
+    
