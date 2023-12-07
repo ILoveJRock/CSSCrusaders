@@ -24,10 +24,13 @@ class Management:
     class Account:
         @staticmethod
         def create_account(request):
+            if len(Account.objects.filter(username=request.POST["name"])) != 0:
+                return "There is already an account with that username."
+            
             form_name = request.POST['name']
             form_phone = request.POST['phone']
             form_email = request.POST['email']
-            form_address = request.POST['address']
+            form_address = request.POST['address']  
             form_password = request.POST['password']
             acctype = request.POST['acctype']
             new_account = Account(

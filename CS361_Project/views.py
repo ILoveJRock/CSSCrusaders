@@ -9,9 +9,6 @@ from .functions import *
 
 
 class Login(View):
-    def __init__(self):
-        # Error Tracking
-        self.missingUser = False
 
     def get(self, request):
         # If the user is already logged in, redirect to home page
@@ -131,11 +128,10 @@ class CreateAccount(View):
         return render(request, 'CreateAccount.html')
 
     def post(self, request):
-        if len(Account.objects.filter(username=request.POST["name"])) != 0:
-            return render(request, 'CreateAccount.html', {"message": "There is already an account with that username."})
-
-        Management.Account.create_account(request)
-        return render(request, 'CreateAccount.html')
+        error = Management.Account.create_account(request)
+        if error:
+            return render(request, 'CreateAccount.html', {"message": error})
+        return redirect('/manage/')
 
 
 class EditAccount(View):
