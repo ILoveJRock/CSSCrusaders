@@ -57,14 +57,19 @@ class Profile(View):
         result = loginCheck(request, 0)
         if result: return result
         request.session['action'] = None
-        return render(request, 'Profile.html', {'validForm': 'invalid'})
+        user = Account.objects.get(username=request.session['name'])
+        named = user.name
+        phone = user.phone
+        email = user.email
+        address = user.address
+        office_hour_location = user.office_hour_location
+        office_hour_time = user.office_hour_time
+        return render(request, 'Profile.html', {"named": named, "phone": phone, "email": email, "address": address, "office_hour_location": office_hour_location, "office_hour_time": office_hour_time, 'validForm': 'invalid'})
 
     def post(self, request):
         result = loginCheck(request, 0)
         if result: return result
         request.session['action'] = None
-        username = request.session['user']['username']
-        user = Account.objects.get(username=username)
         return render(request, 'Profile.html')
 
 
@@ -77,15 +82,74 @@ class EditProfile(View):
     def post(self, request):
         result = loginCheck(request, 0)
         if result: return result
-        username = request.session['user']['username']
-        user = Account.objects.get(username=username)
+        user = Account.objects.get(username=request.session['name'])
+        if request.POST.get("Name") != "":
+            newName = request.POST.get("Name")
+            if type(newName) != str:
+                raise TypeError("Name not string fails to raise TypeError")
 
-        self.editProfileData(request, user, "Name", str, "Name")
-        self.editProfileData(request, user, "Phone", int, "Number")
-        self.editProfileData(request, user, "Email", str, "Email")
-        self.editProfileData(request, user, "Address", str, "Address")
-        self.editProfileData(request, user, "Location", str, "Location")
-        self.editProfileData(request, user, "Time", str, "Time")
+            if newName == "Null":
+                raise ValueError("Null value fails raise ValueError")
+
+            user.name = newName
+            user.save()
+
+        if request.POST.get("Phone") != "":
+            newNum = request.POST.get("Phone")
+            if type(newNum) != int:
+                raise TypeError("Number not integer fails to raise TypeError")
+
+            if newNum == "Null":
+                raise ValueError("Null value fails raise ValueError")
+
+            user.phone = newNum
+            user.save()
+
+        if request.POST.get("Email") != "":
+            #TODO valid email check (contains @ and .)
+            newEmail = request.POST.get("Email")
+            if type(newEmail) != str:
+                raise TypeError("Email not string fails to raise TypeError")
+
+            if newEmail == "Null":
+                raise ValueError("Null value fails raise ValueError")
+
+            user.email = newEmail
+            user.save()
+
+        if request.POST.get("Address") != "":
+            newAddress = request.POST.get("Address")
+            if type(newAddress) != str:
+                raise TypeError("Address not string fails to raise TypeError")
+
+            if newAddress == "Null":
+                raise ValueError("Null value fails raise ValueError")
+
+            user.address = newAddress
+            user.save()
+
+        if request.POST.get("Location") != "":
+            newLocation = request.POST.get("Location")
+            if type(newLocation) != str:
+                raise TypeError("Location not string fails to raise TypeError")
+
+            if newLocation == "Null":
+                raise ValueError("Null value fails raise ValueError")
+
+            user.office_hour_location = newLocation
+            user.save()
+
+        if request.POST.get("Time") != "":
+            #TODO valid time check
+            newTime = request.POST.get("Time")
+            if type(newTime) != str:
+                raise TypeError("Time not string fails to raise TypeError")
+
+            if newTime == "Null":
+                raise ValueError("Null value fails raise ValueError")
+
+            user.office_hour_time = newTime
+            user.save()
 
         return render(request, 'EditProfile.html')
 
@@ -102,8 +166,7 @@ class EditPassword(View):
     def post(self, request):
         result = loginCheck(request, 0)
         if result: return result
-        username = request.session['user']['username']
-        user = Account.objects.get(username=username)
+        user = Account.objects.get(username=request.session['name'])
         currentpass = user.password
 
         # TODO move password to own class
@@ -141,7 +204,9 @@ class ManageAccounts(View):
     def get(self, request):
         result = loginCheck(request, 0)
         if result: return result
-        return render(request, 'ManageAccount.html')
+        accounts = Account.objects.all()
+        query = [{"role": account.role, "named": account.name, "phone": account.phone, "email": account.email, "address": account.address, "office_hour_location": account.office_hour_location, "office_hour_time": account.office_hour_time} for account in accounts]
+        return render(request, 'ManageAccount.html',  {"accounts": query})
 
     def post(self, request):
         result = loginCheck(request, 0)
@@ -161,8 +226,24 @@ class CreateAccount(View):
         if len(Account.objects.filter(username=request.POST["name"])) != 0:
             return render(request, 'CreateAccount.html', {"message": "There is already an account with that username."})
 
-        create_account(request)
-        return render(request, 'CreateAccount.html')
+        # TODO: Fix these errors by using POST['variable'], see below
+        formName = request.POST['name']
+        formPhone = request.POST['phone']
+        formEmail = request.POST['email']
+        formAddress = request.POST['address']
+        formPassword = request.POST['password']
+        acctype = request.POST['acctype']
+        newAccount = Account(
+            username=formName,
+            password=formPassword,
+            role=(1 if (acctype=="instructor") else 2),
+            name=formName,
+            phone=formPhone,
+            email=formEmail,
+            address=formAddress
+        )
+        newAccount.save()
+        return render(request, 'CreateAccount.html', {"message": "Account for " + formName + " sucessfully created"})
 
 
 class EditAccount(View):
@@ -244,11 +325,14 @@ class ManageCourse(View):
 
 # TODO For all of these, persist the course and/or lab selected back to manage course
 class CreateCourse(View):
+
+    def get(self, request):
+        return render(request, 'CreateCourse.html')
     def post(self, request):
         result = loginCheck(request, 0)
         if result: return result
         # TODO Create the course
-        return render(request, 'ManageCourse.html')
+        return render(request, 'CreateCourse.html')
 
 
 class CreateLab(View):
