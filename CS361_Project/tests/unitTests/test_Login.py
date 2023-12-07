@@ -11,25 +11,27 @@ class TestLogin(TestCase):
         self.mock_user.password = 'password'
         self.mock_user.name = 'name'
         self.mock_user.role = 1
-        
-    def test_Login(self):
-        mock_request = Mock()
-        mock_request.POST = {
+        self.mock_request = Mock()
+        self.mock_request.POST = {
             "username": "username",
             "password": "password",
-            'LoggedIn' : False
+            'LoggedIn': False
         }
-        Management.User.login(mock_request, self.mock_user)
+        self.mock_request.session = {}
+
+    def test_Login(self):
+
+        Management.User.login(self.mock_request, self.mock_user)
         
         # Assert that session variables are set correctly
-        self.assertEqual(mock_request.session['name'], self.mock_user.name)
-        self.assertEqual(mock_request.session['role'], self.mock_user.role)
-        self.assertTrue(mock_request.session['LoggedIn'])
+        self.assertEqual(self.mock_request.session['name'], self.mock_user.name)
+        self.assertEqual(self.mock_request.session['role'], self.mock_user.role)
+        self.assertTrue(self.mock_request.session['LoggedIn'])
     def test_authenticate_user(self):
         mock_user = Mock()
         mock_user.username = "test_user"
         mock_user.password = "test_password"
-        #TODO: not sure if this is even correct, any other way to mock an account that will show in get?
+
         Account.objects.get = Mock(return_value=mock_user)
 
         # Test authentication with valid credentials
@@ -40,5 +42,5 @@ class TestLogin(TestCase):
         
 # TODO: After main merge with fixed logout
 class TestLogout(TestCase):
-    def test_logout():
+    def test_logout(self):
         pass

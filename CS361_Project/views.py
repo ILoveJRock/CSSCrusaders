@@ -30,7 +30,7 @@ class Login(View):
             return redirect('/dashboard')
         else:
             # If the user is not authenticated, redisplay the page with the appropriate error
-            error = 'User does not exist' if self.missingUser else "Incorrect Password"
+            error = 'User does not exist' if not user else "Incorrect Password"
             return render(request, "login.html", {"error": error})
 
 
@@ -151,8 +151,9 @@ class EditAccount(View):
 
     def post(self, request):
         selected_account = Account.objects.get(account_id=request.POST.get('userId'))
-        Management.Account.updateAccount(request, selected_account)
-
+        error = Management.Account.updateAccount(request, selected_account)
+        if error:
+            return render(request, 'edit_account.html', {'error' : error})
         # Redirect to ManageAccount view
         return redirect('/manage/')
 

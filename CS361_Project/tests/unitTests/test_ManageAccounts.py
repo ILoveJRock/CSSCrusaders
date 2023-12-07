@@ -39,6 +39,7 @@ class TestEditAccount(TestCase):
         self.mock_existingAccount = Mock()
 
         # Manually assign attributes to the mock instance
+        self.mock_existingAccount.account_id = 0
         self.mock_existingAccount.username = "existing_username"
         self.mock_existingAccount.password = "existing_password"
         self.mock_existingAccount.role = 1
@@ -65,7 +66,7 @@ class TestEditAccount(TestCase):
 
     def test_EditAccount(self):
         # Call the updateAccount method with the mock request and account
-        Management.Account.updateAccount(self.mock_request, self.mock_existingAccount)
+        Management.Account.update_account(self.mock_request, self.mock_existingAccount)
 
         # Assert that the fields of mock_existingAccount have not changed
         self.assertEqual(self.mock_existingAccount.username, "joe")
@@ -81,7 +82,7 @@ class TestEditAccount(TestCase):
     def test_emptyPOSTData(self):
         # Create a test case where POST data is empty
         self.mock_request.POST = {}
-        Management.Account.updateAccount(self.mock_request, self.mock_existingAccount)
+        Management.Account.update_account(self.mock_request, self.mock_existingAccount)
 
         # Assert that mock_existingAccount remains unchanged
         self.assertEqual(self.mock_existingAccount.username, "existing_username")
@@ -97,17 +98,18 @@ class TestEditAccount(TestCase):
     def test_invalidPOSTData(self):
         # Create a test case with invalid POST data
         self.mock_request.POST = {
-            "username": "newJoe",
-            "password": "123",
+            "username": 1, # invalid user
+            "password": 4, # Invalid pass
             "role": "invalid_role",  # Invalid role format
-            "name": "Joe",
-            "phone": "invalid_phone",  # Invalid phone format
-            "email": "invalid_email",  # Invalid email format
-            "address": "Lane",
-            "office_hour_location": "Office",
-            "office_hour_time": "9 AM - 5 PM",
+            "name": "existing_name",
+            "phone": 1533,  # Invalid phone
+            "email": 12346,  # Invalid email
+            "address": "existing_address",
+            "office_hour_location": "existing_office_location",
+            "office_hour_time": "existing_office_time",
+
         }
-        Management.Account.updateAccount(self.mock_request, self.mock_existingAccount)
+        Management.Account.update_account(self.mock_request, self.mock_existingAccount)
 
         # Assert that mock_existingAccount remains unchanged or is handled appropriately
         self.assertEqual(self.mock_existingAccount.username, "existing_username")
@@ -139,7 +141,7 @@ class TestDeleteAccount(TestCase):
 
     def test_DeleteAccount(self):
         # Call the deleteAccount method with the mock account
-        Management.Account.deleteAccount(self.mock_existingAccount)
+        Management.Account.delete_account(self.mock_existingAccount)
 
         # Assert that the account has been deleted
         self.assertFalse(Account.objects.filter(username="existing_username").exists(), "The account was not deleted")
