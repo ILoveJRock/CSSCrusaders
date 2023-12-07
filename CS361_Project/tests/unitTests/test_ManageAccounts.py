@@ -15,7 +15,7 @@ class TestCreateAccount(TestCase):
             "password": "123",
             "acctype": 1
         }
-        create_account(mock_request)
+        Management.Account.create_account(mock_request)
         self.assertEqual(1, len(Account.objects.filter(username="joe")), "The account was not created")
 
     def test_duplicate_account(self):
@@ -28,8 +28,8 @@ class TestCreateAccount(TestCase):
             "password": "123",
             "acctype": 1
         }
-        create_account(mock_request)
-        create_account(mock_request)
+        Management.Account.create_account(mock_request)
+        Management.Account.create_account(mock_request)
         self.assertEqual(1, len(Account.objects.filter(username="joe")), "Duplicate accounts are not allowed")
 
 
@@ -65,7 +65,7 @@ class TestEditAccount(TestCase):
 
     def test_EditAccount(self):
         # Call the updateAccount method with the mock request and account
-        updateAccount(self.mock_request, self.mock_existingAccount)
+        Management.Account.updateAccount(self.mock_request, self.mock_existingAccount)
 
         # Assert that the fields of mock_existingAccount have not changed
         self.assertEqual(self.mock_existingAccount.username, "joe")
@@ -81,7 +81,7 @@ class TestEditAccount(TestCase):
     def test_emptyPOSTData(self):
         # Create a test case where POST data is empty
         self.mock_request.POST = {}
-        updateAccount(self.mock_request, self.mock_existingAccount)
+        Management.Account.updateAccount(self.mock_request, self.mock_existingAccount)
 
         # Assert that mock_existingAccount remains unchanged
         self.assertEqual(self.mock_existingAccount.username, "existing_username")
@@ -107,7 +107,7 @@ class TestEditAccount(TestCase):
             "office_hour_location": "Office",
             "office_hour_time": "9 AM - 5 PM",
         }
-        updateAccount(self.mock_request, self.mock_existingAccount)
+        Management.Account.updateAccount(self.mock_request, self.mock_existingAccount)
 
         # Assert that mock_existingAccount remains unchanged or is handled appropriately
         self.assertEqual(self.mock_existingAccount.username, "existing_username")
@@ -139,7 +139,7 @@ class TestDeleteAccount(TestCase):
 
     def test_DeleteAccount(self):
         # Call the deleteAccount method with the mock account
-        deleteAccount(self.mock_existingAccount)
+        Management.Account.deleteAccount(self.mock_existingAccount)
 
         # Assert that the account has been deleted
         self.assertFalse(Account.objects.filter(username="existing_username").exists(), "The account was not deleted")

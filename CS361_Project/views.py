@@ -139,7 +139,7 @@ class CreateAccount(View):
         if len(Account.objects.filter(username=request.POST["name"])) != 0:
             return render(request, 'CreateAccount.html', {"message": "There is already an account with that username."})
 
-        create_account(request)
+        Management.Account.create_account(request)
         return render(request, 'CreateAccount.html')
 
 
@@ -156,7 +156,7 @@ class EditAccount(View):
 
     def post(self, request):
         selected_account = Account.objects.get(account_id=request.POST.get('userId'))
-        self.updateAccount(request, selected_account)
+        Management.Account.updateAccount(request, selected_account)
 
         # Redirect to ManageAccount view
         return redirect('/manage/')
@@ -167,7 +167,7 @@ class EditAccount(View):
 class DeleteAccount(View):
     def post(self, request):
         user_id = request.GET.get('userId')
-        deleteAccount(request, selected_account)
+        Management.Account.deleteAccount(request, user_id)
         return render(request, 'ManageAccount.html')
 
 
