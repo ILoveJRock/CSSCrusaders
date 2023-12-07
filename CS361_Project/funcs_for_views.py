@@ -20,6 +20,14 @@ def create_account(request):
 
   # Helper Method for EditAccount POST
 def updateAccount(self, request, selected_account):
+    # Case 1: emptyLogin
+    if request.POST['username'] == '' or request.POST['password'] == '':
+        return render(request, 'edit_account.html', {'error': 'Login fields cannot be empty'})
+
+    # Case 2: usernameTaken
+    if Account.objects.filter(username=request.POST['username']).exclude(account_id=user_id).exists():
+        return render(request, 'edit_account.html', {'error': 'An account with that username already exists.'})
+
     # Update user information with form data
     selected_account.username = request.POST['username']
     selected_account.password = request.POST['password']
@@ -33,6 +41,8 @@ def updateAccount(self, request, selected_account):
 
     # Save the changes
     selected_account.save()
+def deleteAccount(self, id):
+    pass
 
 def editProfileData(self, request, user, field_name, field_type, error_name):
     if request.POST.get(field_name) != "":

@@ -152,6 +152,7 @@ class CreateAccount(View):
 class EditAccount(View):
     def get(self, request):
         user_id = request.GET.get('userId')
+        # Get the selected user
         try:
             selected_user = Account.objects.get(account_id=user_id)
             return render(request, 'edit_account.html', {'user': selected_user})
@@ -160,20 +161,7 @@ class EditAccount(View):
             return render(request, 'error_page.html', {'error_message': f"Account with ID {user_id} does not exist."})
 
     def post(self, request):
-        # Get user to edit from accountID
-        user_id = request.POST.get('userId')
-        selected_account = Account.objects.get(account_id=user_id)
-
-        # Catch errors before changes are made
-
-        # Case 1: emptyLogin
-        if request.POST['username'] == '' or request.POST['password'] == '':
-            return render(request, 'edit_account.html', {'error': 'Login fields cannot be empty'})
-
-        # Case 2: usernameTaken
-        if Account.objects.filter(username=request.POST['username']).exclude(account_id=user_id).exists():
-            return render(request, 'edit_account.html', {'error': 'An account with that username already exists.'})
-
+        selected_account = Account.objects.get(account_id=request.POST.get('userId'))
         self.updateAccount(request, selected_account)
 
         # Redirect to ManageAccount view
@@ -185,7 +173,7 @@ class EditAccount(View):
 class DeleteAccount(View):
     def post(self, request):
         user_id = request.GET.get('userId')
-        # TODO Delete the account
+        deleteAccount(request, selected_account)
         return render(request, 'ManageAccount.html')
 
 
