@@ -2,7 +2,7 @@ from django.shortcuts import render
 from .models import Account
 
 class Management:
-    class Login:
+    class User:
         @staticmethod
         def login(request):
             session = request.session
@@ -18,8 +18,8 @@ class Management:
             except Account.DoesNotExist:
                 self.missingUser = True
         @staticmethod
-        def logout():
-            pass
+        def logout(request):
+            request.session.clear()
     class Account:
         @staticmethod
         def create_account(request):

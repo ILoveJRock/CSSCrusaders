@@ -21,17 +21,12 @@ class Login(View):
         return render(request, 'Login.html')
 
     def post(self, request):
-        # Get login details from post request
-        username = request.POST['username']
-        password = request.POST['password']
-        # Authenticate user w/ helper method
-        user = Management.Login.authenticate_user(username, password)
+        # Authenticate user
+        user = Management.User.authenticate_user(request.POST['username'], request.POST['password'])
         # If the user is authenticated, log the user in and redirect them to the ADMIN DASHBOARD page
+        # TODO: Each role should have its own dash
         if user:
-            session = request.session
-            session['name'] = user.name
-            session['role'] = user.role
-            session['LoggedIn'] = True
+            Management.User.login(request)
             return redirect('/dashboard')
         else:
             # If the user is not authenticated, redisplay the page with the appropriate error
@@ -263,7 +258,7 @@ class RemoveAssign(View):
 
 class Logout(View):
     def get(self, request):
-        request.session.clear()
+        Management.User.logout()
         return render(request, 'login.html')
 
 
