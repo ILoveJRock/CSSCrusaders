@@ -22,11 +22,11 @@ class Login(View):
 
     def post(self, request):
         # Authenticate user
-        user = Management.User.authenticate_user(request.POST['username'], request.POST['password'])
+        user = Management.User.authenticate_user(self, request.POST['username'], request.POST['password'])
         # If the user is authenticated, log the user in and redirect them to the ADMIN DASHBOARD page
         # TODO: Each role should have its own dash
         if user:
-            Management.User.login(request)
+            Management.User.login(request, user)
             return redirect('/dashboard')
         else:
             # If the user is not authenticated, redisplay the page with the appropriate error

@@ -4,7 +4,7 @@ from .models import Account
 class Management:
     class User:
         @staticmethod
-        def login(request):
+        def login(request, user):
             session = request.session
             session['name'] = user.name
             session['role'] = user.role
