@@ -1,0 +1,11 @@
+from unittest.mock import MagicMock
+
+from django.test import TestCase, Client
+
+from CS361_Project.models import Account
+
+
+class TestCreateCourse(TestCase):
+class TestEditCourse(TestCase):
+class TestDeleteCourse(TestCase):
+        
