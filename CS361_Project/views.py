@@ -6,6 +6,8 @@ from .models import *
 from datetime import datetime
 from django.core.mail import send_mail
 from .functions import *
+from django.views.decorators.cache import cache_control
+from django.utils.decorators import method_decorator
 
 
 class Login(View):
@@ -398,11 +400,12 @@ class RemoveAssign(View):
         return render(request, 'Assign.html')
 
 
+@method_decorator(cache_control(no_cache=True, must_revalidate=True), name='dispatch')
 class Logout(View):
     def get(self, request):
         request.session.clear()
         request.session['LoggedIn'] = False
-        return render(request, 'login.html')
+        return redirect('login')
 
 
 class AdminDashboard(View):
