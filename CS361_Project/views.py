@@ -18,8 +18,11 @@ class Login(View):
         return render(request, 'Login.html')
 
     def post(self, request):
-        # Authenticate user
-        user = Management.User.authenticate_user(self, request.POST['username'], request.POST['password'])
+        # Get login details from post request
+        username = request.POST['username']
+        password = request.POST['password']
+        # Authenticate user w/ helper method
+        user = authenticate_user(self, username, password)
         # If the user is authenticated, log the user in and redirect them to the ADMIN DASHBOARD page
         # TODO: Each role should have its own dash
         if user:
@@ -30,44 +33,126 @@ class Login(View):
             error = 'User does not exist' if not user else "Incorrect Password"
             return render(request, "login.html", {"error": error})
 
-
+    def authenticate_user(self, username, password):
+        try:
+            user = Account.objects.get(username=username)
+            if user.password == password:
+                return user
+        except Account.DoesNotExist:
+            self.missingUser = True
 
 
 class ForgotPassword(View):
     # TODO: Check Username and Send Recovery Email when appropriate
     def get(self, request):
+        result = loginCheck(request, 0)
+        if result: return result
         return render(request, 'ForgotPassword.html')
 
     def post(self, request):
+        result = loginCheck(request, 0)
+        if result: return result
         return render(request, 'ForgotPassword.html')
 
 
 class Profile(View):
     def get(self, request):
+        result = loginCheck(request, 0)
+        if result: return result
         request.session['action'] = None
-        return render(request, 'Profile.html', {'validForm': 'invalid'})
+        user = Account.objects.get(username=request.session['name'])
+        named = user.name
+        phone = user.phone
+        email = user.email
+        address = user.address
+        office_hour_location = user.office_hour_location
+        office_hour_time = user.office_hour_time
+        return render(request, 'Profile.html', {"named": named, "phone": phone, "email": email, "address": address, "office_hour_location": office_hour_location, "office_hour_time": office_hour_time, 'validForm': 'invalid'})
 
     def post(self, request):
+        result = loginCheck(request, 0)
+        if result: return result
         request.session['action'] = None
-        username = request.session['user']['username']
-        user = Account.objects.get(username=username)
         return render(request, 'Profile.html')
 
 
 class EditProfile(View):
     def get(self, request):
+        result = loginCheck(request, 0)
+        if result: return result
         return render(request, 'EditProfile.html', {'validForm': 'invalid'})
 
     def post(self, request):
-        username = request.session['user']['username']
-        user = Account.objects.get(username=username)
+        result = loginCheck(request, 0)
+        if result: return result
+        user = Account.objects.get(username=request.session['name'])
+        if request.POST.get("Name") != "":
+            newName = request.POST.get("Name")
+            if type(newName) != str:
+                raise TypeError("Name not string fails to raise TypeError")
 
-        self.editProfileData(request, user, "Name", str, "Name")
-        self.editProfileData(request, user, "Phone", int, "Number")
-        self.editProfileData(request, user, "Email", str, "Email")
-        self.editProfileData(request, user, "Address", str, "Address")
-        self.editProfileData(request, user, "Location", str, "Location")
-        self.editProfileData(request, user, "Time", str, "Time")
+            if newName == "Null":
+                raise ValueError("Null value fails raise ValueError")
+
+            user.name = newName
+            user.save()
+
+        if request.POST.get("Phone") != "":
+            newNum = request.POST.get("Phone")
+            if type(newNum) != int:
+                raise TypeError("Number not integer fails to raise TypeError")
+
+            if newNum == "Null":
+                raise ValueError("Null value fails raise ValueError")
+
+            user.phone = newNum
+            user.save()
+
+        if request.POST.get("Email") != "":
+            #TODO valid email check (contains @ and .)
+            newEmail = request.POST.get("Email")
+            if type(newEmail) != str:
+                raise TypeError("Email not string fails to raise TypeError")
+
+            if newEmail == "Null":
+                raise ValueError("Null value fails raise ValueError")
+
+            user.email = newEmail
+            user.save()
+
+        if request.POST.get("Address") != "":
+            newAddress = request.POST.get("Address")
+            if type(newAddress) != str:
+                raise TypeError("Address not string fails to raise TypeError")
+
+            if newAddress == "Null":
+                raise ValueError("Null value fails raise ValueError")
+
+            user.address = newAddress
+            user.save()
+
+        if request.POST.get("Location") != "":
+            newLocation = request.POST.get("Location")
+            if type(newLocation) != str:
+                raise TypeError("Location not string fails to raise TypeError")
+
+            if newLocation == "Null":
+                raise ValueError("Null value fails raise ValueError")
+
+            user.office_hour_location = newLocation
+            user.save()
+
+        if request.POST.get("Time") != "":
+            #TODO valid time check
+            newTime = request.POST.get("Time")
+            if type(newTime) != str:
+                raise TypeError("Time not string fails to raise TypeError")
+
+            if newTime == "Null":
+                raise ValueError("Null value fails raise ValueError")
+
+            user.office_hour_time = newTime
+            user.save()
 
         return render(request, 'EditProfile.html')
 
@@ -76,12 +161,15 @@ class EditProfile(View):
 
 class EditPassword(View):
     def get(self, request):
+        result = loginCheck(request, 0)
+        if result: return result
         request.session['action'] = None
         return render(request, 'Profile.html', {'validForm': 'invalid'})
 
     def post(self, request):
-        username = request.session['user']['username']
-        user = Account.objects.get(username=username)
+        result = loginCheck(request, 0)
+        if result: return result
+        user = Account.objects.get(username=request.session['name'])
         currentpass = user.password
 
         # TODO move password to own class
@@ -109,25 +197,35 @@ class EditPassword(View):
 
 class Home(View):
     def get(self, request):
-        if 'LoggedIn' not in request.GET:
-            return render(request, "Login.html")
+        result = loginCheck(request, 0)
+        if result: return result
         # TODO Figure out who's logged in and what to display based on their permission levels
         return render(request, "Home.html")
 
 
 class ManageAccounts(View):
     def get(self, request):
-        return render(request, 'ManageAccount.html')
+        result = loginCheck(request, 0)
+        if result: return result
+        accounts = Account.objects.all()
+        query = [{"role": account.role, "named": account.name, "phone": account.phone, "email": account.email, "address": account.address, "office_hour_location": account.office_hour_location, "office_hour_time": account.office_hour_time} for account in accounts]
+        return render(request, 'ManageAccount.html',  {"accounts": query})
 
     def post(self, request):
+        result = loginCheck(request, 0)
+        if result: return result
         return render(request, 'ManageAccount.html')
 
 
 class CreateAccount(View):
     def get(self, request):
+        result = loginCheck(request, 0)
+        if result: return result
         return render(request, 'CreateAccount.html')
 
     def post(self, request):
+        result = loginCheck(request, 0)
+        if result: return result
         error = Management.Account.create_account(request)
         if error:
             return render(request, 'CreateAccount.html', {"message": error})
@@ -136,6 +234,8 @@ class CreateAccount(View):
 
 class EditAccount(View):
     def get(self, request):
+        result = loginCheck(request, 0)
+        if result: return result
         user_id = request.GET.get('userId')
         # Get the selected user
         try:
@@ -146,6 +246,8 @@ class EditAccount(View):
             return render(request, 'error_page.html', {'error_message': f"Account with ID {user_id} does not exist."})
 
     def post(self, request):
+        result = loginCheck(request, 0)
+        if result: return result
         selected_account = Account.objects.get(account_id=request.POST.get('userId'))
         error = Management.Account.updateAccount(request, selected_account)
         if error:
@@ -158,6 +260,8 @@ class EditAccount(View):
 
 class DeleteAccount(View):
     def post(self, request):
+        result = loginCheck(request, 0)
+        if result: return result
         user_id = request.GET.get('userId')
         Management.Account.deleteAccount(request, user_id)
         return render(request, 'ManageAccount.html')
@@ -165,90 +269,122 @@ class DeleteAccount(View):
 
 class Notification(View):
     def get(self, request):
+        result = loginCheck(request, 0)
+        if result: return result
         return render(request, 'NotificationForm.html')
 
     def post(self, request):
+        result = loginCheck(request, 0)
+        if result: return result
         # TODO Send email to all the users in the email list
         email = request.POST['email']
         subject = request.POST['subject']
         body = request.POST['body']
-        send_mail(subject, body, "JoeBidenSaysGiveThisGroupAnA@example.com", [email], fail_silently=False, )
+        send_mail(subject, body, "nate.valentine.r@gmail.com", [email], fail_silently=False, )
         return redirect('/dashboard/')
 
 
 class ManageCourse(View):
     def get(self, request):
+        result = loginCheck(request, 0)
+        if result: return result
         # TODO get the courses and labs and pass them to render {"courses": courses, "labs": labs}
         return render(request, 'ManageCourse.html')
 
     def post(self, request):
+        result = loginCheck(request, 0)
+        if result: return result
         # TODO Post actions for every single action to the courses
         return render(request, 'ManageCourse.html')
 
 
 # TODO For all of these, persist the course and/or lab selected back to manage course
 class CreateCourse(View):
+
+    def get(self, request):
+        return render(request, 'CreateCourse.html')
     def post(self, request):
+        result = loginCheck(request, 0)
+        if result: return result
         # TODO Create the course
-        return render(request, 'ManageCourse.html')
+        return render(request, 'CreateCourse.html')
 
 
 class CreateLab(View):
     def post(self, request):
+        result = loginCheck(request, 0)
+        if result: return result
         # TODO Create the lab
         return render(request, 'ManageCourse.html')
 
 
 class EditCourse(View):
     def post(self, request):
+        result = loginCheck(request, 0)
+        if result: return result
         # TODO Edit the course
         return render(request, 'ManageCourse.html')
 
 
 class EditLab(View):
     def post(self, request):
+        result = loginCheck(request, 0)
+        if result: return result
         # TODO Edit the lab
         return render(request, 'ManageCourse.html')
 
 
 class DeleteCourse(View):
     def post(self, request):
+        result = loginCheck(request, 0)
+        if result: return result
         # TODO Delete the course
         return render(request, "ManageCourse.html")
 
 
 class DeleteLab(View):
     def post(self, request):
+        result = loginCheck(request, 0)
+        if result: return result
         # TODO Delete the lab
         return render(request, "ManageCourse.html")
 
 
 class ManageAssign(View):
     def get(self, request):
-        # TODO Ensure only logged in users can see this
+        result = loginCheck(request, 0)
+        if result: return result
         return render(request, 'Assign.html')
 
     def post(self, request):
+        result = loginCheck(request, 0)
+        if result: return result
         # TODO Figure out if we're assigning or removing a user
         return render(request, 'Assign.html')
 
 
 class AssignUser(View):
     def get(self, request):
-        # TODO Ensure only logged in users can see this
+        result = loginCheck(request, 0)
+        if result: return result
         return render(request, 'Assign.html')
 
     def post(self, request):
+        result = loginCheck(request, 0)
+        if result: return result
         # TODO Assign user to course / lab
         return render(request, 'Assign.html')
 
 
 class RemoveAssign(View):
     def get(self, request):
-        # TODO Ensure only logged in users can see this
+        result = loginCheck(request, 0)
+        if result: return result
         return render(request, 'Assign.html')
 
     def post(self, request):
+        result = loginCheck(request, 0)
+        if result: return result
         # TODO Remove user from course/lab
         return render(request, 'Assign.html')
 
@@ -261,15 +397,23 @@ class Logout(View):
 
 class AdminDashboard(View):
     def get(self, request):
+        result = loginCheck(request, 0)
+        if result: return result
         return render(request, 'AdminDashboard.html')
 
     def post(self, request):
+        result = loginCheck(request, 0)
+        if result: return result
         return render(request, 'AdminDashboard.html')
 
 
 class ViewContact(View):
     def get(self, request):
+        result = loginCheck(request, 0)
+        if result: return result
         return render(request, 'view_contact_info.html')
 
     def post(self, request):
+        result = loginCheck(request, 0)
+        if result: return result
         return render(request, 'view_contact_info.html')

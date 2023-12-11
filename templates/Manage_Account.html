@@ -11,7 +11,7 @@
             justify-content: flex-start; /* Vertically align to the top */
             height: 100vh;
             margin: 0;
-            background: linear-gradient(to right, #282c35, #4CAF50);
+            background-color: #282c35;
             color: #fff;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
@@ -88,14 +88,16 @@
         }
 
         button {
-            width: 48%;
-            padding: 10px;
+            width: calc(24% - 5px);
+            margin-right: 5px;
+            padding: 8px;
             background-color: #4CAF50;
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
             transition: background-color 0.3s;
+            text-align: center;
         }
 
         button:hover {
@@ -110,7 +112,7 @@
     <title>Manage Accounts</title>
 </head>
 <body>
-
+{% include 'NavBar.html' %}
 <div id="manageAccount">
     <h1>Manage Accounts</h1>
 </div>
@@ -119,8 +121,6 @@
         <table>
             <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>Username</th>
                     <th>Role</th>
                     <th>Name</th>
                     <th>Phone</th>
@@ -133,10 +133,8 @@
             <tbody>
                 {% for account in accounts %}
                 <tr>
-                    <td>{{ account.account_id }}</td>
-                    <td>{{ account.username }}</td>
                     <td>{{ account.role }}</td>
-                    <td>{{ account.name }}</td>
+                    <td>{{ account.named }}</td>
                     <td>{{ account.phone }}</td>
                     <td>{{ account.email }}</td>
                     <td>{{ account.address }}</td>
@@ -160,40 +158,7 @@
     <button><a id="editLink" style="color: white;">Edit Selected User</a></button>
     <button><a id="deleteLink" style="color: white;">Delete Selected User</a></button>
     <button><a href='manage/createAccount/' style="color: white;">Add New User</a></button>
-    <button><a href="AdminDashboard.html" style="color: white;">Return</a></button>
 </div>
-
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        var tableRows = document.querySelectorAll("tbody tr");
-        var editLink = document.getElementById("editLink");
-        var deleteLink = document.getElementById("deleteLink");
-
-        tableRows.forEach(function (row) {
-            row.addEventListener("click", function () {
-                var selectedUserId = row.querySelector("td:first-child").textContent;
-                var selectedUserName = row.querySelector("td:nth-child(2)").textContent;
-                var selectedUserRole = row.querySelector("td:nth-child(3)").textContent;
-
-                document.getElementById("selectedUserId").textContent = selectedUserId;
-                document.getElementById("selectedUserName").textContent = selectedUserName;
-                document.getElementById("selectedUserRole").textContent = selectedUserRole;
-
-                if (selectedUserId) {
-                    editLink.href = 'manage/editAccount/?userId=' + selectedUserId;
-                    deleteLink.href = 'manage/deleteAccount/?userId=' + selectedUserId;
-                    editLink.style.pointerEvents = 'auto';
-                    deleteLink.style.pointerEvents = 'auto';
-                } else {
-                    editLink.href = '#';
-                    deleteLink.href = '#';
-                    editLink.style.pointerEvents = 'none';
-                    deleteLink.style.pointerEvents = 'none';
-                }
-            });
-        });
-    });
-</script>
 
 </body>
 </html>

@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="NavBar.html">
     <title>Profile Page</title>
     <style>
         body {
@@ -32,7 +33,7 @@
         }
 
         .button {
-            background-color: #04AA6D;
+            background-color: #4CAF50;
             border: none;
             color: white;
             padding: 15px 32px;
@@ -41,6 +42,10 @@
             display: inline-block;
             font-size: 16px;
             border-radius: 4px;
+        }
+
+        .button:hover {
+            background-color: #45a049;
         }
 
         h1{
@@ -57,7 +62,6 @@
 </head>
 <body>
     {% include 'NavBar.html' %}
-
     <article>
         <div>
             <h1>Your Profile</h1>
@@ -69,28 +73,28 @@
         </div>
         <table>
             <tr>
-                <th>Name: </th><th>{{user.name}}</th>
+                <th>Name: </th><th>{{named}}</th>
             </tr>
             <tr>
-                <th>Phone: </th><th>{{user.phone}}</th>
+                <th>Phone: </th><th>{{phone}}</th>
             </tr>
             <tr>
-                <th>Email: </th><th>{{user.email}}</th>
+                <th>Email: </th><th>{{email}}</th>
             </tr>
             <tr>
-                <th>Address: </th><th>{{user.address}}</th>
+                <th>Address: </th><th>{{address}}</th>
             </tr>
             <tr>
-                <th>Office Hour Location: </th><th>{{user.office_hour_location}}</th>
+                <th>Office Hour Location: </th><th>{{office_hour_location}}</th>
             </tr>
             <tr>
-                <th>Office Hour Time: </th><th>{{user.office_hour_time}}</th>
+                <th>Office Hour Time: </th><th>{{office_hour_time}}</th>
             </tr>
         </table>
 
         <div class="container">
             <div class="center">
-                <a href="EditProfile.html" class="button">Edit Information</a>
+                <a href="/profile/edit" class="button">Edit Information</a>
             </div>
         </div>
     </article>
