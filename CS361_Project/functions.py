@@ -75,3 +75,6 @@ def editProfileData(self, request, user, field_name, field_type, error_name):
 
         setattr(user, field_name.lower(), new_data)
         user.save()
+
+def queryFromCourses(courses, labs, junctions):
+   pass
