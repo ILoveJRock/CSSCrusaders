@@ -67,4 +67,4 @@ class TestConvert(TestCase):
             course = next(filter(lambda c : c["id"] == row["course"], self.mock_courses))
             lab = next(filter(lambda l : l["id"] == row["labSection"], self.mock_labs))
             query_course = next(filter(lambda c : c["id"] == course["id"]), query)
-            self.assertTrue(lab == query["lab"])
+            self.assertTrue(lab.name in query_course["labs"], "not every lab was in query")
