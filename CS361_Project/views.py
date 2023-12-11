@@ -6,13 +6,11 @@ from .models import *
 from datetime import datetime
 from django.core.mail import send_mail
 from .functions import *
+from django.views.decorators.cache import cache_control
+from django.utils.decorators import method_decorator
 
 
 class Login(View):
-    def __init__(self):
-        # Error Tracking
-        self.missingUser = False
-
     def get(self, request):
         # If the user is already logged in, redirect to home page
         if 'LoggedIn' in request.GET:
@@ -27,34 +25,43 @@ class Login(View):
         # Authenticate user w/ helper method
         user = authenticate_user(self, username, password)
         # If the user is authenticated, log the user in and redirect them to the ADMIN DASHBOARD page
+        # TODO: Each role should have its own dash
         if user:
-            session = request.session
-            session['name'] = user.name
-            session['role'] = user.role
-            session['LoggedIn'] = True
-            return redirect('/dashboard')
+            Management.User.login(request, user)
+            if (user.role == 0):
+                return redirect('/dashboard')
+            else:
+                return redirect('home')
         else:
             # If the user is not authenticated, redisplay the page with the appropriate error
-            error = 'User does not exist' if self.missingUser else "Incorrect Password"
+            error = 'User does not exist' if not user else "Incorrect Password"
             return render(request, "login.html", {"error": error})
+
+    def authenticate_user(self, username, password):
+        try:
+            user = Account.objects.get(username=username)
+            if user.password == password:
+                return user
+        except Account.DoesNotExist:
+            self.missingUser = True
 
 
 class ForgotPassword(View):
     # TODO: Check Username and Send Recovery Email when appropriate
     def get(self, request):
-        result = loginCheck(request, 0)
+        result = loginCheck(request, 2) # Everyone logged in can view
         if result: return result
         return render(request, 'ForgotPassword.html')
 
     def post(self, request):
-        result = loginCheck(request, 0)
+        result = loginCheck(request, 2) # Everyone logged in can view
         if result: return result
         return render(request, 'ForgotPassword.html')
 
 
 class Profile(View):
     def get(self, request):
-        result = loginCheck(request, 0)
+        result = loginCheck(request, 2) # Everyone logged in can view
         if result: return result
         request.session['action'] = None
         user = Account.objects.get(username=request.session['name'])
@@ -67,7 +74,7 @@ class Profile(View):
         return render(request, 'Profile.html', {"named": named, "phone": phone, "email": email, "address": address, "office_hour_location": office_hour_location, "office_hour_time": office_hour_time, 'validForm': 'invalid'})
 
     def post(self, request):
-        result = loginCheck(request, 0)
+        result = loginCheck(request, 2) # Everyone logged in can view
         if result: return result
         request.session['action'] = None
         return render(request, 'Profile.html')
@@ -75,12 +82,12 @@ class Profile(View):
 
 class EditProfile(View):
     def get(self, request):
-        result = loginCheck(request, 0)
+        result = loginCheck(request, 2) # Everyone logged in can view
         if result: return result
         return render(request, 'EditProfile.html', {'validForm': 'invalid'})
 
     def post(self, request):
-        result = loginCheck(request, 0)
+        result = loginCheck(request, 2) # Everyone logged in can view
         if result: return result
         user = Account.objects.get(username=request.session['name'])
         if request.POST.get("Name") != "":
@@ -154,17 +161,14 @@ class EditProfile(View):
         return render(request, 'EditProfile.html')
 
 
-
-
 class EditPassword(View):
     def get(self, request):
-        result = loginCheck(request, 0)
-        if result: return result
+        result = loginCheck(request, 2) # Everyone logged in can view        if result: return result
         request.session['action'] = None
         return render(request, 'Profile.html', {'validForm': 'invalid'})
 
     def post(self, request):
-        result = loginCheck(request, 0)
+        result = loginCheck(request, 2) # Everyone logged in can view        if result: return result
         if result: return result
         user = Account.objects.get(username=request.session['name'])
         currentpass = user.password
@@ -194,9 +198,8 @@ class EditPassword(View):
 
 class Home(View):
     def get(self, request):
-        result = loginCheck(request, 0)
+        result = loginCheck(request, 2) # Everyone logged in can view
         if result: return result
-        # TODO Figure out who's logged in and what to display based on their permission levels
         return render(request, "Home.html")
 
 
@@ -223,11 +226,10 @@ class CreateAccount(View):
     def post(self, request):
         result = loginCheck(request, 0)
         if result: return result
-        if len(Account.objects.filter(username=request.POST["name"])) != 0:
-            return render(request, 'CreateAccount.html', {"message": "There is already an account with that username."})
-
-        create_account(request)
-        return render(request, 'CreateAccount.html')
+        error = Management.Account.create_account(request)
+        if error:
+            return render(request, 'CreateAccount.html', {"message": error})
+        return redirect('/manage/')
 
 
 class EditAccount(View):
@@ -235,6 +237,7 @@ class EditAccount(View):
         result = loginCheck(request, 0)
         if result: return result
         user_id = request.GET.get('userId')
+        # Get the selected user
         try:
             selected_user = Account.objects.get(account_id=user_id)
             return render(request, 'edit_account.html', {'user': selected_user})
@@ -245,26 +248,12 @@ class EditAccount(View):
     def post(self, request):
         result = loginCheck(request, 0)
         if result: return result
-        # Get user to edit from accountID
-        user_id = request.POST.get('userId')
-        selected_account = Account.objects.get(account_id=user_id)
-
-        # Catch errors before changes are made
-
-        # Case 1: emptyLogin
-        if request.POST['username'] == '' or request.POST['password'] == '':
-            return render(request, 'edit_account.html', {'error': 'Login fields cannot be empty'})
-
-        # Case 2: usernameTaken
-        if Account.objects.filter(username=request.POST['username']).exclude(account_id=user_id).exists():
-            return render(request, 'edit_account.html', {'error': 'An account with that username already exists.'})
-
-        updateAccount(request, selected_account)
-
+        selected_account = Account.objects.get(account_id=request.POST.get('userId'))
+        error = Management.Account.updateAccount(request, selected_account)
+        if error:
+            return render(request, 'edit_account.html', {'error' : error})
         # Redirect to ManageAccount view
         return redirect('/manage/')
-
-
 
 
 class DeleteAccount(View):
@@ -272,7 +261,7 @@ class DeleteAccount(View):
         result = loginCheck(request, 0)
         if result: return result
         user_id = request.GET.get('userId')
-        # TODO Delete the account
+        Management.Account.deleteAccount(request, user_id)
         return render(request, 'ManageAccount.html')
 
 
@@ -309,7 +298,6 @@ class ManageCourse(View):
 
 # TODO For all of these, persist the course and/or lab selected back to manage course
 class CreateCourse(View):
-
     def get(self, request):
         return render(request, 'CreateCourse.html')
     def post(self, request):
@@ -398,10 +386,10 @@ class RemoveAssign(View):
         return render(request, 'Assign.html')
 
 
+@method_decorator(cache_control(no_cache=True, must_revalidate=True), name='dispatch')
 class Logout(View):
     def get(self, request):
-        request.session.clear()
-        request.session['LoggedIn'] = False
+        Management.User.logout(request)
         return render(request, 'login.html')
 
 
@@ -419,11 +407,11 @@ class AdminDashboard(View):
 
 class ViewContact(View):
     def get(self, request):
-        result = loginCheck(request, 0)
+        result = loginCheck(request, 2) # Everyone logged in can view
         if result: return result
         return render(request, 'view_contact_info.html')
 
     def post(self, request):
-        result = loginCheck(request, 0)
+        result = loginCheck(request, 2) # Everyone logged in can view
         if result: return result
         return render(request, 'view_contact_info.html')
