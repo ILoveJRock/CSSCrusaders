@@ -77,4 +77,10 @@ def editProfileData(self, request, user, field_name, field_type, error_name):
         user.save()
 
 def queryFromCourses(courses, labs, junctions):
-   pass
+  for course in courses:
+    course["labs"] = []
+  for row in junctions():
+    course = next(filter(lambda c : c["id"] == row["course"], courses))
+    lab = next(filter(lambda l : l["id"] == row["labSection"], labs))
+    course["labs"].append(lab)
+  return courses    
