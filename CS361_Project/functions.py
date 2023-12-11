@@ -21,7 +21,6 @@ def loginCheck(request, role):
     return render(request, "login.html", {"error": error})
 
 
-
 def authenticate_user(self, username, password):
     try:
         user = Account.objects.get(username=username)
@@ -75,7 +74,7 @@ def editProfileData(self, request, user, field_name, field_type, error_name):
             raise ValueError("Null value fails raise ValueError")
 
         setattr(user, field_name.lower(), new_data)
-        user.save()from django.core.exceptions import ValidationError
+        user.save()
 
 
 class Management:
