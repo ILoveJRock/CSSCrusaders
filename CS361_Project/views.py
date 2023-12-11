@@ -11,7 +11,6 @@ from django.utils.decorators import method_decorator
 
 
 class Login(View):
-
     def get(self, request):
         # If the user is already logged in, redirect to home page
         if 'LoggedIn' in request.GET:
@@ -29,7 +28,10 @@ class Login(View):
         # TODO: Each role should have its own dash
         if user:
             Management.User.login(request, user)
-            return redirect('/dashboard')
+            if (user.role == 0):
+                return redirect('/dashboard')
+            else:
+                return redirect('home')
         else:
             # If the user is not authenticated, redisplay the page with the appropriate error
             error = 'User does not exist' if not user else "Incorrect Password"
@@ -47,19 +49,19 @@ class Login(View):
 class ForgotPassword(View):
     # TODO: Check Username and Send Recovery Email when appropriate
     def get(self, request):
-        result = loginCheck(request, 0)
+        result = loginCheck(request, 2) # Everyone logged in can view
         if result: return result
         return render(request, 'ForgotPassword.html')
 
     def post(self, request):
-        result = loginCheck(request, 0)
+        result = loginCheck(request, 2) # Everyone logged in can view
         if result: return result
         return render(request, 'ForgotPassword.html')
 
 
 class Profile(View):
     def get(self, request):
-        result = loginCheck(request, 0)
+        result = loginCheck(request, 2) # Everyone logged in can view
         if result: return result
         request.session['action'] = None
         user = Account.objects.get(username=request.session['name'])
@@ -72,7 +74,7 @@ class Profile(View):
         return render(request, 'Profile.html', {"named": named, "phone": phone, "email": email, "address": address, "office_hour_location": office_hour_location, "office_hour_time": office_hour_time, 'validForm': 'invalid'})
 
     def post(self, request):
-        result = loginCheck(request, 0)
+        result = loginCheck(request, 2) # Everyone logged in can view
         if result: return result
         request.session['action'] = None
         return render(request, 'Profile.html')
@@ -80,12 +82,12 @@ class Profile(View):
 
 class EditProfile(View):
     def get(self, request):
-        result = loginCheck(request, 0)
+        result = loginCheck(request, 2) # Everyone logged in can view
         if result: return result
         return render(request, 'EditProfile.html', {'validForm': 'invalid'})
 
     def post(self, request):
-        result = loginCheck(request, 0)
+        result = loginCheck(request, 2) # Everyone logged in can view
         if result: return result
         user = Account.objects.get(username=request.session['name'])
         if request.POST.get("Name") != "":
@@ -159,17 +161,14 @@ class EditProfile(View):
         return render(request, 'EditProfile.html')
 
 
-
-
 class EditPassword(View):
     def get(self, request):
-        result = loginCheck(request, 0)
-        if result: return result
+        result = loginCheck(request, 2) # Everyone logged in can view        if result: return result
         request.session['action'] = None
         return render(request, 'Profile.html', {'validForm': 'invalid'})
 
     def post(self, request):
-        result = loginCheck(request, 0)
+        result = loginCheck(request, 2) # Everyone logged in can view        if result: return result
         if result: return result
         user = Account.objects.get(username=request.session['name'])
         currentpass = user.password
@@ -199,9 +198,8 @@ class EditPassword(View):
 
 class Home(View):
     def get(self, request):
-        result = loginCheck(request, 0)
+        result = loginCheck(request, 2) # Everyone logged in can view
         if result: return result
-        # TODO Figure out who's logged in and what to display based on their permission levels
         return render(request, "Home.html")
 
 
@@ -258,8 +256,6 @@ class EditAccount(View):
         return redirect('/manage/')
 
 
-
-
 class DeleteAccount(View):
     def post(self, request):
         result = loginCheck(request, 0)
@@ -302,7 +298,6 @@ class ManageCourse(View):
 
 # TODO For all of these, persist the course and/or lab selected back to manage course
 class CreateCourse(View):
-
     def get(self, request):
         return render(request, 'CreateCourse.html')
     def post(self, request):
@@ -394,7 +389,7 @@ class RemoveAssign(View):
 @method_decorator(cache_control(no_cache=True, must_revalidate=True), name='dispatch')
 class Logout(View):
     def get(self, request):
-        Management.User.logout()
+        Management.User.logout(request)
         return render(request, 'login.html')
 
 
@@ -412,11 +407,11 @@ class AdminDashboard(View):
 
 class ViewContact(View):
     def get(self, request):
-        result = loginCheck(request, 0)
+        result = loginCheck(request, 2) # Everyone logged in can view
         if result: return result
         return render(request, 'view_contact_info.html')
 
     def post(self, request):
-        result = loginCheck(request, 0)
+        result = loginCheck(request, 2) # Everyone logged in can view
         if result: return result
         return render(request, 'view_contact_info.html')
