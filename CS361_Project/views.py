@@ -9,9 +9,6 @@ from .functions import *
 
 
 class Login(View):
-    def __init__(self):
-        # Error Tracking
-        self.missingUser = False
 
     def get(self, request):
         # If the user is already logged in, redirect to home page
@@ -27,16 +24,22 @@ class Login(View):
         # Authenticate user w/ helper method
         user = authenticate_user(self, username, password)
         # If the user is authenticated, log the user in and redirect them to the ADMIN DASHBOARD page
+        # TODO: Each role should have its own dash
         if user:
-            session = request.session
-            session['name'] = user.name
-            session['role'] = user.role
-            session['LoggedIn'] = True
+            Management.User.login(request, user)
             return redirect('/dashboard')
         else:
             # If the user is not authenticated, redisplay the page with the appropriate error
-            error = 'User does not exist' if self.missingUser else "Incorrect Password"
+            error = 'User does not exist' if not user else "Incorrect Password"
             return render(request, "login.html", {"error": error})
+
+    def authenticate_user(self, username, password):
+        try:
+            user = Account.objects.get(username=username)
+            if user.password == password:
+                return user
+        except Account.DoesNotExist:
+            self.missingUser = True
 
 
 class ForgotPassword(View):
@@ -223,11 +226,10 @@ class CreateAccount(View):
     def post(self, request):
         result = loginCheck(request, 0)
         if result: return result
-        if len(Account.objects.filter(username=request.POST["name"])) != 0:
-            return render(request, 'CreateAccount.html', {"message": "There is already an account with that username."})
-
-        create_account(request)
-        return render(request, 'CreateAccount.html')
+        error = Management.Account.create_account(request)
+        if error:
+            return render(request, 'CreateAccount.html', {"message": error})
+        return redirect('/manage/')
 
 
 class EditAccount(View):
@@ -235,6 +237,7 @@ class EditAccount(View):
         result = loginCheck(request, 0)
         if result: return result
         user_id = request.GET.get('userId')
+        # Get the selected user
         try:
             selected_user = Account.objects.get(account_id=user_id)
             return render(request, 'edit_account.html', {'user': selected_user})
@@ -245,22 +248,10 @@ class EditAccount(View):
     def post(self, request):
         result = loginCheck(request, 0)
         if result: return result
-        # Get user to edit from accountID
-        user_id = request.POST.get('userId')
-        selected_account = Account.objects.get(account_id=user_id)
-
-        # Catch errors before changes are made
-
-        # Case 1: emptyLogin
-        if request.POST['username'] == '' or request.POST['password'] == '':
-            return render(request, 'edit_account.html', {'error': 'Login fields cannot be empty'})
-
-        # Case 2: usernameTaken
-        if Account.objects.filter(username=request.POST['username']).exclude(account_id=user_id).exists():
-            return render(request, 'edit_account.html', {'error': 'An account with that username already exists.'})
-
-        updateAccount(request, selected_account)
-
+        selected_account = Account.objects.get(account_id=request.POST.get('userId'))
+        error = Management.Account.updateAccount(request, selected_account)
+        if error:
+            return render(request, 'edit_account.html', {'error' : error})
         # Redirect to ManageAccount view
         return redirect('/manage/')
 
@@ -272,7 +263,7 @@ class DeleteAccount(View):
         result = loginCheck(request, 0)
         if result: return result
         user_id = request.GET.get('userId')
-        # TODO Delete the account
+        Management.Account.deleteAccount(request, user_id)
         return render(request, 'ManageAccount.html')
 
 
@@ -400,8 +391,7 @@ class RemoveAssign(View):
 
 class Logout(View):
     def get(self, request):
-        request.session.clear()
-        request.session['LoggedIn'] = False
+        Management.User.logout()
         return render(request, 'login.html')
 
 
