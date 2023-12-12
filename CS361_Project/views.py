@@ -209,12 +209,12 @@ class ManageAccounts(View):
         if result: return result
         accounts = Account.objects.all()
         query = [{"role": account.role, "named": account.name, "phone": account.phone, "email": account.email, "address": account.address, "office_hour_location": account.office_hour_location, "office_hour_time": account.office_hour_time} for account in accounts]
-        return render(request, 'ManageAccount.html',  {"accounts": query})
+        return render(request, 'Manage_Account.html',  {"accounts": query})
 
     def post(self, request):
         result = loginCheck(request, 0)
         if result: return result
-        return render(request, 'ManageAccount.html')
+        return render(request, 'Manage_Account.html')
 
 
 class CreateAccount(View):
@@ -299,6 +299,8 @@ class ManageCourse(View):
 # TODO For all of these, persist the course and/or lab selected back to manage course
 class CreateCourse(View):
     def get(self, request):
+        result = loginCheck(request, 0)
+        if result: return result
         return render(request, 'CreateCourse.html')
     def post(self, request):
         result = loginCheck(request, 0)
@@ -308,11 +310,19 @@ class CreateCourse(View):
 
 
 class CreateLab(View):
+    def get(self, request):
+        result = loginCheck(request, 0)
+        if result: return result
+        selected_course = Course.objects.get(Courseid=request.GET.get('courseId'))
+        tas = TA.objects.filter(course=selected_course)
+        return render(request, 'CreateLab.html', {"tas": tas})
     def post(self, request):
         result = loginCheck(request, 0)
         if result: return result
-        # TODO Create the lab
-        return render(request, 'ManageCourse.html')
+        if len(LabSection.objects.filter(name=request.POST["name"])) != 0:
+            return render(request, 'CreateLab.html', {"message": "There is already a lab section with that number."})
+        create_lab(request)
+        return render(request, 'CreateLab.html')
 
 
 class EditCourse(View):

@@ -168,3 +168,8 @@ class Management:
 
                 setattr(user, field_name.lower(), new_data)
                 user.save()
+
+def create_lab(request):
+    formName = request.POST['name']
+    formTime = request.POST['time']
+    formTA = request.POST['ta']

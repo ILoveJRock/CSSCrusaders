@@ -33,10 +33,10 @@ class TA(models.Model):
 class LabSection(models.Model):
     Labid = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=40)
-    dept = models.CharField(max_length=40)
+    time = models.CharField(max_length=40)
 
 class Course(models.Model):
-    Labid = models.IntegerField(primary_key=True)
+    Courseid = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=40)
     dept = models.CharField(max_length=40)
 

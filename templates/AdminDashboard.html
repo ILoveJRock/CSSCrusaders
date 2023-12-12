@@ -71,11 +71,9 @@
 
     <tr>
         <td>
-            <a href="{% url 'create_account' %}">
-                <div class="box">
-                    <h2>Create Account</h2>
-                </div>
-            </a>
+            <div class="box" onclick="location.href='/manage/createAccount';">
+                <h2>Create Account</h2>
+            </div>
         </td>
 
         <td>
@@ -87,11 +85,9 @@
 
     <tr>
         <td>
-            <a href="{% url 'view_contact' %}">
-                <div class="box">
-                    <h2>View Contact Info</h2>
-                </div>
-            </a>
+            <div class="box" onclick="location.href='/profile';">
+                <h2>View Contact Info</h2>
+            </div>
         </td>
 
         <td>
@@ -109,11 +105,9 @@
         </td>
 
         <td>
-            <a href="{% url 'logout' %}">
-                <div class="box">
-                    <h2>Log Out</h2>
-                </div>
-          </a>
+            <div class="box" onclick="location.href='/logout';">
+                <h2>Log Out</h2>
+            </div>
         </td>
     </tr>
 </table>
