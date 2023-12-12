@@ -51,13 +51,9 @@ class Login(View):
 class ForgotPassword(View):
     # TODO: Check Username and Send Recovery Email when appropriate
     def get(self, request):
-        result = loginCheck(request, 2) # Everyone logged in can view
-        if result: return result
         return render(request, 'ForgotPassword.html')
 
     def post(self, request):
-        result = loginCheck(request, 2) # Everyone logged in can view
-        if result: return result
         return render(request, 'ForgotPassword.html')
 
 
@@ -92,116 +88,32 @@ class EditProfile(View):
         result = loginCheck(request, 2) # Everyone logged in can view
         if result: return result
         user = Account.objects.get(username=request.session['name'])
-        if request.POST.get("Name") != "":
-            newName = request.POST.get("Name")
-            if type(newName) != str:
-                raise TypeError("Name not string fails to raise TypeError")
-
-            if newName == "Null":
-                raise ValueError("Null value fails raise ValueError")
-
-            user.name = newName
-            user.save()
-
-        if request.POST.get("Phone") != "":
-            newNum = request.POST.get("Phone")
-            if type(newNum) != int:
-                raise TypeError("Number not integer fails to raise TypeError")
-
-            if newNum == "Null":
-                raise ValueError("Null value fails raise ValueError")
-
-            user.phone = newNum
-            user.save()
-
-        if request.POST.get("Email") != "":
-            #TODO valid email check (contains @ and .)
-            newEmail = request.POST.get("Email")
-            if type(newEmail) != str:
-                raise TypeError("Email not string fails to raise TypeError")
-
-            if newEmail == "Null":
-                raise ValueError("Null value fails raise ValueError")
-
-            user.email = newEmail
-            user.save()
-
-        if request.POST.get("Address") != "":
-            newAddress = request.POST.get("Address")
-            if type(newAddress) != str:
-                raise TypeError("Address not string fails to raise TypeError")
-
-            if newAddress == "Null":
-                raise ValueError("Null value fails raise ValueError")
-
-            user.address = newAddress
-            user.save()
-
-        if request.POST.get("Location") != "":
-            newLocation = request.POST.get("Location")
-            if type(newLocation) != str:
-                raise TypeError("Location not string fails to raise TypeError")
-
-            if newLocation == "Null":
-                raise ValueError("Null value fails raise ValueError")
-
-            user.office_hour_location = newLocation
-            user.save()
-
-        if request.POST.get("Time") != "":
-            #TODO valid time check
-            newTime = request.POST.get("Time")
-            if type(newTime) != str:
-                raise TypeError("Time not string fails to raise TypeError")
-
-            if newTime == "Null":
-                raise ValueError("Null value fails raise ValueError")
-
-            user.office_hour_time = newTime
-            user.save()
+        update_user_field(user, "name", request.POST.get("Name"))
+        update_user_field(user, "phone", request.POST.get("Phone"), int)
+        update_user_field(user, "email", request.POST.get("Email"))
+        update_user_field(user, "address", request.POST.get("Address"))
+        update_user_field(user, "office_hour_location", request.POST.get("Location"))
+        update_user_field(user, "office_hour_time", request.POST.get("Time"))
 
         return render(request, 'EditProfile.html')
 
 
 class EditPassword(View):
     def get(self, request):
-        result = loginCheck(request, 2) # Everyone logged in can view        if result: return result
+        result = loginCheck(request, 2) # Everyone logged in can view
         request.session['action'] = None
         return render(request, 'Profile.html', {'validForm': 'invalid'})
 
     def post(self, request):
-        result = loginCheck(request, 2) # Everyone logged in can view        if result: return result
+        result = loginCheck(request, 2) # Everyone logged in can view
         if result: return result
         user = Account.objects.get(username=request.session['name'])
-        currentpass = user.password
-
-        # TODO move password to own class
-        if request.POST.get("NewPassword") != "":
-            newPass = request.POST.get("NewPassword")
-            if currentpass == newPass:
-                error = "New password cannot be the same as old password"
-                return render(request, "Profile.html", {"error": error})
-
-            if type(newPass) != str:
-                raise TypeError("Password not string fails to raise TypeError")
-
-            if newPass == "Null":
-                raise ValueError("Null value fails raise ValueError")
-
-            # TODO check that new password fits password criteria
-            if newPass != request.POST.get("NewPasswordRepeat"):
-                error = "Passwords do not match"
-                return render(request, "Profile.html", {"error": error})
-
-            user.password = newPass
-            user.save()
+        update_user_password(user, request.POST.get("NewPassword"), request.POST.get("NewPasswordRepeat"))
         return render(request, 'Profile.html')
 
 
 class Home(View):
     def get(self, request):
-        result = loginCheck(request, 2) # Everyone logged in can view
-        if result: return result
         return render(request, "Home.html")
 
 

@@ -173,3 +173,36 @@ def create_lab(request):
     formName = request.POST['name']
     formTime = request.POST['time']
     formTA = request.POST['ta']
+    new_lab = LabSection(formName, formTime, formTA)
+    new_lab.save()
+    
+def update_user_field(user, field_name, new_value, value_type=str, check_null=True):
+    if new_value != "":
+        if check_null and new_value == "Null":
+            raise ValueError("Null value fails raise ValueError")
+
+        if not isinstance(new_value, value_type):
+            raise TypeError(f"{field_name} not {value_type.__name__} fails to raise TypeError")
+
+        setattr(user, field_name, new_value)
+        user.save()
+
+def update_user_password(user, new_password, repeat_password):
+    current_password = user.password
+
+    if new_password != "":
+        if current_password == new_password:
+            raise ValueError("New password cannot be the same as the old password")
+
+        if type(new_password) != str:
+            raise TypeError("Password not string fails to raise TypeError")
+
+        if new_password == "Null":
+            raise ValueError("Null value fails raise ValueError")
+
+        # TODO: Check that the new password fits password criteria
+        if new_password != repeat_password:
+            raise ValueError("Passwords do not match")
+
+        user.password = new_password
+        user.save()
