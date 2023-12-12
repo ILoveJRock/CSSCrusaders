@@ -30,8 +30,10 @@ class Login(View):
             Management.User.login(request, user)
             if (user.role == 0):
                 return redirect('/dashboard')
+            elif (user.role == 1):
+                return redirect('/dashboard/prof')
             else:
-                return redirect('home')
+                return redirect('/dashboard/ta')
         else:
             # If the user is not authenticated, redisplay the page with the appropriate error
             error = 'User does not exist' if not user else "Incorrect Password"
@@ -414,6 +416,26 @@ class AdminDashboard(View):
         if result: return result
         return render(request, 'AdminDashboard.html')
 
+class ProfDashboard(View):
+    def get(self, request):
+        result = loginCheck(request, 1)
+        if result: return result
+        return render(request, 'ProfDashboard.html')
+    def post(self, request):
+        result = loginCheck(request, 1)
+        if result: return result
+        return render(request, 'ProfDashboard.html')
+
+class TADashboard(View):
+    def get(self, request):
+        result = loginCheck(request, 2)
+        if result: return result
+        return render(request, 'TADashboard.html')
+
+    def post(self, request):
+        result = loginCheck(request, 2)
+        if result: return result
+        return render(request, 'TADashboard.html')
 
 class ViewContact(View):
     def get(self, request):
