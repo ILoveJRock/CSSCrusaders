@@ -78,9 +78,11 @@ def editProfileData(self, request, user, field_name, field_type, error_name):
 
 def queryFromCourses(courses, labs, junctions):
   for course in courses:
-    course["labs"] = []
+    course["labs"] = ""
   for row in junctions():
     course = next(filter(lambda c : c["id"] == row["course"], courses))
     lab = next(filter(lambda l : l["id"] == row["labSection"], labs))
-    course["labs"].append(lab)
+    course["labs"] += lab.name + ", "
+  for course in courses:
+     course["labs"].removesuffix(", ")
   return courses    
