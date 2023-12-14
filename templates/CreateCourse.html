@@ -129,9 +129,9 @@
         <tr>
             <td>Professor </td>
             <td><select name="section">
-            {% for i in profs %}
-                <option value="{{ i.0 }}">{{ i.1 }}</option>
-            {% endfor %}
+                {% for instructor in profs %}
+                    <option value="{{ instructor.account_id }}">{{ instructor.name }}</option>
+                {% endfor %}
             </select></td>
         </tr>
 

@@ -8,6 +8,7 @@ from django.core.mail import send_mail
 from .functions import *
 from django.views.decorators.cache import cache_control
 from django.utils.decorators import method_decorator
+from django.db.models import Max
 
 
 class Login(View):
@@ -215,12 +216,25 @@ class CreateCourse(View):
     def get(self, request):
         result = loginCheck(request, 0)
         if result: return result
-        return render(request, 'CreateCourse.html')
+        proffessors = Account.objects.filter(role=1)
+        return render(request, 'CreateCourse.html', {'profs' : proffessors})
+    
     def post(self, request):
         result = loginCheck(request, 0)
         if result: return result
-        # TODO Create the course
-        return render(request, 'CreateCourse.html')
+        course_name = request.POST.get('name')
+        department = request.POST.get('dept')
+        proffessor = request.POST.get('section') # Unused for now
+        max_id = Course.objects.aggregate(Max('Courseid'))['Courseid__max']
+        new_id = (max_id or 0) + 1
+        new_course = Course(
+            Courseid=new_id,
+            name=course_name,
+            dept=department
+
+        )
+        new_course.save()
+        return redirect('create_course')
 
 
 class CreateLab(View):
