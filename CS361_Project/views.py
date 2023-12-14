@@ -208,13 +208,32 @@ class ManageAccounts(View):
         result = loginCheck(request, 0)
         if result: return result
         accounts = Account.objects.all()
+        
+        selected_user_id = request.POST.get('selected_user_id')
+        
+        print(f"Selected User ID: {selected_user_id}")
+        
+        selected_user = None
+        if selected_user_id:
+            try:
+                selected_user = Account.objects.get(account_id=selected_user_id)
+            except Account.DoesNotExist:
+                # Handle the case where the account with the specified ID does not exist
+                pass
+        
         query = [{"role": account.role, "named": account.name, "phone": account.phone, "email": account.email, "address": account.address, "office_hour_location": account.office_hour_location, "office_hour_time": account.office_hour_time} for account in accounts]
-        return render(request, 'ManageAccount.html',  {"accounts": query})
+        
+        return render(request, 'Manage_Account.html', {"accounts": query, "selected_user": selected_user})
 
     def post(self, request):
         result = loginCheck(request, 0)
         if result: return result
-        return render(request, 'ManageAccount.html')
+        
+        selected_user_id = request.POST.get('selected_user_id')
+        request.session['selected_user_id'] = selected_user_id
+        
+        return self.get(request)
+        
 
 
 class CreateAccount(View):

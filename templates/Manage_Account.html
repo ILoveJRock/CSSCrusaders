@@ -140,6 +140,12 @@
                     <td>{{ account.address }}</td>
                     <td>{{ account.office_hour_time }}</td>
                     <td>{{ account.office_hour_location }}</td>
+                    <td>
+                        <form method="post" action="">
+                            {% csrf_token %}
+                            <button type="submit" name="selected_user_id" value="{{ account.id }}">Select</button>
+                        </form>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -148,9 +154,9 @@
     <div class="user-overview">
         <h2>Selected User</h2>
         <hr>
-        <p><strong>ID:</strong> <span id="selectedUserId"></span></p>
-        <p><strong>Name:</strong> <span id="selectedUserName"></span></p>
-        <p><strong>Role:</strong> <span id="selectedUserRole"></span></p>
+        <p><strong>ID:</strong> {{ selected_user.id }}</p>
+        <p><strong>Name:</strong> {{ selected_user.name }}</p>
+        <p><strong>Role:</strong> {{ selected_user.role }}</p>
     </div>
 </div>
 
