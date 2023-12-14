@@ -221,7 +221,7 @@ class ManageAccounts(View):
                 return render(request, 'error_page.html', {'error_message': f"Account with ID {user_id} does not exist."})
 
         
-        query = [{"role": account.role, "named": account.name, "phone": account.phone, "email": account.email, "address": account.address, "office_hour_location": account.office_hour_location, "office_hour_time": account.office_hour_time} for account in accounts]
+        query = [{"id" : account.account_id, "role": account.role, "named": account.name, "phone": account.phone, "email": account.email, "address": account.address, "office_hour_location": account.office_hour_location, "office_hour_time": account.office_hour_time} for account in accounts]
         
         return render(request, 'Manage_Account.html', {"accounts": query, "selected_user": selected_user})
 
@@ -230,6 +230,8 @@ class ManageAccounts(View):
         if result: return result
         
         selected_user_id = request.POST.get('selected_user_id')
+        print(selected_user_id)
+        
         request.session['selected_user_id'] = selected_user_id
         
         return self.get(request)
