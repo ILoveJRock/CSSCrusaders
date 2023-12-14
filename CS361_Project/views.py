@@ -211,7 +211,7 @@ class ManageAccounts(View):
         
         selected_user_id = request.POST.get('selected_user_id')
         
-        print(f"Selected User ID: {selected_user_id}")
+      
         
         selected_user = None
         if selected_user_id:
