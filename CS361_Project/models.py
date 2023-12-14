@@ -32,14 +32,10 @@ class TA(models.Model):
 
 class LabSection(models.Model):
     Labid = models.IntegerField(primary_key=True)
+    course = models.ForeignKey("Course", on_delete=models.SET_NULL, null=True)
     name = models.CharField(max_length=40)
-    dept = models.CharField(max_length=40)
 
 class Course(models.Model):
     Labid = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=40)
     dept = models.CharField(max_length=40)
-
-class Course_LabSection(models.Model):
-    course = models.ForeignKey("Course", on_delete=models.CASCADE)
-    labSection = models.ForeignKey("LabSection", on_delete=models.CASCADE)

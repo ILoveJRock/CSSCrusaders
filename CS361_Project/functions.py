@@ -76,13 +76,12 @@ def editProfileData(self, request, user, field_name, field_type, error_name):
         setattr(user, field_name.lower(), new_data)
         user.save()
 
-def queryFromCourses(courses, labs, junctions):
+def queryFromCourses(courses, labs):
   for course in courses:
     course["labs"] = ""
-  for row in junctions():
-    course = next(filter(lambda c : c["id"] == row["course"], courses))
-    lab = next(filter(lambda l : l["id"] == row["labSection"], labs))
-    course["labs"] += lab.name + ", "
+  for lab in labs:
+     course = filter(lambda c : c["id"] == lab.course_id, courses)[0]
+     course["labs"] += lab.name + ", "
   for course in courses:
-     course["labs"].removesuffix(", ")
+     course["labs"] = course["labs"][:-2]
   return courses    

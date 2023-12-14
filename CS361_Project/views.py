@@ -270,11 +270,9 @@ class ManageCourses(View):
         if result: return result
         courses = Course.objects.all()
         labs = LabSection.objects.all()
-        junction = Course_LabSection.all()
         query1 = [{"name": course.name, "dept": course.dept, "id": course.Labid} for course in courses]
-        query2 = [{"name": lab.name, "dept": lab.dept, "id": lab.Labid} for lab in labs]
-        query3 = [{"course": row.course, "course": row.labSection} for row in junction]
-        query = queryFromCourses(query1, query2, query3)
+        query2 = [{"name": lab.name, "course_id": lab.course} for lab in labs]
+        query = queryFromCourses(query1, query2)
         return render(request, 'ManageCourse.html',  {"courses": query})
 
     def post(self, request):
