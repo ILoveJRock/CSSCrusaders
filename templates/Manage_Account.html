@@ -143,7 +143,7 @@
                     <td>
                         <form method="post" action="{% url 'manage_account' %}">
                             {% csrf_token %}
-                            <button type="submit" name="selected_user_id" value="{{ account.id }}">Select</button>
+                            <button type="submit" name="selected_user_id" value={{ account.id }}>Select</button>
                         </form>
                     </td>
                 </tr>
