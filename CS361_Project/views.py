@@ -123,13 +123,26 @@ class ManageAccounts(View):
         result = loginCheck(request, 0)
         if result: return result
         accounts = Account.objects.all()
-        query = [{"role": account.role, "named": account.name, "phone": account.phone, "email": account.email, "address": account.address, "office_hour_location": account.office_hour_location, "office_hour_time": account.office_hour_time} for account in accounts]
-        return render(request, 'Manage_Account.html',  {"accounts": query})
+        
+        selected_user_id = request.POST.get('selected_user_id')
+        selected_user = None
+        if selected_user_id:
+            try:
+                selected_user = Account.objects.get(account_id=selected_user_id)
+            except Account.DoesNotExist:
+                return render(request, 'error_page.html', {'error_message': f"Account with ID {user_id} does not exist."})
+
+        
+        query = [{"id" : account.account_id, "role": account.role, "named": account.name, "phone": account.phone, "email": account.email, "address": account.address, "office_hour_location": account.office_hour_location, "office_hour_time": account.office_hour_time} for account in accounts]
+        
+        return render(request, 'Manage_Account.html', {"accounts": query, "selected_user": selected_user})
+
 
     def post(self, request):
         result = loginCheck(request, 0)
         if result: return result
-        return render(request, 'Manage_Account.html')
+  
+        return self.get(request)
 
 
 class CreateAccount(View):
@@ -157,7 +170,6 @@ class EditAccount(View):
             selected_user = Account.objects.get(account_id=user_id)
             return render(request, 'edit_account.html', {'user': selected_user})
         except Account.DoesNotExist:
-            # Handle the case where the account with the specified ID does not exist
             return render(request, 'error_page.html', {'error_message': f"Account with ID {user_id} does not exist."})
 
     def post(self, request):
