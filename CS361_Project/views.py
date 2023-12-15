@@ -268,6 +268,7 @@ class ManageCourses(View):
     def get(self, request):
         result = loginCheck(request, 0)
         if result: return result
+
         courses = Course.objects.all()
         labs = LabSection.objects.all()
         query1 = [{"name": course.name, "dept": course.dept, "id": course.Labid} for course in courses]
@@ -278,7 +279,12 @@ class ManageCourses(View):
     def post(self, request):
         result = loginCheck(request, 0)
         if result: return result
-        return render(request, 'ManageCourse.html')
+
+        selected_course_id = request.POST["selected_course_id"]
+        selected_course = Course.objects.filter(Labid=selected_course_id).first()
+        
+        courses = request.POST["courses"]
+        return render(request, 'ManageCourse.html', {"courses": courses, "selected_course": selected_course_id})
 
 class DeleteAccount(View):
     def post(self, request):

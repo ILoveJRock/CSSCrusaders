@@ -129,20 +129,23 @@
             <tbody>
                 {% for course in courses %}
                 <tr>
+                    <form method="post" action="">
+                        {% csrf_token %}
+                        <button type="submit" name="selected_course_id" value={{ course.id }}>Select</button>
+                    </form>
                     <td>course.name</td>
                     <td>course.dept</td>
-                    <td>course.labs</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
     <div class="course-overview">
-        <h2>Selected Course</h2>
+        <h2>Selected course</h2>
         <hr>
-        <p><strong>Name:</strong> <span id="selectedUserId"></span></p>
-        <p><strong>Department:</strong> <span id="selectedUserName"></span></p>
-        <p><strong>Labs:</strong> <span id="selectedUserRole"></span></p>
+        <p><strong>Name:</strong> {{ selected_course.name }}</p>
+        <p><strong>Dept:</strong> {{ selected_course.dept }}</p>
+        <p><strong>Labs:</strong> {{ selected_course.labs }}</p>
     </div>
 </div>
 
