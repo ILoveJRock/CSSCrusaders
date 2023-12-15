@@ -230,7 +230,8 @@ class CreateCourse(View):
         new_course = Course(
             Courseid=new_id,
             name=course_name,
-            dept=department
+            dept=department,
+            prof=proffessor
 
         )
         new_course.save()

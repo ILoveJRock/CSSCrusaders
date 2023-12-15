@@ -39,6 +39,7 @@ class Course(models.Model):
     Courseid = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=40)
     dept = models.CharField(max_length=40)
+    prof = models.IntegerField(null=True)
 
 class Course_LabSection(models.Model):
     course = models.ForeignKey("Course", on_delete=models.CASCADE)
