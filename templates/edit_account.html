@@ -108,12 +108,14 @@
 <form method="post" action="{% url 'edit_account' %}">
     {% csrf_token %}
 <!-- TODO Cleanup Error message -->
+
     <div class="form-section">
         {% if error %}
             <p>{{ error }}</p>
         {% endif %}
     </div>
     <div class="form-section">
+        <input type="hidden" name="selected_user_id" value="{{ user.account_id }}">
         <label for="username">Username:</label>
         <input type="text" id="username" name="username" value="{{ user.username }}" required maxlength="30">
 
@@ -126,6 +128,9 @@
             <option value="1" {% if user.role == 1 %}selected{% endif %}>Instructor</option>
             <option value="2" {% if user.role == 2 %}selected{% endif %}>TA</option>
         </select>
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" value="{{ user.name }}" required maxlength="255">
+
     </div>
 
     <div class="form-section">

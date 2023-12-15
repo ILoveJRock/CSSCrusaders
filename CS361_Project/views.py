@@ -175,8 +175,10 @@ class EditAccount(View):
     def post(self, request):
         result = loginCheck(request, 0)
         if result: return result
-        selected_account = Account.objects.get(account_id=request.POST.get('userId'))
-        error = Management.Account.updateAccount(request, selected_account)
+        selected_account = Account.objects.get(account_id=request.POST.get('selected_user_id'))
+        
+        
+        error = Management.Account.update_account(request, selected_account)
         if error:
             return render(request, 'edit_account.html', {'error' : error})
         # Redirect to ManageAccount view
