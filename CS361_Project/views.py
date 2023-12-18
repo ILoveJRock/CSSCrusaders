@@ -349,9 +349,15 @@ class Logout(View):
 
 class AdminDashboard(View):
     def get(self, request):
-        result = loginCheck(request, 0)
-        if result: return result
-        return render(request, 'AdminDashboard.html')
+        # Small little hack, checks if user is supervisor, if not it directs them to the proper dashboard
+        session = request.session
+        current_account = Account.objects.get(account_id=session.get('userID'))
+        if current_account.role == 1:  # Instructor
+            return redirect('prof_dashboard')
+        elif current_account.role == 2:  # TA
+            return redirect('ta_dashboard')
+        else:  # Admin
+            return render(request, 'AdminDashboard.html')
 
     def post(self, request):
         result = loginCheck(request, 0)
