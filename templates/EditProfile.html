@@ -57,31 +57,30 @@
 <body>
     {% include 'NavBar.html'  %}
     <form method="post" action="#">
-		{% csrf_token %}
+        {% csrf_token %}
         <table>
             <tr>
-                <th>Name: </th><th><input name="Name" type="text"/></th>
+                <th>Name: </th><th><input name="Name" type="text" value="{{ currentAccount.name }}"/></th>
             </tr>
             <tr>
-                <th>Phone: </th><th><input name="Phone" type="text"/></th>
+                <th>Phone: </th><th><input name="Phone" type="text" value="{{ currentAccount.phone }}"/></th>
             </tr>
             <tr>
-                <th>Email: </th><th><input name="Email" type="text"/></th>
+                <th>Email: </th><th><input name="Email" type="email" value="{{ currentAccount.email }}"/></th>
             </tr>
             <tr>
-                <th>Address: </th><th><input name="Address" type="text"/></th>
+                <th>Address: </th><th><input name="Address" type="text" value="{{ currentAccount.address }}"/></th>
             </tr>
             <tr>
-                <th>Office Hour Location: </th><th><input name="Location" type="text"/></th>
+                <th>Office Hour Location: </th><th><input name="Location" type="text" value="{{ currentAccount.office_hour_location }}"/></th>
             </tr>
             <tr>
-                <th>Office Hour Time: </th><th><input name="Time" type="text"/></th>
+                <th>Office Hour Time: </th><th><input name="Time" type="text" value="{{ currentAccount.office_hour_time }}"/></th>
             </tr>
         </table>
-
         <div class="container">
             <div class="center">
-                <a class="button" type="submit">Edit</a>
+                <input class="button" type="submit" value="Submit Changes"></input>
             </div>
         </div>
     </form>
