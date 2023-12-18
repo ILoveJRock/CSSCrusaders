@@ -87,7 +87,7 @@
 
         }
 
-        button {
+        button, form {
             width: calc(24% - 5px);
             margin-right: 5px;
             padding: 8px;
@@ -161,9 +161,17 @@
 </div>
 
 <div class="button-container">
-    <button><a href="{% url 'edit_account' %}?userId={{ selected_user.account_id }}" style="color: white;">Edit Selected User</a></button>
-    <button><a href="{% url 'delete_account' %}?userId={{ selected_user.account_id }}" style="color: white;">Delete Selected User</a></button>   
-    <button><a href='manage/createAccount/' style="color: white;">Add New User</a></button>
+    <button>
+        <a href="{% if selected_user %}{% url 'edit_account' %}?userId={{ selected_user.account_id }}{% endif %}" style="color: white;" >Edit Selected User</a>
+    </button>
+    <form action="{% url 'delete_account' %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="userId" value="{{ selected_user.account_id }}">
+        <button type="submit" style="color: white; width: 100%; height: 100%;" {% if not selected_user %}disabled{% endif %}>Delete Selected User</button>
+    </form>   
+    <button>
+        <a href='manage/createAccount/' style="color: white;">Add New User</a>
+    </button>
 </div>
 
 </body>

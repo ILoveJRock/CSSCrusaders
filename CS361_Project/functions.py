@@ -150,10 +150,10 @@ class Management:
                 return str(e)
 
         @staticmethod
-        def delete_account(selected_account):
+        def delete_account(request):
             try:
-                existing_account = Account.objects.get(username=selected_account.username)
-                existing_account.delete()
+                user_id = request.POST.get('userId')
+                Account.objects.get(account_id=user_id).delete()
             except Account.DoesNotExist:
                 return 'Cannot delete an account that does not exist'
     class Profile: 
