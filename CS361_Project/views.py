@@ -83,20 +83,21 @@ class EditProfile(View):
     def get(self, request):
         result = loginCheck(request, 2) # Everyone logged in can view
         if result: return result
-        return render(request, 'EditProfile.html', {'validForm': 'invalid'})
+        session = request.session
+        current_account = Account.objects.get(account_id=session.get('userID'))
+        return render(request, 'EditProfile.html', {'currentAccount': current_account})
 
     def post(self, request):
         result = loginCheck(request, 2) # Everyone logged in can view
         if result: return result
         user = Account.objects.get(username=request.session['name'])
         update_user_field(user, "name", request.POST.get("Name"))
-        update_user_field(user, "phone", request.POST.get("Phone"), int)
+        update_user_field(user, "phone", request.POST.get("Phone"))
         update_user_field(user, "email", request.POST.get("Email"))
         update_user_field(user, "address", request.POST.get("Address"))
         update_user_field(user, "office_hour_location", request.POST.get("Location"))
         update_user_field(user, "office_hour_time", request.POST.get("Time"))
-
-        return render(request, 'EditProfile.html')
+        return render(request, 'EditProfile.html', {'currentAccount': user})
 
 
 class EditPassword(View):
@@ -130,7 +131,7 @@ class ManageAccounts(View):
             try:
                 selected_user = Account.objects.get(account_id=selected_user_id)
             except Account.DoesNotExist:
-                return render(request, 'error_page.html', {'error_message': f"Account with ID {user_id} does not exist."})
+                return render(request, 'error_page.html', {'error_message': f"Account with ID {selected_user_id} does not exist."})
 
         
         query = [{"id" : account.account_id, "role": account.role, "named": account.name, "phone": account.phone, "email": account.email, "address": account.address, "office_hour_location": account.office_hour_location, "office_hour_time": account.office_hour_time} for account in accounts]
@@ -371,9 +372,15 @@ class Logout(View):
 
 class AdminDashboard(View):
     def get(self, request):
-        result = loginCheck(request, 0)
-        if result: return result
-        return render(request, 'AdminDashboard.html')
+        # Small little hack, checks if user is supervisor, if not it directs them to the proper dashboard
+        session = request.session
+        current_account = Account.objects.get(account_id=session.get('userID'))
+        if current_account.role == 1:  # Instructor
+            return redirect('prof_dashboard')
+        elif current_account.role == 2:  # TA
+            return redirect('ta_dashboard')
+        else:  # Admin
+            return render(request, 'AdminDashboard.html')
 
     def post(self, request):
         result = loginCheck(request, 0)

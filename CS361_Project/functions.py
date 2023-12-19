@@ -93,6 +93,7 @@ class Management:
         @staticmethod
         def login(request, user):
             session = request.session
+            session['userID'] = user.account_id
             session['name'] = user.name
             session['role'] = user.role
             session['LoggedIn'] = True
