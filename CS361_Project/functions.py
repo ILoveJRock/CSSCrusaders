@@ -125,7 +125,6 @@ class Management:
                 try:
                     new_instructor.full_clean()
                     new_instructor.save()
-                    print(new_instructor.instructor_id)
                 except ValidationError as e:
                     print(e)
             else:
@@ -134,7 +133,6 @@ class Management:
                 try:
                     new_ta.full_clean()
                     new_ta.save()
-                    print(new_ta.ta_id)
                 except ValidationError as e:
                     print(e)
 
