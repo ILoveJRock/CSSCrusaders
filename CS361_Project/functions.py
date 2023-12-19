@@ -103,7 +103,6 @@ class Management:
         def create_account(request):
             if len(Account.objects.filter(username=request.POST["name"])) != 0:
                 return "There is already an account with that username."
-            
             form_name = request.POST['name']
             form_phone = request.POST['phone']
             form_email = request.POST['email']
@@ -120,6 +119,24 @@ class Management:
                 address=form_address
             )
             new_account.save()
+            if acctype == "instructor":
+                # creates instructor model
+                new_instructor = Instructor(instructor_id=new_account)
+                try:
+                    new_instructor.full_clean()
+                    new_instructor.save()
+                    print(new_instructor.instructor_id)
+                except ValidationError as e:
+                    print(e)
+            else:
+                # creates ta model
+                new_ta = TA(ta_id=new_account)
+                try:
+                    new_ta.full_clean()
+                    new_ta.save()
+                    print(new_ta.ta_id)
+                except ValidationError as e:
+                    print(e)
 
         @staticmethod
         def update_account(request, selected_account):
