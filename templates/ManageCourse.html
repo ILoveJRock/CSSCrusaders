@@ -8,7 +8,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start; /* Vertically align to the top */
             height: 100vh;
             margin: 0;
             background-color: #282c35;
@@ -16,48 +16,88 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        #manageCourse {
+        #manageAccount {
             text-align: center;
-            margin-bottom: 20px;
-        }
-
-        form {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 80%;
-            max-width: 600px;
-        }
-
-        label {
-            margin: 10px 0;
-        }
-
-        input {
-            width: 100%;
+            width: 100%; /* Take up the full width */
+            background-color: #4CAF50;
             padding: 10px;
-            margin: 5px 0;
-            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+
+        .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .scrollable-table {
+            width: 70%;
+            max-height: 500px;
+            overflow-y: auto;
+            display: block;
+        }
+
+        .course-overview {
+            width: 30%;
+            margin-left: 10px;
+            padding: 10px;
             border-radius: 5px;
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        table {
+            width: 100%;
+            max-width: 1000px;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            white-space: nowrap;
+            word-wrap: break-word;
+            overflow: hidden;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+        td{
+           background-color: #4CAF50;
+            color: white;
         }
 
         .button-container {
             display: flex;
             justify-content: space-between;
             width: 100%;
-            max-width: 600px;
+            max-width: 500px;
             margin-top: 20px;
+
         }
 
         button {
-            width: 48%;
-            padding: 10px;
+            width: calc(24% - 5px);
+            margin-right: 5px;
+            padding: 8px;
             background-color: #4CAF50;
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
             transition: background-color 0.3s;
+            text-align: center;
         }
 
         button:hover {
@@ -69,85 +109,51 @@
             text-decoration: none;
         }
     </style>
-    <title>Manage Course</title>
+    <title>Manage Accounts</title>
 </head>
 <body>
-{% include 'NavBar.html'  %}
-<div id="manageCourse">
-    <h1>Manage Course</h1>
+{% include 'NavBar.html' %}
+<div id="manageAccount">
+    <h1>Manage Courses</h1>
+</div>
+<div class="container">
+    <div class="scrollable-table">
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Department</th>
+                    <th>Labs</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for course in courses %}
+                <tr>
+                    <form method="post" action="">
+                        {% csrf_token %}
+                        <button type="submit" name="selected_course_id" value={{ course.id }}>Select</button>
+                    </form>
+                    <td>course.name</td>
+                    <td>course.dept</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="course-overview">
+        <h2>Selected course</h2>
+        <hr>
+        <p><strong>Name:</strong> {{ selected_course.name }}</p>
+        <p><strong>Dept:</strong> {{ selected_course.dept }}</p>
+        <p><strong>Labs:</strong> {{ selected_course.labs }}</p>
+    </div>
 </div>
 
-<form>
-    <label for="id">Course ID:</label>
-    <input type="text" id="id" name="id" required>
-
-    <!-- Input fields for current information -->
-    <label for="currentName">Current Name:</label>
-    <input type="text" id="currentName" name="currentName" required>
-
-    <label for="currentTeacher">Current Teacher ID:</label>
-    <input type="text" id="currentTeacher" name="currentTeacher" required>
-
-    <!-- Input fields for new information -->
-    <label for="newName">New Name:</label>
-    <input type="text" id="newName" name="newName">
-
-    <label for="newTeacher">New Teacher ID:</label>
-    <input type="text" id="newTeacher" name="newTeacher">
-
-  <div class="button-container">
-      <button type="button" onclick="confirmUpdate()">Confirm</button>
-      <button><a href="{% url 'admin_dashboard' %}" style="color: white;">Return</a></button>
-  </div>
-</form>
-
-<script>
-    function confirmUpdate() {
-        // Get the values from the form inputs
-        var courseId = document.getElementById("id").value;
-        var currentName = document.getElementById("currentName").value;
-        var currentTeacher = document.getElementById("currentTeacher").value;
-        var newName = document.getElementById("newName").value;
-        var newTeacher = document.getElementById("newTeacher").value;
-
-        // Validate if required fields are not empty
-        if (!courseId || !currentName || !currentTeacher) {
-            alert("Please fill in the required fields (Course ID, Current Name, Current Teacher ID).");
-            return;
-        }
-
-        // Create a data object with the form values
-        var data = {
-            id: courseId,
-            currentName: currentName,
-            currentTeacher: currentTeacher,
-            newName: newName,
-            newTeacher: newTeacher,
-        };
-
-        // Use fetch to send a POST request to the Django view
-        fetch('/course/update/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken'),  // Include CSRF token for Django
-            },
-            body: JSON.stringify(data),
-        })
-        .then(response => {
-            if (response.ok) {
-                alert("Course information updated successfully!");
-                // Optionally, you can redirect to another page or perform additional actions
-            } else {
-                throw new Error('Network response was not ok');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert("An error occurred while updating the course information.");
-        });
-    }
-</script>
+<div class="button-container">
+    <button><a id="editLink" style="color: white;">Edit Selected Course</a></button>
+    <button><a id="deleteLink" style="color: white;">Delete Selected Course</a></button>
+    <button><a href='manage/createAccount/' style="color: white;">Add New Course</a></button>
+</div>
 
 </body>
 </html>

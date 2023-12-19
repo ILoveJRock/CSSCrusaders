@@ -8,4 +8,3 @@ admin.site.register(TA)
 admin.site.register(Course)
 admin.site.register(LabSection)
 admin.site.register(Course_LabSection)
-

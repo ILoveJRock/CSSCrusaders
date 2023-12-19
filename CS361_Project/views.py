@@ -184,6 +184,29 @@ class EditAccount(View):
         # Redirect to ManageAccount view
         return redirect('/manage/')
 
+class ManageCourses(View):
+    def get(self, request):
+        result = loginCheck(request, 0)
+        if result: return result
+
+        courses = Course.objects.all()
+        labs = LabSection.objects.all()
+        query1 = [{"name": course.name, "dept": course.dept, "id": course.Labid} for course in courses]
+        query2 = [{"name": lab.name, "course_id": lab.course} for lab in labs]
+        query = queryFromCourses(query1, query2)
+        return render(request, 'ManageCourse.html',  {"courses": query})
+
+
+    def post(self, request):
+        result = loginCheck(request, 0)
+        if result: return result
+
+        selected_course_id = request.POST["selected_course_id"]
+        selected_course = Course.objects.filter(Labid=selected_course_id).first()
+        
+        courses = request.POST["courses"]
+        return render(request, 'ManageCourse.html', {"courses": courses, "selected_course": selected_course_id})
+
 
 class DeleteAccount(View):
     def post(self, request):

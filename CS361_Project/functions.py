@@ -77,6 +77,17 @@ def editProfileData(self, request, user, field_name, field_type, error_name):
         user.save()
 
 
+def queryFromCourses(courses, labs):
+  for course in courses:
+    course["labs"] = ""
+  for lab in labs:
+     course = filter(lambda c : c["id"] == lab.course_id, courses)[0]
+     course["labs"] += lab.name + ", "
+  for course in courses:
+     course["labs"] = course["labs"][:-2]
+  return courses    
+
+
 class Management:
     class User:
         @staticmethod
@@ -206,3 +217,4 @@ def update_user_password(user, new_password, repeat_password):
 
         user.password = new_password
         user.save()
+
