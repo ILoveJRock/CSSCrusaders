@@ -213,9 +213,8 @@ class DeleteAccount(View):
     def post(self, request):
         result = loginCheck(request, 0)
         if result: return result
-        user_id = request.GET.get('userId')
-        Management.Account.deleteAccount(request, user_id)
-        return render(request, 'ManageAccount.html')
+        Management.Account.delete_account(request)
+        return redirect('/manage/')
 
 
 class Notification(View):

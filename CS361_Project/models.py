@@ -22,13 +22,13 @@ class Supervisor(models.Model):
 
 class Instructor(models.Model):
     instructor_id = models.OneToOneField("Account", on_delete=models.CASCADE, primary_key=True)
-    course = models.ForeignKey("Course", on_delete=models.SET_NULL, null=True)
-    section = models.ForeignKey("Course_LabSection", on_delete=models.SET_NULL, null=True)
+    course = models.ForeignKey("Course", on_delete=models.SET_NULL, null=True, blank=True)
+    section = models.ForeignKey("Course_LabSection", on_delete=models.SET_NULL, null=True, blank=True)
 
 class TA(models.Model):
     ta_id = models.OneToOneField("Account", on_delete=models.CASCADE, primary_key=True)
-    course = models.ForeignKey("Course", on_delete=models.SET_NULL, null=True)
-    section = models.ForeignKey("Course_LabSection", on_delete=models.SET_NULL, null=True)
+    course = models.ForeignKey("Course", on_delete=models.SET_NULL, null=True, blank=True)
+    section = models.ForeignKey("Course_LabSection", on_delete=models.SET_NULL, null=True, blank=True)
 
 class LabSection(models.Model):
     Labid = models.IntegerField(primary_key=True)
