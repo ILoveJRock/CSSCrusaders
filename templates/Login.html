@@ -88,4 +88,12 @@
         </div>
     </div>
 </body>
+<!-- Screw you, don't try to get around logout by clicking the back button -->
+<script>
+    // *takes away your back button privileges*
+    history.pushState(null, null, document.URL);
+    window.addEventListener('popstate', function () {
+        history.pushState(null, null, document.URL);
+    });
+</script>
 </html>

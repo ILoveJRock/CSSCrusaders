@@ -8,7 +8,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start; /* Vertically align to the top */
             height: 100vh;
             margin: 0;
             background-color: #282c35;
@@ -18,35 +18,73 @@
 
         #createCourse {
             text-align: center;
-            margin-bottom: 20px;
-        }
-
-        form {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 80%;
-            max-width: 600px;
-        }
-
-        label {
-            margin: 10px 0;
-        }
-
-        input {
-            width: 100%;
+            width: 100%; /* Take up the full width */
+            background-color: #4CAF50;
             padding: 10px;
-            margin: 5px 0;
-            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+
+        .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .scrollable-table {
+            width: 70%;
+            max-height: 500px;
+            overflow-y: auto;
+            display: block;
+        }
+
+        .user-overview {
+            width: 30%;
+            margin-left: 10px;
+            padding: 10px;
             border-radius: 5px;
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        table {
+            width: 100%;
+            max-width: 1000px;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            white-space: nowrap;
+            word-wrap: break-word;
+            overflow: hidden;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+        td{
+           background-color: #4CAF50;
+            color: white;
         }
 
         .button-container {
             display: flex;
             justify-content: space-between;
             width: 100%;
-            max-width: 600px;
+            max-width: 500px;
             margin-top: 20px;
+
         }
 
         button {
@@ -77,30 +115,32 @@
 <div id="createCourse">
     <h1>Create Course</h1>
 </div>
+<form action="#" method="post" class="form-container">
+    {% csrf_token %}
+    <table>
+        <tr>
+            <td><label for="name">Course Name</label></td>
+            <td><input type="text" id="name" name="name" required></td>
+        </tr>
+        <tr>
+            <td><label for="dept">Department</label></td>
+            <td><input type="text" id="dept" name="dept" required></td>
+        </tr>
+        <tr>
+            <td>Professor </td>
+            <td><select name="section">
+                {% for instructor in profs %}
+                    <option value="{{ instructor.account_id }}">{{ instructor.name }}</option>
+                {% endfor %}
+            </select></td>
+        </tr>
 
-<form>
-    <label for="name">Name:</label>
-    <input type="text" id="name" name="name" required>
-
-    <label for="teacher">Teacher ID:</label>
-    <input type="text" id="teacher" name="teacher" required>
-
-    <label for="id">ID:</label>
-    <input type="text" id="id" name="id" required>
-
-  <div class="button-container">
-      <button type="button" onclick="confirmUpdate()">Confirm</button>
-      <button><a href="{% url 'admin_dashboard' %}" style="color: white;">Return</a></button>
-  </div>
-</form>
-
-<script>
-    function createCourse() {
-        // Add logic to create a new course in the database
-        // You can use JavaScript or send a request to a server-side script.
-        alert("Course created successfully!");
-    }
-</script>
+        <tr>
+            <td colspan="2"><input type="submit" id="id" value="Create" class="submit-button"></td>
+        </tr>
+    </table>
+    </form>
+    {{ message }}
 
 </body>
 </html>

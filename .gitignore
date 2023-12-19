@@ -159,6 +159,5 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
-CS361/__pycache__/
-djangoProject1/__pycache__/
-*.pyc
+templates/ManageAccount.html
+
