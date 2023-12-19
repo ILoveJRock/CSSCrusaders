@@ -185,14 +185,15 @@ class EditAccount(View):
         # Redirect to ManageAccount view
         return redirect('/manage/')
 
-class ManageCourses(View):
+
+class ManageCourse(View):
     def get(self, request):
         result = loginCheck(request, 0)
         if result: return result
 
         courses = Course.objects.all()
         labs = LabSection.objects.all()
-        query1 = [{"name": course.name, "dept": course.dept, "id": course.Labid} for course in courses]
+        query1 = [{"name": course.name, "dept": course.dept, "id": course.Courseid} for course in courses]
         query2 = [{"name": lab.name, "course_id": lab.course} for lab in labs]
         query = queryFromCourses(query1, query2)
         return render(request, 'ManageCourse.html',  {"courses": query})
@@ -235,20 +236,6 @@ class Notification(View):
         return redirect('/dashboard/')
 
 
-class ManageCourse(View):
-    def get(self, request):
-        result = loginCheck(request, 0)
-        if result: return result
-        # TODO get the courses and labs and pass them to render {"courses": courses, "labs": labs}
-        return render(request, 'ManageCourse.html')
-
-    def post(self, request):
-        result = loginCheck(request, 0)
-        if result: return result
-        # TODO Post actions for every single action to the courses
-        return render(request, 'ManageCourse.html')
-
-
 # TODO For all of these, persist the course and/or lab selected back to manage course
 class CreateCourse(View):
     def get(self, request):
@@ -262,17 +249,18 @@ class CreateCourse(View):
         if result: return result
         course_name = request.POST.get('name')
         department = request.POST.get('dept')
-        proffessor = request.POST.get('section') # Unused for now
+        proffessor = request.POST.get('professor')
         max_id = Course.objects.aggregate(Max('Courseid'))['Courseid__max']
         new_id = (max_id or 0) + 1
         new_course = Course(
             Courseid=new_id,
             name=course_name,
-            dept=department,
-            prof=proffessor
-
+            dept=department
         )
         new_course.save()
+        instructor = Instructor.objects.filter(instructor_id=proffessor)
+        instructor.course = new_course
+
         return redirect('create_course')
 
 
