@@ -9,6 +9,7 @@ from .functions import *
 from django.views.decorators.cache import cache_control
 from django.utils.decorators import method_decorator
 from django.db.models import Max
+from django.forms import Form, ModelChoiceField
 
 
 class Login(View):
@@ -26,7 +27,6 @@ class Login(View):
         # Authenticate user w/ helper method
         user = authenticate_user(self, username, password)
         # If the user is authenticated, log the user in and redirect them to the ADMIN DASHBOARD page
-        # TODO: Each role should have its own dash
         if user:
             Management.User.login(request, user)
             if (user.role == 0):
@@ -384,13 +384,22 @@ class TADashboard(View):
         if result: return result
         return render(request, 'TADashboard.html')
 
+# TODO MOVE THIS TO A FORM CLASS SUPER BAD PRACTICE THAT IT'S IN HERE!!!!
+class UserForm(Form):
+    user = ModelChoiceField(queryset=Account.objects.all())
+
 class ViewContact(View):
     def get(self, request):
         result = loginCheck(request, 2) # Everyone logged in can view
         if result: return result
-        return render(request, 'view_contact_info.html')
+        form = UserForm()
+        return render(request, 'view_contact_info.html', {'form': form})
 
     def post(self, request):
         result = loginCheck(request, 2) # Everyone logged in can view
         if result: return result
-        return render(request, 'view_contact_info.html')
+        form = UserForm(request.POST)
+        if form.is_valid():
+            user = form.cleaned_data['user']
+            return render(request, 'view_contact_info.html', {'form': form, 'selected_user': user})
+        return render(request, 'view_contact_info.html', {'form': form})
