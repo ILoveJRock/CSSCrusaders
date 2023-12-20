@@ -123,18 +123,21 @@
                 <tr>
                     <th>Name</th>
                     <th>Department</th>
-                    <th>Professor</th>
+                    <th>Instructor</th>
                 </tr>
             </thead>
             <tbody>
                 {% for course in courses %}
                 <tr>
-                    <form method="post" action="">
-                        {% csrf_token %}
-                        <button type="submit" name="selected_course_id" value={{course.id}}>Select</button>
-                    </form>
-                    <td>{{course.name}}</td>
-                    <td>{{course.dept}}</td>
+                    <td>{{ course.name }}</td>
+                    <td>{{ course.dept }}</td>
+                    <td>{{ course.instructor }}</td>
+                    <td>
+                        <form method="post" action="">
+                            {% csrf_token %}
+                            <button type="submit" name="selected_course_id" value={{ course.id }}>Select</button>
+                        </form>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -145,7 +148,7 @@
         <hr>
         <p><strong>Name:</strong> {{ selected_course.name }}</p>
         <p><strong>Dept:</strong> {{ selected_course.dept }}</p>
-        <p><strong>Labs:</strong> {{ selected_course.labs }}</p>
+        <p><strong>Instructor:</strong> {{ selected_course.instructor }}</p>
     </div>
 </div>
 
