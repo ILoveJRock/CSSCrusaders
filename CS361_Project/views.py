@@ -191,10 +191,12 @@ class ManageCourses(View):
         if result: return result
 
         courses = Course.objects.all()
-        labs = LabSection.objects.all()
-        query1 = [{"name": course.name, "dept": course.dept, "id": course.Labid} for course in courses]
-        query2 = [{"name": lab.name, "course_id": lab.course} for lab in labs]
-        query = queryFromCourses(query1, query2)
+        instructors = Instructor.objects.all()
+        accounts = Account.objects.all()
+        query1 = [{"name": course.name, "dept": course.dept, "id": course.Courseid} for course in courses]
+        query2 = [{"id": instructor.name, "course": instructor.course} for instructor in instructors]
+        query3 = [{"id": account.account_id, "name": account.username} for account in accounts]
+        query = queryFromCourses(query1, query2, query3)
         return render(request, 'ManageCourse.html',  {"courses": query})
 
 

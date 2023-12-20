@@ -77,14 +77,11 @@ def editProfileData(self, request, user, field_name, field_type, error_name):
         user.save()
 
 
-def queryFromCourses(courses, labs):
-  for course in courses:
-    course["labs"] = ""
-  for lab in labs:
-     course = filter(lambda c : c["id"] == lab.course_id, courses)[0]
-     course["labs"] += lab.name + ", "
-  for course in courses:
-     course["labs"] = course["labs"][:-2]
+def queryFromCourses(courses, instructors, accounts):
+  for instructor in instructors:
+      course = filter(lambda c : c["id"] == instructor["id"], courses)[0]
+      account = filter(lambda a : a["id"] == instructor["id"], accounts)[0]
+      course["instructor"] = account["name"]
   return courses    
 
 
