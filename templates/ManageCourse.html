@@ -129,9 +129,9 @@
             <tbody>
                 {% for course in courses %}
                 <tr>
-                    <td>course.name</td>
-                    <td>course.dept</td>
-                    <td>course.instructor</td>
+                    <td>{{ course.name }}</td>
+                    <td>{{ course.dept }}</td>
+                    <td>{{ course.instructor }}</td>
                     <td>
                         <form method="post" action="">
                             {% csrf_token %}

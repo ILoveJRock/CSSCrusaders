@@ -78,11 +78,24 @@ def editProfileData(self, request, user, field_name, field_type, error_name):
 
 
 def queryFromCourses(courses, instructors, accounts):
-  for instructor in instructors:
-      course = filter(lambda c : c["id"] == instructor["id"], courses)[0]
-      account = filter(lambda a : a["id"] == instructor["id"], accounts)[0]
-      course["instructor"] = account["name"]
-  return courses
+    for instructor in instructors:
+        print(courses)
+        print(instructor)
+        course = None
+        for c in courses:
+            print(c)
+            if c["id"] == instructor["course"]:
+                course = c
+                break
+        if course != None:
+            print("found course")
+            account = None
+            for a in accounts:
+                if a["id"] == instructor["id"]:
+                    account = a
+            course["instructor"] = account["name"]
+    print(courses)
+    return courses
 
 
 class Management:
