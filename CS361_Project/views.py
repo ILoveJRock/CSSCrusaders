@@ -220,14 +220,23 @@ class ManageCourse(View):
 
         selected_course_id = request.POST.get("selected_course_id")
         selected_course = None
+
         if selected_course_id:
-            selected_course = Course.objects.get(Courseid=selected_course_id)
+            try:
+                selected_course = Course.objects.get(Courseid=selected_course_id)
+            except Course.DoesNotExist:
+                # Handle given ID doesn't exist
+                pass
 
         courses = Course.objects.all()
         instructors = Instructor.objects.all()
         accounts = Account.objects.all()
         query1 = [{"name": course.name, "dept": course.dept, "id": course.Courseid} for course in courses]
-        query2 = [{"id": instructor.instructor_id.account_id, "course": instructor.course.Courseid} for instructor in instructors]
+        query2 = [
+            {"id": instructor.instructor_id.account_id, "course": instructor.course.Courseid}
+            if instructor.course is not None
+            else {"id": instructor.instructor_id.account_id, "course": None}
+            for instructor in instructors]
         query3 = [{"id": account.account_id, "name": account.name} for account in accounts]
         query = queryFromCourses(query1, query2, query3)
         return render(request, 'ManageCourse.html',  {"courses": query, "selected_course": selected_course})
