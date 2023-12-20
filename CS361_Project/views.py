@@ -273,7 +273,7 @@ class CreateCourse(View):
         instructor = Instructor.objects.filter(instructor_id=proffessor)
         instructor.course = new_course
 
-        return redirect('create_course')
+        return redirect('course')
 
 
 class CreateLab(View):
