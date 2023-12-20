@@ -12,6 +12,7 @@ from django.db.models import Max
 from django.forms import Form, ModelChoiceField
 
 
+
 class Login(View):
     def get(self, request):
         # If the user is already logged in, redirect to home page
@@ -185,9 +186,6 @@ class EditAccount(View):
         # Redirect to ManageAccount view
         return redirect('/manage/')
 
-class ManageCourses(View):
-    pass
-
 
 class DeleteAccount(View):
     def post(self, request):
@@ -253,17 +251,18 @@ class CreateCourse(View):
         if result: return result
         course_name = request.POST.get('name')
         department = request.POST.get('dept')
-        proffessor = request.POST.get('section') # Unused for now
+        proffessor = request.POST.get('professor')
         max_id = Course.objects.aggregate(Max('Courseid'))['Courseid__max']
         new_id = (max_id or 0) + 1
         new_course = Course(
             Courseid=new_id,
             name=course_name,
-            dept=department,
-            prof=proffessor
-
+            dept=department
         )
         new_course.save()
+        instructor = Instructor.objects.filter(instructor_id=proffessor)
+        instructor.course = new_course
+
         return redirect('create_course')
 
 
@@ -271,24 +270,51 @@ class CreateLab(View):
     def get(self, request):
         result = loginCheck(request, 0)
         if result: return result
-        selected_course = Course.objects.get(Courseid=request.GET.get('courseId'))
+        selected_course = Course.objects.get(Courseid=request.get('courseId'))
         tas = TA.objects.filter(course=selected_course)
         return render(request, 'CreateLab.html', {"tas": tas})
+
     def post(self, request):
         result = loginCheck(request, 0)
         if result: return result
         if len(LabSection.objects.filter(name=request.POST["name"])) != 0:
             return render(request, 'CreateLab.html', {"message": "There is already a lab section with that number."})
         create_lab(request)
-        return render(request, 'CreateLab.html')
+        return render(request, 'ManageCourse.html')
 
 
 class EditCourse(View):
+    template_name = 'edit_course.html'
+
+    def get(self, request):
+        result = loginCheck(request, 0)
+        if result: return result
+
+        selected_section_id = request.GET.get('Labid')
+        try:
+            selected_section = Course_LabSection.objects.get(course_id=selected_section_id)
+            return render(request, self.template_name, {'selected_section': selected_section})
+        except Course_LabSection.DoesNotExist:
+            return render(request, 'error_page.html',
+                          {'error_message': f"Section with ID {selected_section_id} does not exist."})
+
     def post(self, request):
         result = loginCheck(request, 0)
         if result: return result
-        # TODO Edit the course
-        return render(request, 'ManageCourse.html')
+
+        selected_section_id = request.POST.get('selected_section_id')
+        try:
+            selected_section = Course_LabSection.objects.get(course_id=selected_section_id)
+        except Course_LabSection.DoesNotExist:
+            return render(request, 'error_page.html',
+                          {'error_message': f"Section with ID {selected_section_id} does not exist."})
+
+        form = EditCourseLabSectionForm(request.POST, instance=selected_section)
+        if form.is_valid():
+            form.save()
+            return redirect('/course')
+
+        return render(request, self.template_name, {'form': form, 'selected_section': selected_section})
 
 
 class EditLab(View):
@@ -418,3 +444,9 @@ class ViewContact(View):
             user = form.cleaned_data['user']
             return render(request, 'view_contact_info.html', {'form': form, 'selected_user': user})
         return render(request, 'view_contact_info.html', {'form': form})
+
+
+class EditCourseLabSectionForm(forms.ModelForm):
+    class Meta:
+        model = Course_LabSection
+        fields = ['name', 'time']

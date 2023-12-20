@@ -78,9 +78,9 @@
         <tr>
             <td>TA </td>
             <td><select name="section">
-            {% for i in tas %}
-                <option value="{{ i.0 }}">{{ i.1 }}</option>
-            {% endfor %}
+                {% for i in tas %}
+                    <option value="{{ i.account_id }}">{{ i.name }}</option>
+                {% endfor %}
             </select></td>
         </tr>
         <tr>
