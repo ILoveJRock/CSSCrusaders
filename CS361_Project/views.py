@@ -10,6 +10,7 @@ from django.views.decorators.cache import cache_control
 from django.utils.decorators import method_decorator
 from django.db.models import Max
 from django.forms import Form, ModelChoiceField
+from django import forms
 
 
 
@@ -449,4 +450,4 @@ class ViewContact(View):
 class EditCourseLabSectionForm(forms.ModelForm):
     class Meta:
         model = Course_LabSection
-        fields = ['name', 'time']
+        fields = ['labSection']

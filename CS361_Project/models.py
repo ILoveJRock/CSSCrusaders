@@ -30,6 +30,7 @@ class TA(models.Model):
     course = models.ForeignKey("Course", on_delete=models.SET_NULL, null=True, blank=True)
     section = models.ForeignKey("Course_LabSection", on_delete=models.SET_NULL, null=True, blank=True)
 
+
 class LabSection(models.Model):
     Labid = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=40)
