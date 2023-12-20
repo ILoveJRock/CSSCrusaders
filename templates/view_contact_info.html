@@ -21,31 +21,6 @@
             margin-bottom: 20px;
         }
 
-        .tabs {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-
-        .tab {
-            padding: 10px 20px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px 5px 0 0;
-            cursor: pointer;
-            margin-right: 5px;
-            transition: background-color 0.3s;
-        }
-
-        .tab:hover {
-            background-color: #45a049;
-        }
-
-        .active-tab {
-            background-color: #45a049;
-        }
-
         form {
             display: flex;
             flex-direction: column;
@@ -94,66 +69,25 @@
             text-decoration: none;
         }
     </style>
-    <title>Manage Contact</title>
+    <title>View Contact</title>
 </head>
 <body>
-
-<div id="manageContact">
-    <h1>Manage Contact</h1>
-</div>
-
-<div class="tabs">
-    <button class="tab active-tab" onclick="switchTab('view')">View Contact</button>
-    <button class="tab" onclick="switchTab('edit')">Edit Contact</button>
-</div>
-
-<form id="viewContactForm">
-    <label for="idView">Account ID:</label>
-    <input type="text" id="idView" name="idView" required readonly>
-
-    <label for="contactView">Contact Information:</label>
-    <input type="text" id="contactView" name="contactView" required readonly>
-
-    <div class="button-container">
-        <button type="button" onclick="confirmUpdate()">Confirm</button>
-    <button><a href="{% url 'admin_dashboard' %}" style="color: white;">Return</a></button>
+    {% include 'NavBar.html' %}
+    <div id="manageContact">
+        <h1>View Contact</h1>
     </div>
-</form>
-
-<form id="editContactForm" style="display: none;">
-    <label for="idEdit">Account ID:</label>
-    <input type="text" id="idEdit" name="idEdit" required>
-
-    <label for="contactEdit">New Contact Information:</label>
-    <input type="text" id="contactEdit" name="contactEdit" required>
-
-    <div class="button-container">
-        <button type="button" onclick="editContact()">Edit Contact</button>
-    <button><a href="{% url 'admin_dashboard' %}" style="color: white;">Return</a></button>
-    </div>
-</form>
-
-<script>
-    function switchTab(tab) {
-        if (tab === 'view') {
-            document.getElementById('viewContactForm').style.display = 'block';
-            document.getElementById('editContactForm').style.display = 'none';
-            document.querySelector('.tab.active-tab').classList.remove('active-tab');
-            document.querySelectorAll('.tab')[0].classList.add('active-tab');
-        } else if (tab === 'edit') {
-            document.getElementById('viewContactForm').style.display = 'none';
-            document.getElementById('editContactForm').style.display = 'block';
-            document.querySelector('.tab.active-tab').classList.remove('active-tab');
-            document.querySelectorAll('.tab')[1].classList.add('active-tab');
-        }
-    }
-
-    function editContact() {
-        // Add logic to edit the contact information in the database
-        // You can use JavaScript or send a request to a server-side script.
-        alert("Contact information updated successfully!");
-    }
-</script>
-
-</body>
+    
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" value="Submit">
+    </form>
+    
+    {% if selected_user %}
+    <p>Phone: {{ selected_user.phone }}</p>
+    <p>Email: {{ selected_user.email }}</p>
+    {% endif %}
+    
+    <a href="/profile" class="button">Back to Profile</a>
+    </body>
 </html>
