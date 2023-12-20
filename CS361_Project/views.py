@@ -186,27 +186,7 @@ class EditAccount(View):
         return redirect('/manage/')
 
 class ManageCourses(View):
-    def get(self, request):
-        result = loginCheck(request, 0)
-        if result: return result
-
-        courses = Course.objects.all()
-        labs = LabSection.objects.all()
-        query1 = [{"name": course.name, "dept": course.dept, "id": course.Labid} for course in courses]
-        query2 = [{"name": lab.name, "course_id": lab.course} for lab in labs]
-        query = queryFromCourses(query1, query2)
-        return render(request, 'ManageCourse.html',  {"courses": query})
-
-
-    def post(self, request):
-        result = loginCheck(request, 0)
-        if result: return result
-
-        selected_course_id = request.POST["selected_course_id"]
-        selected_course = Course.objects.filter(Labid=selected_course_id).first()
-        
-        courses = request.POST["courses"]
-        return render(request, 'ManageCourse.html', {"courses": courses, "selected_course": selected_course_id})
+    pass
 
 
 class DeleteAccount(View):
@@ -238,14 +218,26 @@ class ManageCourse(View):
     def get(self, request):
         result = loginCheck(request, 0)
         if result: return result
-        # TODO get the courses and labs and pass them to render {"courses": courses, "labs": labs}
-        return render(request, 'ManageCourse.html')
+
+        selected_course_id = request.POST.get("selected_course_id")
+        selected_course = None
+        if selected_course_id:
+            selected_course = Course.objects.get(Courseid=selected_course_id)
+
+        courses = Course.objects.all()
+        instructors = Instructor.objects.all()
+        accounts = Account.objects.all()
+        query1 = [{"name": course.name, "dept": course.dept, "id": course.Courseid} for course in courses]
+        query2 = [{"id": instructor.instructor_id.account_id, "course": instructor.course.Courseid} for instructor in instructors]
+        query3 = [{"id": account.account_id, "name": account.name} for account in accounts]
+        query = queryFromCourses(query1, query2, query3)
+        return render(request, 'ManageCourse.html',  {"courses": query, "selected_course": selected_course})
 
     def post(self, request):
         result = loginCheck(request, 0)
         if result: return result
-        # TODO Post actions for every single action to the courses
-        return render(request, 'ManageCourse.html')
+  
+        return self.get(request)
 
 
 # TODO For all of these, persist the course and/or lab selected back to manage course
