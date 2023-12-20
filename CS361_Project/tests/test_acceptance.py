@@ -159,6 +159,10 @@ class DeleteAccountAcceptance(TestCase):
         self.accountToDelete  = Account.objects.create(account_id=2, username="Bob", password="12345", role=1, name="Bob B.")
         self.accountToDelete.save()
         self.account.save()
+        
+        #Log in the client
+        self.client.post('/login/', {'username': 'Joe', 'password': '12345'})
+
 
     def test_criteriaOne(self):
         # GIVEN the admin is on the page with all accounts
@@ -166,9 +170,8 @@ class DeleteAccountAcceptance(TestCase):
         # WHEN they click on an account
         account_id_to_delete = self.accountToDelete.account_id
         # THEN there is an option to delete it
-        response = self.client.post(f'/manage/deleteAccount?userId={account_id_to_delete}', follow=True)
-
-        self.assertContains(response, 'Delete Account')
+        response = self.client.post('/manage/deleteAccount/', {'userId': account_id_to_delete}, follow=True)
+        self.assertContains(response, 'Account Deleted Successfully')
         # AND the admin is prompted to confirm the deletion if they select that option
 class EditAccountAcceptance(TestCase):
     # As a supervisor or administrator, I want to be able to edit the information on other accounts

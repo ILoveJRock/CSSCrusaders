@@ -113,9 +113,20 @@
 </head>
 <body>
 {% include 'NavBar.html' %}
+
 <div id="manageAccount">
     <h1>Manage Accounts</h1>
 </div>
+{% if messages %}
+    <div id="messages">
+        {% for message in messages %}
+            <div class="alert {{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
 <div class="container">
     <div class="scrollable-table">
         <table>

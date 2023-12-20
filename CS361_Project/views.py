@@ -205,7 +205,13 @@ class DeleteAccount(View):
     def post(self, request):
         result = loginCheck(request, 0)
         if result: return result
-        Management.Account.delete_account(request)
+        msg = Management.Account.delete_account(request)
+        if not msg:
+            # Deletion was successful, add a success message
+            messages.success(request, 'Account Deleted Successfully')
+        else:
+            # Deletion failed, add an error message
+            messages.error(request, msg)
         return redirect('/manage/')
 
 
