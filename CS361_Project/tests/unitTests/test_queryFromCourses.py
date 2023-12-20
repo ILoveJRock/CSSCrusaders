@@ -1,7 +1,6 @@
 from django.test import TestCase
-from functions import queryFromCourses
+from CS361_Project.functions import queryFromCourses
 from CS361_Project.models import Course
-from functions import queryFromCourses
 
 class TestConvert(TestCase):
     mock_courses = None

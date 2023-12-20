@@ -24,7 +24,7 @@ class Login(View):
         username = request.POST['username']
         password = request.POST['password']
         # Authenticate user w/ helper method
-        user = authenticate_user(self, username, password)
+        user = Management.User.authenticate_user(username, password)
         # If the user is authenticated, log the user in and redirect them to the ADMIN DASHBOARD page
         # TODO: Each role should have its own dash
         if user:
@@ -39,14 +39,6 @@ class Login(View):
             # If the user is not authenticated, redisplay the page with the appropriate error
             error = 'User does not exist' if not user else "Incorrect Password"
             return render(request, "login.html", {"error": error})
-
-    def authenticate_user(self, username, password):
-        try:
-            user = Account.objects.get(username=username)
-            if user.password == password:
-                return user
-        except Account.DoesNotExist:
-            self.missingUser = True
 
 
 class ForgotPassword(View):
@@ -366,7 +358,7 @@ class RemoveAssign(View):
 class Logout(View):
     def get(self, request):
         Management.User.logout(request)
-        return render(request, 'login.html')
+        return redirect('/login/')
 
 
 class AdminDashboard(View):

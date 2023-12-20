@@ -10,6 +10,7 @@ class LoginTests(TestCase):
 
     def setUp(self):
         self.client = Client()
+        
         account = Account(account_id=1, username="Joe", password="12345", role=0, name="Joe Schmo")
         account.save()
 
@@ -22,8 +23,14 @@ class LoginTests(TestCase):
         # When the incorrect password is submitted the response should contain the error 'Incorrect Password'
         self.assertContains(response, 'Incorrect Password')
     def test_AlreadyLoggedIn(self):
-        response = self.client.get('/login/', {'LoggedIn' : True}, follow=True)
+        session = self.client.session
+        session['LoggedIn'] = True
+        session['name'] = 'Joe Schmo'
+        session['role'] = 0
+        response = self.client.get('/login/', follow=True)
         self.assertRedirects(response, '/dashboard/')
+        
+        
     def test_SuccessfulLogin(self):
         response = self.client.post('/login/', {'username': 'Joe', 'password': "12345"}, follow=True)
         # Redirects to home when user is logged in

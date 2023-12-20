@@ -9,21 +9,57 @@ class LoginAcceptance(TestCase):
 
     def setUp(self):
         self.client = Client()
-        self.account = Account.objects.create(account_id=1, username="Joe", password="12345", role=0, name="Joe Schmo")
-        self.account.save()
+        self.account1 = Account.objects.create(account_id=1, username="Joe", password="12345", role=0, name="Joe Schmo")
+        self.account2 = Account.objects.create(account_id=2, username="Joel", password="12345", role=1, name="Joel Schmol")
+        self.account3 = Account.objects.create(account_id=3, username="Joey", password="12345", role=2, name="Joey Schmoey")
 
-    def test_criteriaOne(self):
+        self.account1.save()
+        self.account2.save()
+        self.account3.save()
+        
+
+    def test_criteriaOne_Supervisor(self):
         # GIVEN no one is logged in
+        session = self.client.session
         self.client.post('/logout/', follow=True)
+        self.assertFalse(session.get('LoggedIn', False))
+        print("Session before login:", session)
         # WHEN a user enters a username and password that matches a pair in the database
         response = self.client.post('/login/', {'username': 'Joe', 'password': '12345'}, follow=True)
-
+        print("Session before login:", session)
         # THEN they are redirected to the home page logged in as that user
-        self.assertRedirects(response, '/')
-        self.assertTrue(response.context['LoggedIn'])
+        self.assertRedirects(response, '/dashboard/')
+        self.assertTrue(session.get('LoggedIn', False))
         self.assertEqual(response.context['name'], 'Joe Schmo')
         self.assertEqual(response.context['role'], 0)
+    
+    def test_criteriaOne_Instructor(self):
+        # GIVEN no one is logged in
+        session = self.client.session
+        self.client.post('/logout/', follow=True)
+        # WHEN a user enters a username and password that matches a pair in the database
+        response = self.client.post('/login/', {'username': 'Joel', 'password': '12345'}, follow=True)
 
+        # THEN they are redirected to the home page logged in as that user
+        self.assertRedirects(response, '/dashboard/prof/')
+        self.assertTrue(session.get('LoggedIn', False))
+        self.assertEqual(response.context['name'], 'Joel Schmol')
+        self.assertEqual(response.context['role'], 1)
+        
+    def test_criteriaOne_TA(self):
+        # GIVEN no one is logged in
+        session = self.client.session
+        self.client.post('/logout/', follow=True)
+        # WHEN a user enters a username and password that matches a pair in the database
+        response = self.client.post('/login/', {'username': 'Joey', 'password': '12345'}, follow=True)
+
+        # THEN they are redirected to the home page logged in as that user
+        self.assertRedirects(response, '/dashboard/ta/')
+        self.assertTrue(session.get('LoggedIn', False))
+        self.assertEqual(response.context['name'], 'Joey Schmoey')
+        self.assertEqual(response.context['role'], 0)
+    
+    
     def test_criteriaTwo(self):
         # GIVEN no one is logged in
         self.client.post('/logout/', follow=True)
@@ -65,8 +101,8 @@ class CreateAccountAcceptance(TestCase):
 
         # WHEN an admin attempts to create an account with that name
         response = self.client.post('/manage/createAccount/',
-                                    {'name': 'Joe', 'phone': '1234567890', 'email': 'new@example.com',
-                                     'address': 'New Address', 'password': 'new_password', 'acctype': 'instructor'})
+                                    {'username' : 'Joe', 'name': 'Joe', 'phone': '1234567890', 'email': 'new@example.com',
+                                    'address': 'New Address', 'password': 'new_password', 'acctype': 'instructor'})
         # THEN no change happens to the database
         self.assertEqual(Account.objects.count(), old_num_accounts)
         # AND the admin sees a message that the account already exists
@@ -77,8 +113,8 @@ class CreateAccountAcceptance(TestCase):
 
         # WHEN an admin attempts to create that account
         response = self.client.post('/manage/createAccount/',
-                                    {'name': 'NewUser', 'phone': '1234567890', 'email': 'new@example.com',
-                                     'address': 'New Address', 'password': 'new_password', 'acctype': 'instructor'}, follow=True)
+                                    {'username' : 'NewUser','name': 'NewUser', 'phone': '1234567890', 'email': 'new@example.com',
+                                    'address': 'New Address', 'password': 'new_password', 'acctype': 'instructor'}, follow=True)
         # Check if the request was successful (status code 200 OK)
         self.assertEqual(response.status_code, 200)
 
@@ -101,7 +137,7 @@ class DeleteAccountAcceptance(TestCase):
     def setUp(self):
         self.client = Client()
         self.account = Account.objects.create(account_id=1, username="Joe", password="12345", role=0, name="Joe Schmo")
-        self.accountToDelete  = Accounts.objects.create(account_id=2, username="Bob", password="12345", role=1, name="Bob B.")
+        self.accountToDelete  = Account.objects.create(account_id=2, username="Bob", password="12345", role=1, name="Bob B.")
         self.accountToDelete.save()
         self.account.save()
 

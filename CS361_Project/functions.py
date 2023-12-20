@@ -5,7 +5,10 @@ from .models import *
 # call this as loginCheck(request, x) with x being the int value of the role needed to access
 def loginCheck(request, role):
   session = request.session
-  logged_in = session.get('LoggedIn', False)
+  logged_in = session.get('LoggedIn', False)# `session.get('LoggedIn', False)` is retrieving the value of the 'LoggedIn' key from
+  # the session dictionary. If the key does not exist, it will return the default value of
+  # False.
+  session.get('LoggedIn', False)
   user_role = session.get('role', 3)
   if logged_in:
     if user_role > role:
@@ -21,13 +24,6 @@ def loginCheck(request, role):
     return render(request, "login.html", {"error": error})
 
 
-def authenticate_user(self, username, password):
-    try:
-        user = Account.objects.get(username=username)
-        if user.password == password:
-            return user
-    except Account.DoesNotExist:
-        self.missingUser = True
 
 
 def create_account(request):
@@ -93,10 +89,12 @@ class Management:
         @staticmethod
         def login(request, user):
             session = request.session
+            print(f"Logging in user: {user.account_id}, {user.name}, {user.role}")
             session['userID'] = user.account_id
             session['name'] = user.name
             session['role'] = user.role
             session['LoggedIn'] = True
+            print(f"Session after login: {session}")
         @staticmethod    
         def authenticate_user(username, password):
             try:
@@ -107,8 +105,9 @@ class Management:
                 return None
         @staticmethod
         def logout(request):
-            request.session.clear()
-            request.session['LoggedIn'] = False
+            session = request.session
+            session.clear()
+            session['LoggedIn'] = False
     class Account:
         @staticmethod
         def create_account(request):
