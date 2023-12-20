@@ -44,6 +44,7 @@ class Course(models.Model):
 
 
 class Course_LabSection(models.Model):
-    course = models.OneToOneField("Course", on_delete=models.CASCADE, primary_key=True)
-    labSection = models.ForeignKey("LabSection", on_delete=models.CASCADE)
+    id = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    labSection = models.ForeignKey(LabSection, on_delete=models.CASCADE)
 
