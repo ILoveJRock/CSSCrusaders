@@ -82,7 +82,7 @@ def queryFromCourses(courses, instructors, accounts):
       course = filter(lambda c : c["id"] == instructor["id"], courses)[0]
       account = filter(lambda a : a["id"] == instructor["id"], accounts)[0]
       course["instructor"] = account["name"]
-  return courses    
+  return courses
 
 
 class Management:
