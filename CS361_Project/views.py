@@ -96,7 +96,7 @@ class EditProfile(View):
         update_user_field(user, "address", request.POST.get("Address"))
         update_user_field(user, "office_hour_location", request.POST.get("Location"))
         update_user_field(user, "office_hour_time", request.POST.get("Time"))
-        return render(request, 'EditProfile.html', {'currentAccount': user})
+        return redirect('profile')
 
 
 class EditPassword(View):

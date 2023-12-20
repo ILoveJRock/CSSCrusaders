@@ -60,7 +60,10 @@
         {% csrf_token %}
         <table>
             <tr>
-                <th>Phone: </th><th><input name="Phone" type="text" value="{{ currentAccount.phone }}"/></th>
+                <th>Phone: </th>
+                <th>
+                    <input name="Phone" type="text" value="{{ currentAccount.phone }}" pattern="^\d{3}-\d{3}-\d{4}$" title="Format: 123-456-7890"/>
+                </th>
             </tr>
             <tr>
                 <th>Email: </th><th><input name="Email" type="email" value="{{ currentAccount.email }}"/></th>
