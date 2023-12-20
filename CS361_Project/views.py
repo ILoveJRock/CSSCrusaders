@@ -91,7 +91,6 @@ class EditProfile(View):
         result = loginCheck(request, 2) # Everyone logged in can view
         if result: return result
         user = Account.objects.get(username=request.session['name'])
-        update_user_field(user, "name", request.POST.get("Name"))
         update_user_field(user, "phone", request.POST.get("Phone"))
         update_user_field(user, "email", request.POST.get("Email"))
         update_user_field(user, "address", request.POST.get("Address"))
