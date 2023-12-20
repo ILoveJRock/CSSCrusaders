@@ -94,7 +94,7 @@ class Management:
             session['name'] = user.name
             session['role'] = user.role
             session['LoggedIn'] = True
-            print(f"Session after login: {session}")
+            
         @staticmethod    
         def authenticate_user(username, password):
             try:

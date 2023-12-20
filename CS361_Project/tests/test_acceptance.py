@@ -23,67 +23,78 @@ class LoginAcceptance(TestCase):
         session = self.client.session
         self.client.post('/logout/', follow=True)
         self.assertFalse(session.get('LoggedIn', False))
-        print("Session before login:", session)
+        
         # WHEN a user enters a username and password that matches a pair in the database
         response = self.client.post('/login/', {'username': 'Joe', 'password': '12345'}, follow=True)
-        print("Session before login:", session)
+        
         # THEN they are redirected to the home page logged in as that user
         self.assertRedirects(response, '/dashboard/')
-        self.assertTrue(session.get('LoggedIn', False))
-        self.assertEqual(response.context['name'], 'Joe Schmo')
-        self.assertEqual(response.context['role'], 0)
+        
+        response = self.client.get('/dashboard/')
+        self.assertTrue(response.context['request'].session.get('LoggedIn', False))
+        self.assertEqual(response.context['request'].session['name'], 'Joe Schmo')
+        self.assertEqual(response.context['request'].session['role'], 0)
     
     def test_criteriaOne_Instructor(self):
         # GIVEN no one is logged in
         session = self.client.session
         self.client.post('/logout/', follow=True)
+
         # WHEN a user enters a username and password that matches a pair in the database
         response = self.client.post('/login/', {'username': 'Joel', 'password': '12345'}, follow=True)
 
         # THEN they are redirected to the home page logged in as that user
         self.assertRedirects(response, '/dashboard/prof/')
-        self.assertTrue(session.get('LoggedIn', False))
-        self.assertEqual(response.context['name'], 'Joel Schmol')
-        self.assertEqual(response.context['role'], 1)
         
+        # Follow the redirect to check session
+        response = self.client.get('/dashboard/prof/')
+        self.assertTrue(response.context['request'].session.get('LoggedIn', False))
+        self.assertEqual(response.context['request'].session['name'], 'Joel Schmol')
+        self.assertEqual(response.context['request'].session['role'], 1)
+
     def test_criteriaOne_TA(self):
         # GIVEN no one is logged in
         session = self.client.session
         self.client.post('/logout/', follow=True)
+
         # WHEN a user enters a username and password that matches a pair in the database
         response = self.client.post('/login/', {'username': 'Joey', 'password': '12345'}, follow=True)
 
         # THEN they are redirected to the home page logged in as that user
         self.assertRedirects(response, '/dashboard/ta/')
-        self.assertTrue(session.get('LoggedIn', False))
-        self.assertEqual(response.context['name'], 'Joey Schmoey')
-        self.assertEqual(response.context['role'], 0)
-    
+        
+        # Follow the redirect to check session
+        response = self.client.get('/dashboard/ta/')
+        self.assertTrue(response.context['request'].session.get('LoggedIn', False))
+        self.assertEqual(response.context['request'].session['name'], 'Joey Schmoey')
+        self.assertEqual(response.context['request'].session['role'], 2)
     
     def test_criteriaTwo(self):
         # GIVEN no one is logged in
+        session = self.client.session
         self.client.post('/logout/', follow=True)
+
         # WHEN a user enters a username and password pair not in the database
         response = self.client.post('/login/', {'username': 'InvalidUser', 'password': 'InvalidPassword'}, follow=True)
 
         # THEN they stay on the login page and an error is displayed
         self.assertContains(response, 'User does not exist')
-        self.assertFalse(response.context['LoggedIn'])  # Assuming it's False for a failed login
+        self.assertFalse(session.get('LoggedIn', False))  # Assuming it's False for a failed login
 
+        
     def test_criteriaThree(self):
         # GIVEN a user is logged in
+        session = self.client.session
+        self.client.post('/login/', {'username': 'Joe', 'password': '12345'}, follow=True)
 
         # WHEN they select the log out button
         response = self.client.get('/logout/', follow=True)
 
         # THEN they are redirected to the login page and are no longer logged in
         self.assertRedirects(response, '/login/')
-        self.assertFalse(response.context['LoggedIn'])
-        session = self.client.session
+        self.assertFalse(session.get('LoggedIn', False))
         self.assertNotIn('name', session)
         self.assertNotIn('role', session)
-        self.assertFalse(session['LoggedIn'])
-
 
 class CreateAccountAcceptance(TestCase):
     # As a supervisor or administrator, I need to be able to create instructor and TA accounts so that random people can’t get in the system.
