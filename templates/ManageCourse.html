@@ -146,14 +146,15 @@
     <div class="course-overview">
         <h2>Selected course</h2>
         <hr>
+        <p><strong>ID:</strong> {{ selected_course.Courseid }}</p>
         <p><strong>Name:</strong> {{ selected_course.name }}</p>
         <p><strong>Dept:</strong> {{ selected_course.dept }}</p>
-        <p><strong>Instructor:</strong> {{ selected_course.instructor }}</p>
+        <p><strong>Instructor:</strong> {{ selected_course.prof }}</p>
     </div>
 </div>
 
 <div class="button-container">
-    <button><a href='/course/editCourse' id="editLink" style="color: white;">Edit Selected Course</a></button>
+    <button><a href='/course/editCourse?courseId={{ selected_course.Courseid }}' id="editLink" style="color: white;">Edit Selected Course</a></button>
     <button><a id="deleteLink" style="color: white;">Delete Selected Course</a></button>
     <button><a href='/course/createCourse' style="color: white;">Add New Course</a></button>
 </div>

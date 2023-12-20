@@ -30,21 +30,18 @@ class TA(models.Model):
     course = models.ForeignKey("Course", on_delete=models.SET_NULL, null=True, blank=True)
     section = models.ForeignKey("Course_LabSection", on_delete=models.SET_NULL, null=True, blank=True)
 
-
 class LabSection(models.Model):
     Labid = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=40)
     time = models.CharField(max_length=40)
 
-
 class Course(models.Model):
     Courseid = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=40)
     dept = models.CharField(max_length=40)
-
+    prof = models.IntegerField(null=True)
 
 class Course_LabSection(models.Model):
-    id = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
-    course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    labSection = models.ForeignKey(LabSection, on_delete=models.CASCADE)
+    course = models.ForeignKey("Course", on_delete=models.CASCADE)
+    labSection = models.ForeignKey("LabSection", on_delete=models.CASCADE)
 

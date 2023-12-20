@@ -115,15 +115,15 @@
     </div>
     <div class="form-section">
         <label for="name">Name:</label>
-        <input type="text" id="name" name="name" value="{{ course.name }}" required maxlength="30">
+        <input type="text" id="name" name="name" value="{{ selected_course.name }}" required maxlength="30">
 
         <label for="time">Time:</label>
-        <input type="time" id="time" name="time" value="{{ course.time }}" required maxlength="30">
+        <input type="time" id="time" name="time" value="{{ selected_course.time }}" required maxlength="30">
 
         <label for="professor">Professor:</label>
         <select id="professor" name="professor">
             {% for professor in profs %}
-                <option value="{{ professor.account_id }}">{{ professor.name }}</option>
+                <option value="{{ professor.account_id }}" {% if professor.account_id == selected_course.prof %}selected{% endif %}>{{ professor.name }}</option>
             {% endfor %}
         </select>
     </div>

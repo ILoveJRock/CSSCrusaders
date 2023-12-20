@@ -294,19 +294,22 @@ class CreateLab(View):
 
 
 class EditCourse(View):
-    template_name = 'edit_course.html'
+    template_name = 'EditCourse.html'
 
     def get(self, request):
         result = loginCheck(request, 0)
         if result: return result
 
-        selected_section_id = request.GET.get('Labid')
-        try:
-            selected_section = Course_LabSection.objects.get(course_id=selected_section_id)
-            return render(request, self.template_name, {'selected_section': selected_section})
-        except Course_LabSection.DoesNotExist:
+        selected_course_id = request.GET.get('courseId')
+        if not selected_course_id:
             return render(request, 'error_page.html',
-                          {'error_message': f"Section with ID {selected_section_id} does not exist."})
+                          {'error_message': "No course ID provided."})
+        try:
+            selected_section = Course.objects.get(Courseid=selected_course_id)
+            return render(request, self.template_name, {'selected_section': selected_section})
+        except Course.DoesNotExist:
+            return render(request, 'error_page.html',
+                          {'error_message': f"Section with ID {selected_course_id} does not exist."})
 
     def post(self, request):
         result = loginCheck(request, 0)
@@ -314,8 +317,8 @@ class EditCourse(View):
 
         selected_section_id = request.POST.get('selected_section_id')
         try:
-            selected_section = Course_LabSection.objects.get(course_id=selected_section_id)
-        except Course_LabSection.DoesNotExist:
+            selected_section = Course.objects.get(Courseid=selected_section_id)
+        except Course.DoesNotExist:
             return render(request, 'error_page.html',
                           {'error_message': f"Section with ID {selected_section_id} does not exist."})
 
