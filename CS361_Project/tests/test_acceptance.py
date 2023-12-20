@@ -104,11 +104,18 @@ class CreateAccountAcceptance(TestCase):
         self.client = Client()
         self.account = Account.objects.create(account_id=1, username="Joe", password="12345", role=0, name="Joe Schmo")
         self.account.save()
+        # Log in the client
+        self.client.post('/login/', {'username': 'Joe', 'password': '12345'})
+
 
     def test_criteriaOne(self):
         # GIVEN a user already exists with a certain username
         existing_account = self.account
         old_num_accounts = Account.objects.count()
+        
+        # And the logged in user has the proper permissions
+        response = self.client.get('/manage/createAccount/')
+        self.assertEqual(response.status_code, 200)
 
         # WHEN an admin attempts to create an account with that name
         response = self.client.post('/manage/createAccount/',
@@ -116,9 +123,10 @@ class CreateAccountAcceptance(TestCase):
                                     'address': 'New Address', 'password': 'new_password', 'acctype': 'instructor'})
         # THEN no change happens to the database
         self.assertEqual(Account.objects.count(), old_num_accounts)
-        # AND the admin sees a message that the account already exists
-        self.assertContains(response, 'There is already an account with that username.')
-
+        self.assertContains(response, "There is already an account with that username.", status_code=200)
+        
+        
+        
     def test_criteriaTwo(self):
         # GIVEN an account with a certain username doesn’t exist yet
 
@@ -136,7 +144,7 @@ class CreateAccountAcceptance(TestCase):
         # AND the account can be logged into from another computer
         response = self.client.post('/login/', {'username' : 'NewUser', 'password' : 'new_password'}, follow=True)
 
-        session = response.session
+        session = self.client.session
         self.assertEqual(session['name'], "NewUser")
         self.assertEqual(session['role'], 1)
         self.assertTrue(session['LoggedIn'])
