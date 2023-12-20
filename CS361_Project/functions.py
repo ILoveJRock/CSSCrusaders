@@ -77,15 +77,25 @@ def editProfileData(self, request, user, field_name, field_type, error_name):
         user.save()
 
 
-def queryFromCourses(courses, labs):
-  for course in courses:
-    course["labs"] = ""
-  for lab in labs:
-     course = filter(lambda c : c["id"] == lab.course_id, courses)[0]
-     course["labs"] += lab.name + ", "
-  for course in courses:
-     course["labs"] = course["labs"][:-2]
-  return courses    
+def queryFromCourses(courses, instructors, accounts):
+    for instructor in instructors:
+        print(courses)
+        print(instructor)
+        course = None
+        for c in courses:
+            print(c)
+            if c["id"] == instructor["course"]:
+                course = c
+                break
+        if course != None:
+            print("found course")
+            account = None
+            for a in accounts:
+                if a["id"] == instructor["id"]:
+                    account = a
+            course["instructor"] = account["name"]
+    print(courses)
+    return courses
 
 
 class Management:
@@ -114,7 +124,6 @@ class Management:
         def create_account(request):
             if len(Account.objects.filter(username=request.POST["name"])) != 0:
                 return "There is already an account with that username."
-            
             form_name = request.POST['name']
             form_phone = request.POST['phone']
             form_email = request.POST['email']
@@ -131,6 +140,22 @@ class Management:
                 address=form_address
             )
             new_account.save()
+            if acctype == "instructor":
+                # creates instructor model
+                new_instructor = Instructor(instructor_id=new_account)
+                try:
+                    new_instructor.full_clean()
+                    new_instructor.save()
+                except ValidationError as e:
+                    print(e)
+            else:
+                # creates ta model
+                new_ta = TA(ta_id=new_account)
+                try:
+                    new_ta.full_clean()
+                    new_ta.save()
+                except ValidationError as e:
+                    print(e)
 
         @staticmethod
         def update_account(request, selected_account):
@@ -161,10 +186,10 @@ class Management:
                 return str(e)
 
         @staticmethod
-        def delete_account(selected_account):
+        def delete_account(request):
             try:
-                existing_account = Account.objects.get(username=selected_account.username)
-                existing_account.delete()
+                user_id = request.POST.get('userId')
+                Account.objects.get(account_id=user_id).delete()
             except Account.DoesNotExist:
                 return 'Cannot delete an account that does not exist'
 

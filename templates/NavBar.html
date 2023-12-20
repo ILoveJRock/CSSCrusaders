@@ -21,9 +21,9 @@ Make sure this is right below the <body> for it to work correctly.
     ul {
         list-style-type: none;
         margin: 0;
-        padding: 0;
         display: flex;
         justify-content: space-between;
+        padding: 10px;
     }
 
     li {
@@ -36,15 +36,29 @@ Make sure this is right below the <body> for it to work correctly.
         text-decoration: none;
         color: white;
         background-color: #4CAF50;
+        z-index: 1000; /* Ensure the navbar is above other elements */
+        border: 3px solid #282c35; /* 5px border around the buttons */
+        border-radius: 10px;
     }
 
     .navbar a:hover {
         background-color: #45a049;
     }
-
+    
     .navbar ul li {
-        margin-right: 50px;
+        margin-top: 25px
     }
+     /* Style for the buttons */
+    .navbar ul li:first-child {
+        position: absolute;
+        left: 0;
+        margin-left: 50px; /* Adjust the margin for the first button */
+    }
+
+    .navbar ul li:last-child {
+        position: absolute;
+        right: 0;
+        margin-right: 50px; /* Adjust the margin for the last button */
 </style>
 </head>
 <body>

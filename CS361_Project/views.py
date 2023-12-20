@@ -9,7 +9,8 @@ from .functions import *
 from django.views.decorators.cache import cache_control
 from django.utils.decorators import method_decorator
 from django.db.models import Max
-from django import forms
+from django.forms import Form, ModelChoiceField
+
 
 
 class Login(View):
@@ -27,7 +28,6 @@ class Login(View):
         # Authenticate user w/ helper method
         user = authenticate_user(self, username, password)
         # If the user is authenticated, log the user in and redirect them to the ADMIN DASHBOARD page
-        # TODO: Each role should have its own dash
         if user:
             Management.User.login(request, user)
             if (user.role == 0):
@@ -187,37 +187,12 @@ class EditAccount(View):
         return redirect('/manage/')
 
 
-class ManageCourse(View):
-    def get(self, request):
-        result = loginCheck(request, 0)
-        if result: return result
-
-        courses = Course.objects.all()
-        labs = LabSection.objects.all()
-        query1 = [{"name": course.name, "dept": course.dept, "id": course.Courseid} for course in courses]
-        query2 = [{"name": lab.name, "course_id": lab.course} for lab in labs]
-        query = queryFromCourses(query1, query2)
-        return render(request, 'ManageCourse.html',  {"courses": query})
-
-
-    def post(self, request):
-        result = loginCheck(request, 0)
-        if result: return result
-
-        selected_course_id = request.POST["selected_course_id"]
-        selected_course = Course.objects.filter(Labid=selected_course_id).first()
-        
-        courses = request.POST["courses"]
-        return render(request, 'ManageCourse.html', {"courses": courses, "selected_course": selected_course_id})
-
-
 class DeleteAccount(View):
     def post(self, request):
         result = loginCheck(request, 0)
         if result: return result
-        user_id = request.GET.get('userId')
-        Management.Account.deleteAccount(request, user_id)
-        return render(request, 'ManageAccount.html')
+        Management.Account.delete_account(request)
+        return redirect('/manage/')
 
 
 class Notification(View):
@@ -235,6 +210,32 @@ class Notification(View):
         body = request.POST['body']
         send_mail(subject, body, "nate.valentine.r@gmail.com", [email], fail_silently=False, )
         return redirect('/dashboard/')
+
+
+class ManageCourse(View):
+    def get(self, request):
+        result = loginCheck(request, 0)
+        if result: return result
+
+        selected_course_id = request.POST.get("selected_course_id")
+        selected_course = None
+        if selected_course_id:
+            selected_course = Course.objects.get(Courseid=selected_course_id)
+
+        courses = Course.objects.all()
+        instructors = Instructor.objects.all()
+        accounts = Account.objects.all()
+        query1 = [{"name": course.name, "dept": course.dept, "id": course.Courseid} for course in courses]
+        query2 = [{"id": instructor.instructor_id.account_id, "course": instructor.course.Courseid} for instructor in instructors]
+        query3 = [{"id": account.account_id, "name": account.name} for account in accounts]
+        query = queryFromCourses(query1, query2, query3)
+        return render(request, 'ManageCourse.html',  {"courses": query, "selected_course": selected_course})
+
+    def post(self, request):
+        result = loginCheck(request, 0)
+        if result: return result
+  
+        return self.get(request)
 
 
 # TODO For all of these, persist the course and/or lab selected back to manage course
@@ -424,16 +425,25 @@ class TADashboard(View):
         if result: return result
         return render(request, 'TADashboard.html')
 
+# TODO MOVE THIS TO A FORM CLASS SUPER BAD PRACTICE THAT IT'S IN HERE!!!!
+class UserForm(Form):
+    user = ModelChoiceField(queryset=Account.objects.all())
+
 class ViewContact(View):
     def get(self, request):
         result = loginCheck(request, 2) # Everyone logged in can view
         if result: return result
-        return render(request, 'view_contact_info.html')
+        form = UserForm()
+        return render(request, 'view_contact_info.html', {'form': form})
 
     def post(self, request):
         result = loginCheck(request, 2) # Everyone logged in can view
         if result: return result
-        return render(request, 'view_contact_info.html')
+        form = UserForm(request.POST)
+        if form.is_valid():
+            user = form.cleaned_data['user']
+            return render(request, 'view_contact_info.html', {'form': form, 'selected_user': user})
+        return render(request, 'view_contact_info.html', {'form': form})
 
 
 class EditCourseLabSectionForm(forms.ModelForm):
