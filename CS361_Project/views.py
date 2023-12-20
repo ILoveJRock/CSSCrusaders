@@ -9,6 +9,7 @@ from .functions import *
 from django.views.decorators.cache import cache_control
 from django.utils.decorators import method_decorator
 from django.db.models import Max
+from django import forms
 
 
 class Login(View):
@@ -282,11 +283,37 @@ class CreateLab(View):
 
 
 class EditCourse(View):
+    template_name = 'edit_course.html'
+
+    def get(self, request):
+        result = loginCheck(request, 0)
+        if result: return result
+
+        selected_section_id = request.GET.get('Labid')
+        try:
+            selected_section = Course_LabSection.objects.get(course_id=selected_section_id)
+            return render(request, self.template_name, {'selected_section': selected_section})
+        except Course_LabSection.DoesNotExist:
+            return render(request, 'error_page.html',
+                          {'error_message': f"Section with ID {selected_section_id} does not exist."})
+
     def post(self, request):
         result = loginCheck(request, 0)
         if result: return result
-        # TODO Edit the course
-        return render(request, 'ManageCourse.html')
+
+        selected_section_id = request.POST.get('selected_section_id')
+        try:
+            selected_section = Course_LabSection.objects.get(course_id=selected_section_id)
+        except Course_LabSection.DoesNotExist:
+            return render(request, 'error_page.html',
+                          {'error_message': f"Section with ID {selected_section_id} does not exist."})
+
+        form = EditCourseLabSectionForm(request.POST, instance=selected_section)
+        if form.is_valid():
+            form.save()
+            return redirect('/course')
+
+        return render(request, self.template_name, {'form': form, 'selected_section': selected_section})
 
 
 class EditLab(View):
@@ -407,3 +434,9 @@ class ViewContact(View):
         result = loginCheck(request, 2) # Everyone logged in can view
         if result: return result
         return render(request, 'view_contact_info.html')
+
+
+class EditCourseLabSectionForm(forms.ModelForm):
+    class Meta:
+        model = Course_LabSection
+        fields = ['name', 'time']

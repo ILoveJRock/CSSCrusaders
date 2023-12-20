@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Course</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            height: 100vh;
+            margin: 0;
+            background-color: #282c35;
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        #editAccount {
+            position: fixed;
+            top: 0;
+            text-align: center;
+            width: 100%;
+            background-color: #4CAF50;
+            padding: 10px;
+            box-sizing: border-box;
+            z-index: 1;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 80%;
+            max-width: 1000px;
+            margin-top: 100px;
+        }
+
+        .form-section {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: 20px;
+            border: 2px solid #4CAF50;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        .form-section label {
+            margin: 10px 0;
+            color: #4CAF50;
+            width: 30%;
+        }
+
+        .form-section input,
+        .form-section select {
+            width: 65%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .form-section:last-child {
+            margin-bottom: 40px;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            max-width: 600px;
+            position: fixed;
+            bottom: 20px;
+            z-index: 1;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        a {
+            color: #4CAF50;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+<div id="editCourse">
+    <h1>Edit Course</h1>
+</div>
+
+<form method="post" action="{% url 'edit_course' %}">
+    {% csrf_token %}
+<!-- TODO Cleanup Error message -->
+
+    <div class="form-section">
+        {% if error %}
+            <p>{{ error }}</p>
+        {% endif %}
+    </div>
+    <div class="form-section">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" value="{{ course.name }}" required maxlength="30">
+
+        <label for="time">Time:</label>
+        <input type="time" id="time" name="time" value="{{ course.time }}" required maxlength="30">
+
+        <label for="professor">Professor:</label>
+        <select id="professor" name="professor">
+            {% for professor in profs %}
+                <option value="{{ professor.account_id }}">{{ professor.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="button-container">
+        <button type="submit">Save Changes</button>
+    </div>
+
+    <div class="container">
+        <div class="scrollable-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Time</th>
+                        <th>TA</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for section in sections %}
+                    <tr>
+                        <td>{{ section.name }}</td>
+                        <td>{{ section.time }}</td>
+                        <td>{{ section.ta }}</td>
+
+                        <td>
+                            <form method="post" action="{% url 'EditCourse' %}">
+                                {% csrf_token %}
+                                <button type="submit" name="selected_section_id" value={{section.LabiId}}>Select</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="user-overview">
+            <h2>Selected Section</h2>
+            <hr>
+            <p><strong>Name:</strong> {{ selected_section.name }}</p>
+            <p><strong>Time:</strong> {{ selected_section.time }}</p>
+            <p><strong>TA:</strong> {{ selected_section.TA }}</p>
+        </div>
+    </div>
+</form>
+    <div class="button-container">
+        <button><a href="{% url 'edit_lab' %}?Labid={{ selected_section.Labid }}" style="color: white;">Edit Selected Section</a></button>
+        <button><a href="{% url 'delete_lab' %}?Labid={{ selected_section.Labid }}" style="color: white;">Delete Selected Section</a></button>
+        <button><a href='/course/createLab' style="color: white;">Add New Section</a></button>
+    </div>
+
+</body>
+</html>
