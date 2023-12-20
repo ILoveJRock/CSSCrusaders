@@ -219,6 +219,11 @@ class ManageCourse(View):
         result = loginCheck(request, 0)
         if result: return result
 
+        selected_course_id = request.POST.get("selected_course_id")
+        selected_course = None
+        if selected_course_id:
+            selected_course = Course.objects.get(Courseid=selected_course_id)
+
         courses = Course.objects.all()
         instructors = Instructor.objects.all()
         accounts = Account.objects.all()
@@ -226,17 +231,13 @@ class ManageCourse(View):
         query2 = [{"id": instructor.instructor_id.account_id, "course": instructor.course.Courseid} for instructor in instructors]
         query3 = [{"id": account.account_id, "name": account.name} for account in accounts]
         query = queryFromCourses(query1, query2, query3)
-        return render(request, 'ManageCourse.html',  {"courses": query})
-
+        return render(request, 'ManageCourse.html',  {"courses": query, "selected_course": selected_course})
 
     def post(self, request):
         result = loginCheck(request, 0)
         if result: return result
-
-        selected_course_id = request.POST["selected_course_id"]
-        
-        courses = request.POST["courses"]
-        return render(request, 'ManageCourse.html', {"courses": courses, "selected_course": selected_course_id})
+  
+        return self.get(request)
 
 
 # TODO For all of these, persist the course and/or lab selected back to manage course
