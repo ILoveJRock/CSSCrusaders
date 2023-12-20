@@ -25,7 +25,11 @@
                         <option value="{{ course.id }}">{{ course.name }}</option>
                     {% endfor %}
                 </select>
-                <!-- Rest of the instructor form -->
+                <label for="subject">Email Subject:</label>
+                <input type="text" id="subject" name="subject" required>
+                <label for="body">Email Body:</label>
+                <input type ="text" id="body" name="body" required>
+                <button type="submit">Send email</button>
             </form>
         {% endif %}
         <button type="button">
