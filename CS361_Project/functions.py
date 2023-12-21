@@ -1,3 +1,5 @@
+from django.core.exceptions import ValidationError
+from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.core.mail import send_mail
 from django.db.models import Max
@@ -15,6 +17,14 @@ def profile_information(request):
     office_hour_time = user.office_hour_time
     return  {"named": named, "phone": phone, "email": email, "address": address, "office_hour_location": office_hour_location, "office_hour_time": office_hour_time, 'validForm': 'invalid'}    
 
+
+def authenticate_user(self, username, password):
+        try:
+            user = Account.objects.get(username=username)
+            if user.password == password:
+                return user
+        except Account.DoesNotExist:
+            self.missingUser = True
 
 # call this as loginCheck(request, x) with x being the int value of the role needed to access
 def loginCheck(request, role):
