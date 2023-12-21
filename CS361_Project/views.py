@@ -197,18 +197,39 @@ class DeleteAccount(View):
 
 class Notification(View):
     def get(self, request):
-        result = loginCheck(request, 0)
+        result = loginCheck(request, 1)
         if result: return result
-        return render(request, 'NotificationForm.html')
+        session = request.session
+        account = Account.objects.get(account_id=session.get('userID'))
+        if account.role == 0:  # account is a supervisor
+            context = {'is_supervisor': True}
+        elif account.role == 1:  # account is an instructor
+            instructor = Instructor.objects.get(instructor_id=account.account_id)
+            courses = Course.objects.filter(instructor=instructor)
+            context = {'courses': courses}
+        return render(request, 'NotificationForm.html', context)
 
     def post(self, request):
-        result = loginCheck(request, 0)
+        result = loginCheck(request, 1)
         if result: return result
-        # TODO Send email to all the users in the email list
-        email = request.POST['email']
+        session = request.session
+        account = Account.objects.get(account_id=session.get('userID'))
+        if account.role == 0:  # account is a supervisor
+            # Fetch all accounts with a valid email
+            accounts = Account.objects.exclude(email__exact='')
+            # Extract email addresses
+            emails = [account.email for account in accounts]
+        elif account.role == 1:  # account is an instructor
+            # Get the selected course
+            course_id = request.POST['course']
+            course = Course.objects.get(course_id=course_id)
+            # Fetch all TAs associated with the selected course
+            tas = TA.objects.filter(course=course)
+            # Extract email addresses
+            emails = [ta.account.email for ta in tas]
         subject = request.POST['subject']
         body = request.POST['body']
-        send_mail(subject, body, "nate.valentine.r@gmail.com", [email], fail_silently=False, )
+        send_mail(subject, body, "nate.valentine.r@gmail.com", emails, fail_silently=True)
         return redirect('/dashboard/')
 
 
