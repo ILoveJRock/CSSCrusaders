@@ -277,18 +277,40 @@ class CreateCourse(View):
 
 
 class CreateLab(View):
+    template_name = 'CreateLab.html'
     def get(self, request):
         result = loginCheck(request, 0)
         if result: return result
-        selected_course = Course.objects.get(Courseid=request.GET.get('courseId'))
-        tas = TA.objects.filter(course=selected_course)
-        return render(request, 'CreateLab.html', {"tas": tas})
+        selected_course_id = request.GET.get('courseId')
+
+        # Check if the course ID is provided
+        if not selected_course_id:
+            return render(request, 'error_page.html', {'error_message': "No course ID provided."})
+
+        try:
+            selected_course = Course.objects.get(Courseid=selected_course_id)
+            tas = Account.objects.filter(role=2)
+            return render(request, self.template_name, {"tas": tas, "selected_course": selected_course})
+        except Course.DoesNotExist:
+            return render(request, 'error_page.html', {'error_message': "Selected course does not exist."})
 
     def post(self, request):
         result = loginCheck(request, 0)
         if result: return result
-        if len(LabSection.objects.filter(name=request.POST["name"])) != 0:
-            return render(request, 'CreateLab.html', {"message": "There is already a lab section with that number."})
+        selected_course_id = request.POST.get('courseId')
+        if not selected_course_id:
+            return render(request, 'error_page.html', {'error_message': "No course ID provided."})
+
+        try:
+            selected_course = Course.objects.get(Courseid=selected_course_id)
+        except Course.DoesNotExist:
+            return render(request, 'error_page.html', {'error_message': "Selected course does not exist."})
+
+        if len(LabSection.objects.filter(name=request.POST.get("name"))) != 0:
+            return render(request, self.template_name, {"message": "There is already a lab section with that number.",
+                                                        "tas": Account.objects.filter(role=2),
+                                                        "selected_course": selected_course})
+
         create_lab(request)
         return render(request, 'ManageCourse.html')
 

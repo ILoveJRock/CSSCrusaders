@@ -212,13 +212,15 @@ def create_lab(request):
     formName = request.POST['name']
     formTime = request.POST['time']
     formTA = request.POST['ta']
-    new_lab = LabSection(name=formName, time=formTime, ta=formTA)
+    new_lab = LabSection(name=formName, time=formTime)
     new_lab.save()
-    course = Course.objects.get(course=request.session['course'])
+    selected_course_id = request.POST['courseId']
+    selected_course = Course.objects.get(Courseid=selected_course_id)
     ta_instance = TA.objects.get(ta_id=formTA)
-    ta_instance.section_id = new_lab.Labid
+    ta_instance.course = selected_course
+    ta_instance.section = new_lab
     ta_instance.save()
-    new_lab_course = Course_LabSection(course, new_lab)
+    new_lab_course = Course_LabSection(course=selected_course, labSection=new_lab)
     new_lab_course.save()
 
 
