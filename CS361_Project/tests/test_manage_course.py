@@ -1,7 +1,7 @@
 #from django.test import TestCase, Client
 
 from CS361_Project.models import Course
-#Commented because it isnt done
+#Commented because it isn't done
 # class EditAccountTests(TestCase):
 class EditAccountTests():
     client = None
