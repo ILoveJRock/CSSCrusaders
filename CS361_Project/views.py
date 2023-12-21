@@ -231,7 +231,7 @@ class EditCourse(View):
                           {'error_message': "No course ID provided."})
         try:
             selected_section = Course.objects.get(Courseid=selected_course_id)
-            return render(request, self.template_name, {'selected_section': selected_section})
+            return render(request, self.template_name, {'selected_course': selected_section})
         except Course.DoesNotExist:
             return render(request, 'error_page.html',
                           {'error_message': f"Section with ID {selected_course_id} does not exist."})
