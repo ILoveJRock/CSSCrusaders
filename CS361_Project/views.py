@@ -221,6 +221,10 @@ class CreateLab(View):
 class EditCourse(View):
     template_name = 'EditCourse.html'
 
+    from CS361_Project.models import Instructor  # Import the Instructor model at the top of your file
+
+    from CS361_Project.models import Instructor  # Import the Instructor model at the top of your file
+
     def get(self, request):
         result = loginCheck(request, 0)
         if result: return result
@@ -230,11 +234,12 @@ class EditCourse(View):
             return render(request, 'error_page.html',
                           {'error_message': "No course ID provided."})
         try:
-            selected_section = Course.objects.get(Courseid=selected_course_id)
-            return render(request, self.template_name, {'selected_course': selected_section})
+            selected_course = Course.objects.get(Courseid=selected_course_id)
+            instructors = Account.objects.filter(role=1)  # Fetch all Accounts with the Instructor rol
+            return render(request, self.template_name, {'selected_course': selected_course, 'profs': instructors})
         except Course.DoesNotExist:
             return render(request, 'error_page.html',
-                          {'error_message': f"Section with ID {selected_course_id} does not exist."})
+                          {'error_message': f"Course with ID {selected_course_id} does not exist."})
 
     def post(self, request):
         result = loginCheck(request, 0)
