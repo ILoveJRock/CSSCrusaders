@@ -49,7 +49,7 @@ class TestConvert(TestCase):
 
     def test_retain_courses(self):
         query = queryFromCourses(self.mock_courses, self.mock_instructors, self.mock_accounts)
-        for i in range(self.mock_courses):
+        for i in range(len(self.mock_courses)):
             for key in self.mock_courses[i].keys():
                 self.assertTrue(self.mock_courses[i][key] == query[i][key], "not every course was transferred to query")
 

@@ -140,13 +140,12 @@ class DeleteAccount(View):
 
 class Notification(View):
     def get(self, request):
-        result = loginCheck(request, 1)
+        result = loginCheck(request, 0)
         if result: return result
-        context = Management.Notification.notification_context(request)
-        return render(request, 'NotificationForm.html', context)
+        return render(request, 'NotificationForm.html')
 
     def post(self, request):
-        result = loginCheck(request, 1)
+        result = loginCheck(request, 0)
         if result: return result
         Management.Notification.send_notification(request)
         return redirect('/dashboard/')

@@ -62,7 +62,6 @@
         </style>
     </head>
     <body>
-        {% if is_supervisor %}
             <p>Send an email to all users</p>
             <form action="/notification/" method="post">
                 {% csrf_token %}
@@ -72,24 +71,8 @@
                 <input type ="text" id="body" name="body" required>
                 <button type="submit">Send email</button>
             </form>
-        {% else %}
-            <form action="/notification/" method="post">
-                {% csrf_token %}
-                <p>Send email to all TAs</p>
-                <select name="course">
-                    {% for course in courses %}
-                        <option value="{{ course.id }}">{{ course.name }}</option>
-                    {% endfor %}
-                </select>
-                <label for="subject">Email Subject:</label>
-                <input type="text" id="subject" name="subject" required>
-                <label for="body">Email Body:</label>
-                <input type ="text" id="body" name="body" required>
-                <button type="submit">Send email</button>
-            </form>
-        {% endif %}
         <button type="button">
-            <a href="{% url 'admin_dashboard' %}">Return to dashboard</a>
+            <a href="{% url 'admin_dashboard' %}" style="color: black;">Return to dashboard</a>
         </button>
     </body>
 </html>

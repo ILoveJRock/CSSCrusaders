@@ -485,12 +485,9 @@ def update_user_password(user, new_password, repeat_password):
 
 
 def login_post(self, request):
-    username = request.POST["username"]
-    password = request.POST["password"]
-    # Authenticate user w/ helper method
-    user = authenticate_user(self, username, password)
-    # If the user is authenticated, log the user in and redirect them to the ADMIN DASHBOARD page
-    if user:
+    username = request.POST['username']
+    password = request.POST['password']
+    if user := Management.User.authenticate_user(username, password):
         Management.User.login(request, user)
         if user.role == 0:
             return redirect("/dashboard")
@@ -500,5 +497,6 @@ def login_post(self, request):
             return redirect("/dashboard/ta")
     else:
         # If the user is not authenticated, redisplay the page with the appropriate error
-        error = "User does not exist" if not user else "Incorrect Password"
+        error = 'User does not exist' if not user else "Incorrect Password"
+        print('loginpost'+error)
         return render(request, "login.html", {"error": error})
