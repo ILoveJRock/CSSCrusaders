@@ -114,7 +114,25 @@ class LoginAcceptance(TestCase):
         self.assertNotIn("name", session)
         self.assertNotIn("role", session)
 
+class LogoutAcceptance(TestCase):
+    client = None
 
+    def setUp(self):
+        self.client = Client()
+        account = Account(account_id=1, username="Joe", password="12345", role=0, name="Joe Schmo")
+        account.save()
+    def test_SuccessfulLogout(self):
+        login_response = self.client.post('/login/', {'username': 'Joe', 'password': '12345'}, follow = True)
+        self.assertRedirects(login_response, '/dashboard/')  # Update with the expected redirect URL
+
+        # Now, test the logout
+        logout_response = self.client.get('/logout/')
+        self.assertRedirects(logout_response, '/login/')  # Assuming the user is redirected to the login page
+
+        # Check if session data is cleared
+        self.assertEqual(self.client.session.get('LoggedIn'), False)
+        self.assertEqual(self.client.session.get('name'), None)
+        self.assertEqual(self.client.session.get('role'), None)
 class CreateAccountAcceptance(TestCase):
     # As a supervisor or administrator, I need to be able to create instructor and TA accounts so that random people can’t get in the system.
     client = None
