@@ -1,5 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.shortcuts import render, redirect
+from django.core.mail import send_mail
 from django.db.models import Max
 from .models import *
 
@@ -262,7 +263,38 @@ class Management:
             instructor = Instructor.objects.filter(instructor_id=proffessor)
             instructor.course = new_course
 
+    class Notification:
+        @staticmethod
+        def send_notification(request):
+            session = request.session
+            account = Account.objects.get(account_id=session.get('userID'))
+            if account.role == 0:  # account is a supervisor
+                # Fetch all accounts with a valid email
+                accounts = Account.objects.exclude(email__exact='')
+                # Extract email addresses
+                emails = [account.email for account in accounts]
+            elif account.role == 1:  # account is an instructor
+                # Get the selected course
+                course_id = request.POST['course']
+                course = Course.objects.get(course_id=course_id)
+                # Fetch all TAs associated with the selected course
+                tas = TA.objects.filter(course=course)
+                # Extract email addresses
+                emails = [ta.account.email for ta in tas]
+            subject = request.POST['subject']
+            body = request.POST['body']
+            send_mail(subject, body, "nate.valentine.r@gmail.com", emails, fail_silently=True)
 
+        @staticmethod
+        def notification_context(request):
+            session = request.session
+            account = Account.objects.get(account_id=session.get('userID'))
+            if account.role == 0:  # account is a supervisor
+                context = {'is_supervisor': True}
+            elif account.role == 1:  # account is an instructor
+                instructor = Instructor.objects.get(instructor_id=account.account_id)
+                courses = Course.objects.filter(instructor=instructor)
+                context = {'courses': courses}
 
     class Profile: 
         @staticmethod

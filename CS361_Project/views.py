@@ -50,15 +50,14 @@ class EditProfile(View):
     def get(self, request):
         result = loginCheck(request, 2) # Everyone logged in can view
         if result: return result
-        session = request.session
-        current_account = Account.objects.get(account_id=session.get('userID'))
+        current_account = Account.objects.get(account_id=request.session.get('userID'))
         return render(request, 'EditProfile.html', {'currentAccount': current_account})
 
     def post(self, request):
         result = loginCheck(request, 2) # Everyone logged in can view
-        if result: return result
-        user = Account.objects.get(username=request.session['name'])
-        Management.Profile.edit_profile(request, user)
+        if result: return 
+        # Edit profile information of user currently logged in
+        Management.Profile.edit_profile(request, Account.objects.get(username=request.session['name']))
         return redirect('profile')
 
 
@@ -104,10 +103,10 @@ class CreateAccount(View):
     def post(self, request):
         result = loginCheck(request, 0)
         if result: return result
+        # Returns error if account wasn't able to be created
         error = Management.Account.create_account(request)
-        if error:
-            return render(request, 'CreateAccount.html', {"message": error})
-        return redirect('/manage/')
+        if error: return render(request, 'CreateAccount.html', {"message": error})
+        return redirect('/manage/') # Redirect to ManageAccount view
 
 
 class EditAccount(View):
@@ -120,9 +119,9 @@ class EditAccount(View):
         result = loginCheck(request, 0)
         if result: return result
         selected_account = Account.objects.get(account_id=request.POST.get('selected_user_id'))
+        # Returns error if account wasn't able to be edited
         error = Management.Account.update_account(request, selected_account)
-        if error: 
-            return render(request, 'edit_account.html', {'error' : error})
+        if error: return render(request, 'edit_account.html', {'error' : error})
         return redirect('/manage/') # Redirect to ManageAccount view
 
 
@@ -138,37 +137,13 @@ class Notification(View):
     def get(self, request):
         result = loginCheck(request, 1)
         if result: return result
-        session = request.session
-        account = Account.objects.get(account_id=session.get('userID'))
-        if account.role == 0:  # account is a supervisor
-            context = {'is_supervisor': True}
-        elif account.role == 1:  # account is an instructor
-            instructor = Instructor.objects.get(instructor_id=account.account_id)
-            courses = Course.objects.filter(instructor=instructor)
-            context = {'courses': courses}
+        context = Management.Notification.notification_context(request)
         return render(request, 'NotificationForm.html', context)
 
     def post(self, request):
         result = loginCheck(request, 1)
         if result: return result
-        session = request.session
-        account = Account.objects.get(account_id=session.get('userID'))
-        if account.role == 0:  # account is a supervisor
-            # Fetch all accounts with a valid email
-            accounts = Account.objects.exclude(email__exact='')
-            # Extract email addresses
-            emails = [account.email for account in accounts]
-        elif account.role == 1:  # account is an instructor
-            # Get the selected course
-            course_id = request.POST['course']
-            course = Course.objects.get(course_id=course_id)
-            # Fetch all TAs associated with the selected course
-            tas = TA.objects.filter(course=course)
-            # Extract email addresses
-            emails = [ta.account.email for ta in tas]
-        subject = request.POST['subject']
-        body = request.POST['body']
-        send_mail(subject, body, "nate.valentine.r@gmail.com", emails, fail_silently=True)
+        Management.Notification.send_notification(request)
         return redirect('/dashboard/')
 
 
