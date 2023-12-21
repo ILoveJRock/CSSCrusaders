@@ -115,6 +115,7 @@ class EditAccount(View):
         if result: return result
         return Management.Account.edit_account_select(request)
 
+
     def post(self, request):
         result = loginCheck(request, 0)
         if result: return result
@@ -129,7 +130,13 @@ class DeleteAccount(View):
     def post(self, request):
         result = loginCheck(request, 0)
         if result: return result
-        Management.Account.delete_account(request)
+        msg = Management.Account.delete_account(request)
+        if not msg:
+            # Deletion was successful, add a success message
+            messages.success(request, 'Account Deleted Successfully')
+        else:
+            # Deletion failed, add an error message
+            messages.error(request, msg)
         return redirect('/manage/')
 
 
@@ -292,7 +299,7 @@ class RemoveAssign(View):
 class Logout(View):
     def get(self, request):
         Management.User.logout(request)
-        return render(request, 'login.html')
+        return redirect('/login/')
 
 
 class AdminDashboard(View):
