@@ -336,7 +336,7 @@ class Management:
             query2 = [
                 {
                     "id": instructor.instructor_id.account_id,
-                    "course": instructor.course.Courseid,
+                    "course": instructor.course.Courseid if instructor.course else None,
                 }
                 for instructor in instructors
             ]
