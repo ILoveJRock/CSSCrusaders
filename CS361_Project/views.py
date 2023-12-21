@@ -113,17 +113,14 @@ class EditAccount(View):
     def get(self, request):
         result = loginCheck(request, 0)
         if result: return result
-        return Management.Account.edit_account_select(request)
+        return Management.Account.edit_account_GETview(request)
 
 
     def post(self, request):
         result = loginCheck(request, 0)
         if result: return result
-        selected_account = Account.objects.get(account_id=request.POST.get('selected_user_id'))
-        # Returns error if account wasn't able to be edited
-        error = Management.Account.update_account(request, selected_account)
-        if error: return render(request, 'edit_account.html', {'error' : error})
-        return redirect('/manage/') # Redirect to ManageAccount view
+        return Management.Account.edit_account_POSTview(request)
+        
 
 
 class DeleteAccount(View):
