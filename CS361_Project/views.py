@@ -176,7 +176,7 @@ class CreateCourse(View):
         result = loginCheck(request, 0)
         if result: return result
         Management.Course.create_course(request)
-        return redirect('create_course')
+        return redirect('course')
 
 
 class CreateLab(View):
@@ -268,7 +268,7 @@ class DeleteCourse(View):
         result = loginCheck(request, 0)
         if result: return result
         Management.Course.delete_course(request)
-        return redirect("manage_course")
+        return redirect("course")
 
 
 class DeleteLab(View):
