@@ -326,6 +326,7 @@ class Management:
             selected_course = None
             if selected_course_id:
                 selected_course = Course.objects.get(Courseid=selected_course_id)
+            # Switches courses provided based on logged in level
             courses = Course.objects.all()
             instructors = Instructor.objects.all()
             accounts = Account.objects.all()
@@ -355,7 +356,7 @@ class Management:
             new_id = (max_id or 0) + 1
             new_course = Course(Courseid=new_id, name=course_name, dept=department)
             new_course.save()
-            instructor = Instructor.objects.filter(instructor_id=proffessor)
+            instructor = Instructor.objects.get(instructor_id=proffessor)
             instructor.course = new_course
 
         @staticmethod
