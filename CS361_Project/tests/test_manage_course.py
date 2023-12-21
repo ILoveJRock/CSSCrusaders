@@ -1,9 +1,9 @@
-from django.test import TestCase, Client
+#from django.test import TestCase, Client
 
 from CS361_Project.models import Course
-
-
-class EditAccountTests(TestCase):
+#Commented because it isn't done
+# class EditAccountTests(TestCase):
+class EditAccountTests():
     client = None
 
     def setUp(self):

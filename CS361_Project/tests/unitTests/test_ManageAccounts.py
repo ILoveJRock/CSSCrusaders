@@ -1,9 +1,7 @@
 from django.test import TestCase
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 from CS361_Project.functions import *
 from CS361_Project.models import Account
-
-
 class TestCreateAccount(TestCase):
     def test_new_account(self):
         mock_request = Mock()
@@ -13,6 +11,7 @@ class TestCreateAccount(TestCase):
             "phone": "414",
             "email": "@hotmail",
             "address": "lane",
+            "username" : 'joe',
             "password": "123",
             "acctype": 1
         }
@@ -26,6 +25,7 @@ class TestCreateAccount(TestCase):
             "phone": "414",
             "email": "@hotmail",
             "address": "lane",
+            "username" : 'joe',
             "password": "123",
             "acctype": 1
         }
@@ -33,6 +33,7 @@ class TestCreateAccount(TestCase):
         Management.Account.create_account(mock_request)
         Management.Account.create_account(mock_request)
         self.assertEqual(1, len(Account.objects.filter(username="joe")), "Duplicate accounts are not allowed")
+
 
 
 class TestEditAccount(TestCase):
@@ -157,4 +158,17 @@ class TestDeleteAccount(TestCase):
         # Assert that the account with non-existent username does not exist
         self.assertFalse(Account.objects.filter(username="non_existent_username").exists(), "Non-existent account was deleted")
     
-    
+class TestManageAccount(TestCase):
+    def setUp(self):
+        # Create a mock request
+        self.mock_request = Mock()
+        self.mock_request.POST = {}
+# TODO D:
+    def test_manageAccountView_noSelection(self):
+        # Management.Account.manage_account(self.mock_request)
+        pass
+        
+# TODO D:
+    def test_manageAccountView_Selection(self):
+        self.mock_request.POST['selected_user_id'] = '123'
+            
