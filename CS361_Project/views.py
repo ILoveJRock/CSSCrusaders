@@ -446,7 +446,7 @@ class ViewContact(View):
         return render(request, 'view_contact_info.html', {'form': form})
 
 
-class EditCourseLabSectionForm(forms.ModelForm):
+class EditCourseLabSectionForm(Form):
     class Meta:
         model = Course_LabSection
         fields = ['name', 'time']
