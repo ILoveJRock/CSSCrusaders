@@ -8,6 +8,7 @@ class TestCreateAccount(TestCase):
     def test_new_account(self):
         mock_request = Mock()
         mock_request.POST = {
+            "username": "joe",
             "name": "joe",
             "phone": "414",
             "email": "@hotmail",
