@@ -9,6 +9,8 @@ from .functions import *
 from django.views.decorators.cache import cache_control
 from django.utils.decorators import method_decorator
 from django.db.models import Max
+from django.forms import Form, ModelChoiceField
+
 
 
 class Login(View):
@@ -26,7 +28,6 @@ class Login(View):
         # Authenticate user w/ helper method
         user = Management.User.authenticate_user(username, password)
         # If the user is authenticated, log the user in and redirect them to the ADMIN DASHBOARD page
-        # TODO: Each role should have its own dash
         if user:
             Management.User.login(request, user)
             if (user.role == 0):
@@ -186,29 +187,6 @@ class EditAccount(View):
         # Redirect to ManageAccount view
         return redirect('/manage/')
 
-class ManageCourses(View):
-    def get(self, request):
-        result = loginCheck(request, 0)
-        if result: return result
-
-        courses = Course.objects.all()
-        labs = LabSection.objects.all()
-        query1 = [{"name": course.name, "dept": course.dept, "id": course.Labid} for course in courses]
-        query2 = [{"name": lab.name, "course_id": lab.course} for lab in labs]
-        query = queryFromCourses(query1, query2)
-        return render(request, 'ManageCourse.html',  {"courses": query})
-
-
-    def post(self, request):
-        result = loginCheck(request, 0)
-        if result: return result
-
-        selected_course_id = request.POST["selected_course_id"]
-        selected_course = Course.objects.filter(Labid=selected_course_id).first()
-        
-        courses = request.POST["courses"]
-        return render(request, 'ManageCourse.html', {"courses": courses, "selected_course": selected_course_id})
-
 
 class DeleteAccount(View):
     def post(self, request):
@@ -245,14 +223,26 @@ class ManageCourse(View):
     def get(self, request):
         result = loginCheck(request, 0)
         if result: return result
-        # TODO get the courses and labs and pass them to render {"courses": courses, "labs": labs}
-        return render(request, 'ManageCourse.html')
+
+        selected_course_id = request.POST.get("selected_course_id")
+        selected_course = None
+        if selected_course_id:
+            selected_course = Course.objects.get(Courseid=selected_course_id)
+
+        courses = Course.objects.all()
+        instructors = Instructor.objects.all()
+        accounts = Account.objects.all()
+        query1 = [{"name": course.name, "dept": course.dept, "id": course.Courseid} for course in courses]
+        query2 = [{"id": instructor.instructor_id.account_id, "course": instructor.course.Courseid} for instructor in instructors]
+        query3 = [{"id": account.account_id, "name": account.name} for account in accounts]
+        query = queryFromCourses(query1, query2, query3)
+        return render(request, 'ManageCourse.html',  {"courses": query, "selected_course": selected_course})
 
     def post(self, request):
         result = loginCheck(request, 0)
         if result: return result
-        # TODO Post actions for every single action to the courses
-        return render(request, 'ManageCourse.html')
+  
+        return self.get(request)
 
 
 # TODO For all of these, persist the course and/or lab selected back to manage course
@@ -268,17 +258,18 @@ class CreateCourse(View):
         if result: return result
         course_name = request.POST.get('name')
         department = request.POST.get('dept')
-        proffessor = request.POST.get('section') # Unused for now
+        proffessor = request.POST.get('professor')
         max_id = Course.objects.aggregate(Max('Courseid'))['Courseid__max']
         new_id = (max_id or 0) + 1
         new_course = Course(
             Courseid=new_id,
             name=course_name,
-            dept=department,
-            prof=proffessor
-
+            dept=department
         )
         new_course.save()
+        instructor = Instructor.objects.filter(instructor_id=proffessor)
+        instructor.course = new_course
+
         return redirect('create_course')
 
 
@@ -286,24 +277,51 @@ class CreateLab(View):
     def get(self, request):
         result = loginCheck(request, 0)
         if result: return result
-        selected_course = Course.objects.get(Courseid=request.GET.get('courseId'))
+        selected_course = Course.objects.get(Courseid=request.get('courseId'))
         tas = TA.objects.filter(course=selected_course)
         return render(request, 'CreateLab.html', {"tas": tas})
+
     def post(self, request):
         result = loginCheck(request, 0)
         if result: return result
         if len(LabSection.objects.filter(name=request.POST["name"])) != 0:
             return render(request, 'CreateLab.html', {"message": "There is already a lab section with that number."})
         create_lab(request)
-        return render(request, 'CreateLab.html')
+        return render(request, 'ManageCourse.html')
 
 
 class EditCourse(View):
+    template_name = 'edit_course.html'
+
+    def get(self, request):
+        result = loginCheck(request, 0)
+        if result: return result
+
+        selected_section_id = request.GET.get('Labid')
+        try:
+            selected_section = Course_LabSection.objects.get(course_id=selected_section_id)
+            return render(request, self.template_name, {'selected_section': selected_section})
+        except Course_LabSection.DoesNotExist:
+            return render(request, 'error_page.html',
+                          {'error_message': f"Section with ID {selected_section_id} does not exist."})
+
     def post(self, request):
         result = loginCheck(request, 0)
         if result: return result
-        # TODO Edit the course
-        return render(request, 'ManageCourse.html')
+
+        selected_section_id = request.POST.get('selected_section_id')
+        try:
+            selected_section = Course_LabSection.objects.get(course_id=selected_section_id)
+        except Course_LabSection.DoesNotExist:
+            return render(request, 'error_page.html',
+                          {'error_message': f"Section with ID {selected_section_id} does not exist."})
+
+        form = EditCourseLabSectionForm(request.POST, instance=selected_section)
+        if form.is_valid():
+            form.save()
+            return redirect('/course')
+
+        return render(request, self.template_name, {'form': form, 'selected_section': selected_section})
 
 
 class EditLab(View):
@@ -414,13 +432,28 @@ class TADashboard(View):
         if result: return result
         return render(request, 'TADashboard.html')
 
+# TODO MOVE THIS TO A FORM CLASS SUPER BAD PRACTICE THAT IT'S IN HERE!!!!
+class UserForm(Form):
+    user = ModelChoiceField(queryset=Account.objects.all())
+
 class ViewContact(View):
     def get(self, request):
         result = loginCheck(request, 2) # Everyone logged in can view
         if result: return result
-        return render(request, 'view_contact_info.html')
+        form = UserForm()
+        return render(request, 'view_contact_info.html', {'form': form})
 
     def post(self, request):
         result = loginCheck(request, 2) # Everyone logged in can view
         if result: return result
-        return render(request, 'view_contact_info.html')
+        form = UserForm(request.POST)
+        if form.is_valid():
+            user = form.cleaned_data['user']
+            return render(request, 'view_contact_info.html', {'form': form, 'selected_user': user})
+        return render(request, 'view_contact_info.html', {'form': form})
+
+
+class EditCourseLabSectionForm(Form):
+    class Meta:
+        model = Course_LabSection
+        fields = ['name', 'time']

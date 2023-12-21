@@ -80,14 +80,24 @@ def editProfileData(self, request, user, field_name, field_type, error_name):
         user.save()
 
 
-def queryFromCourses(courses, labs):
-    for course in courses:
-        course["labs"] = ""
-    for lab in labs:
-        course = filter(lambda c: c["id"] == lab.course_id, courses)[0]
-        course["labs"] += lab.name + ", "
-    for course in courses:
-        course["labs"] = course["labs"][:-2]
+def queryFromCourses(courses, instructors, accounts):
+    for instructor in instructors:
+        print(courses)
+        print(instructor)
+        course = None
+        for c in courses:
+            print(c)
+            if c["id"] == instructor["course"]:
+                course = c
+                break
+        if course != None:
+            print("found course")
+            account = None
+            for a in accounts:
+                if a["id"] == instructor["id"]:
+                    account = a
+            course["instructor"] = account["name"]
+    print(courses)
     return courses
 
 
@@ -230,11 +240,17 @@ class Management:
 
 
 def create_lab(request):
-    formName = request.POST["name"]
-    formTime = request.POST["time"]
-    formTA = request.POST["ta"]
-    new_lab = LabSection(formName, formTime, formTA)
+    formName = request.POST['name']
+    formTime = request.POST['time']
+    formTA = request.POST['ta']
+    new_lab = LabSection(name=formName, time=formTime, ta=formTA)
     new_lab.save()
+    course = Course.objects.get(course=request.session['course'])
+    ta_instance = TA.objects.get(ta_id=formTA)
+    ta_instance.section_id = new_lab.Labid
+    ta_instance.save()
+    new_lab_course = Course_LabSection(course, new_lab)
+    new_lab_course.save()
 
 
 def update_user_field(user, field_name, new_value, value_type=str, check_null=True):
