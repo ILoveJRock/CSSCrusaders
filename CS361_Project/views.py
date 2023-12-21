@@ -92,13 +92,12 @@ class EditProfile(View):
         result = loginCheck(request, 2) # Everyone logged in can view
         if result: return result
         user = Account.objects.get(username=request.session['name'])
-        update_user_field(user, "name", request.POST.get("Name"))
         update_user_field(user, "phone", request.POST.get("Phone"))
         update_user_field(user, "email", request.POST.get("Email"))
         update_user_field(user, "address", request.POST.get("Address"))
         update_user_field(user, "office_hour_location", request.POST.get("Location"))
         update_user_field(user, "office_hour_time", request.POST.get("Time"))
-        return render(request, 'EditProfile.html', {'currentAccount': user})
+        return redirect('profile')
 
 
 class EditPassword(View):
