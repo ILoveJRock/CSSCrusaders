@@ -305,7 +305,7 @@ class Management:
                 selected_account.full_clean()
                 selected_account.save()
 
-                return "Account information updated successfully."
+
             except ValidationError as e:
                 return str(e)
 
@@ -423,7 +423,6 @@ class Management:
 
         @staticmethod
         def edit_profile(request, user):
-            update_user_field(user, "name", request.POST.get("Name"))
             update_user_field(user, "phone", request.POST.get("Phone"))
             update_user_field(user, "email", request.POST.get("Email"))
             update_user_field(user, "address", request.POST.get("Address"))

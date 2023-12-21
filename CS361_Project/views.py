@@ -38,7 +38,22 @@ class Profile(View):
     def get(self, request):
         result = loginCheck(request, 2) # Everyone logged in can view
         if result: return result
-        return render(request, profile_information(request))
+        request.session["action"] = None
+        user = Account.objects.get(username=request.session["name"])
+        named = user.name
+        phone = user.phone
+        email = user.email
+        address = user.address
+        office_hour_location = user.office_hour_location
+        office_hour_time = user.office_hour_time
+        return render(request, 'Profile.html', {
+            "named": named,
+            "phone": phone,
+            "email": email,
+            "address": address,
+            "office_hour_location": office_hour_location,
+            "office_hour_time": office_hour_time,
+        })
 
     def post(self, request):
         result = loginCheck(request, 2) # Everyone logged in can view
@@ -219,10 +234,6 @@ class CreateLab(View):
 
 class EditCourse(View):
     template_name = 'EditCourse.html'
-
-    from CS361_Project.models import Instructor  # Import the Instructor model at the top of your file
-
-    from CS361_Project.models import Instructor  # Import the Instructor model at the top of your file
 
     def get(self, request):
         result = loginCheck(request, 0)
