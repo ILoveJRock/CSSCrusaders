@@ -13,6 +13,7 @@ class TestCreateAccount(TestCase):
             "phone": "414",
             "email": "@hotmail",
             "address": "lane",
+            "username" : 'joe',
             "password": "123",
             "acctype": 1
         }
@@ -26,6 +27,7 @@ class TestCreateAccount(TestCase):
             "phone": "414",
             "email": "@hotmail",
             "address": "lane",
+            "username" : 'joe',
             "password": "123",
             "acctype": 1
         }
