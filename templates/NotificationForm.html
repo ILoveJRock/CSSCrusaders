@@ -3,7 +3,63 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <title>Notification Form</title>
+        <title>Send Notification</title>
+        <style>
+            body {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                height: 100vh;
+                margin: 0;
+                background-color: #282c35;
+                color: #fff;
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            }
+
+            h1{
+                text-align: center;
+                margin: 0;
+            }
+
+            th {
+                text-align: left;
+            }
+
+        a:link {
+          color: white;
+          background-color: transparent;
+          text-decoration: none;
+        }
+
+        a:visited {
+            color: white;
+            background-color: transparent;
+            text-decoration: none;
+        }
+
+            article{ flex:1; }
+
+            .form-container {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .submit-button {
+                margin: 10px auto;
+                padding: 10px;
+                background-color: #4CAF50;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                transition: background-color 0.3s;
+            }
+
+            .submit-button:hover {
+                background-color: #45a049;
+            }
+        </style>
     </head>
     <body>
         {% if is_supervisor %}

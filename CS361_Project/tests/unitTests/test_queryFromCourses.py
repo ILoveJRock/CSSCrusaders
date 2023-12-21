@@ -22,29 +22,39 @@ class TestConvert(TestCase):
             }
         ]
 
-        self.mock_labs = [
+        self.mock_instructors = [
             {
-                "name": "001",
-                "course_id": 1
+                "id": 1,
+                "course": 1
             },
             {
-                "name": "007",
-                "course_id": 1
+                "id": 3,
+                "course": 2
+            }
+        ]
+
+        self.mock_accounts = [
+            {
+                "id": 1,
+                "name": "joe shmo"
             },
             {
-                "name": "001",
-                "course_id": 2
+                "id": 2,
+                "name": "not instructor"
+            },
+            {
+                "id": 3,
+                "name": "prof trelawney"
             }
         ]
 
     def test_retain_courses(self):
-        query = queryFromCourses(self.mock_courses, self.mock_labs)
+        query = queryFromCourses(self.mock_courses, self.mock_instructors, self.mock_accounts)
         for i in range(self.mock_courses):
             for key in self.mock_courses[i].keys():
                 self.assertTrue(self.mock_courses[i][key] == query[i][key], "not every course was transferred to query")
 
-    def test_convert_labs(self):
-        query = queryFromCourses(self.mock_courses, self.mock_labs)
-        for lab in self.mock_labs:
-            course = filter(lambda c : c["id"] == lab["course_id"], self.mock_courses)[0]
-            self.assertEqual(course["id"], lab["course_id"], "A lab is not with the right course")
+    def test_no_extra_accounts(self):
+        query = queryFromCourses(self.mock_courses, self.mock_instructors, self.mock_accounts)
+        for course in query:
+            self.assertFalse(course["instructor"] == "not instructor", "non-instructor was set as instructor")
