@@ -236,7 +236,7 @@
     <div class="button-container">
         <button><a href="{% url 'edit_lab' %}?Labid={{ selected_section.Labid }}" style="color: white;">Edit Selected Section</a></button>
         <button><a href="{% url 'delete_lab' %}?Labid={{ selected_section.Labid }}" style="color: white;">Delete Selected Section</a></button>
-        <button><a href='/course/createLab' style="color: white;">Add New Section</a></button>
+        <button><a href="{% url 'create_lab' %}?courseId={{ selected_section.Courseid }}" style="color: white;">Add New Section</a></button>
     </div>
 
 </body>
