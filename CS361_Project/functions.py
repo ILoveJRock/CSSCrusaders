@@ -1,7 +1,19 @@
-from django.core.exceptions import ValidationError
-from django.shortcuts import render
-from django.contrib import messages
+from django.shortcuts import render, redirect
+from django.core.mail import send_mail
+from django.db.models import Max
 from .models import *
+
+
+def profile_information(request):
+    request.session['action'] = None
+    user = Account.objects.get(username=request.session['name'])
+    named = user.name
+    phone = user.phone
+    email = user.email
+    address = user.address
+    office_hour_location = user.office_hour_location
+    office_hour_time = user.office_hour_time
+    return  {"named": named, "phone": phone, "email": email, "address": address, "office_hour_location": office_hour_location, "office_hour_time": office_hour_time, 'validForm': 'invalid'}    
 
 
 # call this as loginCheck(request, x) with x being the int value of the role needed to access
@@ -135,6 +147,29 @@ class Management:
             except Account.DoesNotExist:
                 return None
         @staticmethod
+        def edit_account_select(request):
+            user_id = request.GET.get('userId')
+            # Get the selected user
+            try:
+                selected_user = Account.objects.get(account_id=user_id)
+                return render(request, 'edit_account.html', {'user': selected_user})
+            except Account.DoesNotExist:
+                return render(request, 'error_page.html', {'error_message': f"Account with ID {user_id} does not exist."})
+            
+        @staticmethod
+        def manage_account(request):
+            accounts = Account.objects.all()
+            selected_user_id = request.POST.get('selected_user_id')
+            selected_user = None
+            if selected_user_id:
+                try:
+                    selected_user = Account.objects.get(account_id=selected_user_id)
+                except Account.DoesNotExist:
+                    return render(request, 'error_page.html', {'error_message': f"Account with ID {selected_user_id} does not exist."})
+            query = [{"id" : account.account_id, "role": account.role, "named": account.name, "phone": account.phone, "email": account.email, "address": account.address, "office_hour_location": account.office_hour_location, "office_hour_time": account.office_hour_time} for account in accounts]
+            return render(request, 'Manage_Account.html', {"accounts": query, "selected_user": selected_user})
+
+        @staticmethod
         def create_account(request):
             form_username = request.POST["username"]
             if len(Account.objects.filter(username=form_username)) != 0:
@@ -222,7 +257,72 @@ class Management:
             except Account.DoesNotExist:
                 messages.error(request, "Account Deletion Failed: DoesNotExist")
 
-    class Profile:
+    class Course:
+        @staticmethod
+        def manage_course(request):
+            selected_course_id = request.POST.get("selected_course_id")
+            selected_course = None
+            if selected_course_id:
+                selected_course = Course.objects.get(Courseid=selected_course_id)
+            courses = Course.objects.all()
+            instructors = Instructor.objects.all()
+            accounts = Account.objects.all()
+            query1 = [{"name": course.name, "dept": course.dept, "id": course.Courseid} for course in courses]
+            query2 = [{"id": instructor.instructor_id.account_id, "course": instructor.course.Courseid} for instructor in instructors]
+            query3 = [{"id": account.account_id, "name": account.name} for account in accounts]
+            query = queryFromCourses(query1, query2, query3)
+            return {"courses": query, "selected_course": selected_course}
+        
+        @staticmethod
+        def create_course(request):
+            course_name = request.POST.get('name')
+            department = request.POST.get('dept')
+            proffessor = request.POST.get('professor')
+            max_id = Course.objects.aggregate(Max('Courseid'))['Courseid__max']
+            new_id = (max_id or 0) + 1
+            new_course = Course(
+                Courseid=new_id,
+                name=course_name,
+                dept=department
+            )
+            new_course.save()
+            instructor = Instructor.objects.filter(instructor_id=proffessor)
+            instructor.course = new_course
+
+    class Notification:
+        @staticmethod
+        def send_notification(request):
+            session = request.session
+            account = Account.objects.get(account_id=session.get('userID'))
+            if account.role == 0:  # account is a supervisor
+                # Fetch all accounts with a valid email
+                accounts = Account.objects.exclude(email__exact='')
+                # Extract email addresses
+                emails = [account.email for account in accounts]
+            elif account.role == 1:  # account is an instructor
+                # Get the selected course
+                course_id = request.POST['course']
+                course = Course.objects.get(course_id=course_id)
+                # Fetch all TAs associated with the selected course
+                tas = TA.objects.filter(course=course)
+                # Extract email addresses
+                emails = [ta.account.email for ta in tas]
+            subject = request.POST['subject']
+            body = request.POST['body']
+            send_mail(subject, body, "nate.valentine.r@gmail.com", emails, fail_silently=True)
+
+        @staticmethod
+        def notification_context(request):
+            session = request.session
+            account = Account.objects.get(account_id=session.get('userID'))
+            if account.role == 0:  # account is a supervisor
+                context = {'is_supervisor': True}
+            elif account.role == 1:  # account is an instructor
+                instructor = Instructor.objects.get(instructor_id=account.account_id)
+                courses = Course.objects.filter(instructor=instructor)
+                context = {'courses': courses}
+
+    class Profile: 
         @staticmethod
         def edit_profile_data(request, user, field_name, field_type, error_name):
             if request.POST.get(field_name) != "":
@@ -237,6 +337,15 @@ class Management:
 
                 setattr(user, field_name.lower(), new_data)
                 user.save()
+        
+        @staticmethod
+        def edit_profile(request, user):
+            update_user_field(user, "name", request.POST.get("Name"))
+            update_user_field(user, "phone", request.POST.get("Phone"))
+            update_user_field(user, "email", request.POST.get("Email"))
+            update_user_field(user, "address", request.POST.get("Address"))
+            update_user_field(user, "office_hour_location", request.POST.get("Location"))
+            update_user_field(user, "office_hour_time", request.POST.get("Time"))
 
 
 def create_lab(request):
@@ -286,3 +395,23 @@ def update_user_password(user, new_password, repeat_password):
 
         user.password = new_password
         user.save()
+
+
+def login_post(self, request):
+    username = request.POST['username']
+    password = request.POST['password']
+    # Authenticate user w/ helper method
+    user = authenticate_user(self, username, password)
+    # If the user is authenticated, log the user in and redirect them to the ADMIN DASHBOARD page
+    if user:
+        Management.User.login(request, user)
+        if (user.role == 0):
+            return redirect('/dashboard')
+        elif (user.role == 1):
+            return redirect('/dashboard/prof')
+        else:
+            return redirect('/dashboard/ta')
+    else:
+        # If the user is not authenticated, redisplay the page with the appropriate error
+        error = 'User does not exist' if not user else "Incorrect Password"
+        return render(request, "login.html", {"error": error})

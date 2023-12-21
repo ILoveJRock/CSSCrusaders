@@ -18,28 +18,10 @@ class Login(View):
         # If the user is already logged in, redirect to home page
         if 'LoggedIn' in request.GET:
             return redirect('/dashboard/')
-
         return render(request, 'Login.html')
 
     def post(self, request):
-        # Get login details from post request
-        username = request.POST['username']
-        password = request.POST['password']
-        # Authenticate user w/ helper method
-        user = Management.User.authenticate_user(username, password)
-        # If the user is authenticated, log the user in and redirect them to the ADMIN DASHBOARD page
-        if user:
-            Management.User.login(request, user)
-            if (user.role == 0):
-                return redirect('/dashboard')
-            elif (user.role == 1):
-                return redirect('/dashboard/prof')
-            else:
-                return redirect('/dashboard/ta')
-        else:
-            # If the user is not authenticated, redisplay the page with the appropriate error
-            error = 'User does not exist' if not user else "Incorrect Password"
-            return render(request, "login.html", {"error": error})
+        return login_post(self, request)
 
 
 class ForgotPassword(View):
@@ -55,15 +37,7 @@ class Profile(View):
     def get(self, request):
         result = loginCheck(request, 2) # Everyone logged in can view
         if result: return result
-        request.session['action'] = None
-        user = Account.objects.get(username=request.session['name'])
-        named = user.name
-        phone = user.phone
-        email = user.email
-        address = user.address
-        office_hour_location = user.office_hour_location
-        office_hour_time = user.office_hour_time
-        return render(request, 'Profile.html', {"named": named, "phone": phone, "email": email, "address": address, "office_hour_location": office_hour_location, "office_hour_time": office_hour_time, 'validForm': 'invalid'})
+        return render(request, profile_information(request))
 
     def post(self, request):
         result = loginCheck(request, 2) # Everyone logged in can view
@@ -76,26 +50,21 @@ class EditProfile(View):
     def get(self, request):
         result = loginCheck(request, 2) # Everyone logged in can view
         if result: return result
-        session = request.session
-        current_account = Account.objects.get(account_id=session.get('userID'))
+        current_account = Account.objects.get(account_id=request.session.get('userID'))
         return render(request, 'EditProfile.html', {'currentAccount': current_account})
 
     def post(self, request):
         result = loginCheck(request, 2) # Everyone logged in can view
-        if result: return result
-        user = Account.objects.get(username=request.session['name'])
-        update_user_field(user, "name", request.POST.get("Name"))
-        update_user_field(user, "phone", request.POST.get("Phone"))
-        update_user_field(user, "email", request.POST.get("Email"))
-        update_user_field(user, "address", request.POST.get("Address"))
-        update_user_field(user, "office_hour_location", request.POST.get("Location"))
-        update_user_field(user, "office_hour_time", request.POST.get("Time"))
-        return render(request, 'EditProfile.html', {'currentAccount': user})
+        if result: return 
+        # Edit profile information of user currently logged in
+        Management.Profile.edit_profile(request, Account.objects.get(username=request.session['name']))
+        return redirect('profile')
 
 
 class EditPassword(View):
     def get(self, request):
-        result = loginCheck(request, 2) # Everyone logged in can view
+        result = loginCheck(request, 2) # Everyone logged in can 
+        if result: return result
         request.session['action'] = None
         return render(request, 'Profile.html', {'validForm': 'invalid'})
 
@@ -116,26 +85,12 @@ class ManageAccounts(View):
     def get(self, request):
         result = loginCheck(request, 0)
         if result: return result
-        accounts = Account.objects.all()
-        
-        selected_user_id = request.POST.get('selected_user_id')
-        selected_user = None
-        if selected_user_id:
-            try:
-                selected_user = Account.objects.get(account_id=selected_user_id)
-            except Account.DoesNotExist:
-                return render(request, 'error_page.html', {'error_message': f"Account with ID {selected_user_id} does not exist."})
-
-        
-        query = [{"id" : account.account_id, "role": account.role, "named": account.name, "phone": account.phone, "email": account.email, "address": account.address, "office_hour_location": account.office_hour_location, "office_hour_time": account.office_hour_time} for account in accounts]
-        
-        return render(request, 'Manage_Account.html', {"accounts": query, "selected_user": selected_user})
+        return Management.Account.manage_account(request)
 
 
     def post(self, request):
         result = loginCheck(request, 0)
         if result: return result
-  
         return self.get(request)
 
 
@@ -148,44 +103,27 @@ class CreateAccount(View):
     def post(self, request):
         result = loginCheck(request, 0)
         if result: return result
+        # Returns error if account wasn't able to be created
         error = Management.Account.create_account(request)
-        if error:
-            return render(request, 'CreateAccount.html', {"message": error})
-        return redirect('/manage/')
+        if error: return render(request, 'CreateAccount.html', {"message": error})
+        return redirect('/manage/') # Redirect to ManageAccount view
 
 
 class EditAccount(View):
     def get(self, request):
         result = loginCheck(request, 0)
         if result: return result
-        user_id = request.GET.get('userId')
-        # Get the selected user
-        selected_user = Management.Account.get_from_id(user_id)
-        if selected_user:
-            request.session['selected_user_id'] = user_id
-            return render(request, 'edit_account.html', {'user': selected_user})
-        else:
-            return render(request, 'error_page.html', {'error_message': f"Account with ID {user_id} does not exist."})
+        return Management.Account.edit_account_select(request)
+
 
     def post(self, request):
         result = loginCheck(request, 0)
         if result: return result
-        
-        user_id = request.session.get('selected_user_id')
-        
-        if user_id is None:
-            return render(request, 'error_page.html', {'error_message': "Can't edit null user"})
-
-        # Get the selected user based on the account_id
-        user = Management.Account.get_from_id(user_id)
-        if user is None:
-            return render(request, 'error_page.html', {'error_message': f"Account with ID {user_id} does not exist."})
-        
-        error = Management.Account.update_account(request, user)
-        if error:
-            return render(request, 'edit_account.html', {'error' : error})
-        # Redirect to ManageAccount view
-        return redirect('/manage/')
+        selected_account = Account.objects.get(account_id=request.POST.get('selected_user_id'))
+        # Returns error if account wasn't able to be edited
+        error = Management.Account.update_account(request, selected_account)
+        if error: return render(request, 'edit_account.html', {'error' : error})
+        return redirect('/manage/') # Redirect to ManageAccount view
 
 
 class DeleteAccount(View):
@@ -204,18 +142,15 @@ class DeleteAccount(View):
 
 class Notification(View):
     def get(self, request):
-        result = loginCheck(request, 0)
+        result = loginCheck(request, 1)
         if result: return result
-        return render(request, 'NotificationForm.html')
+        context = Management.Notification.notification_context(request)
+        return render(request, 'NotificationForm.html', context)
 
     def post(self, request):
-        result = loginCheck(request, 0)
+        result = loginCheck(request, 1)
         if result: return result
-        # TODO Send email to all the users in the email list
-        email = request.POST['email']
-        subject = request.POST['subject']
-        body = request.POST['body']
-        send_mail(subject, body, "nate.valentine.r@gmail.com", [email], fail_silently=False, )
+        Management.Notification.send_notification(request)
         return redirect('/dashboard/')
 
 
@@ -223,25 +158,11 @@ class ManageCourse(View):
     def get(self, request):
         result = loginCheck(request, 0)
         if result: return result
-
-        selected_course_id = request.POST.get("selected_course_id")
-        selected_course = None
-        if selected_course_id:
-            selected_course = Course.objects.get(Courseid=selected_course_id)
-
-        courses = Course.objects.all()
-        instructors = Instructor.objects.all()
-        accounts = Account.objects.all()
-        query1 = [{"name": course.name, "dept": course.dept, "id": course.Courseid} for course in courses]
-        query2 = [{"id": instructor.instructor_id.account_id, "course": instructor.course.Courseid} for instructor in instructors]
-        query3 = [{"id": account.account_id, "name": account.name} for account in accounts]
-        query = queryFromCourses(query1, query2, query3)
-        return render(request, 'ManageCourse.html',  {"courses": query, "selected_course": selected_course})
+        return render(request, 'ManageCourse.html',  Management.Course.manage_course(request))
 
     def post(self, request):
         result = loginCheck(request, 0)
         if result: return result
-  
         return self.get(request)
 
 
@@ -256,20 +177,7 @@ class CreateCourse(View):
     def post(self, request):
         result = loginCheck(request, 0)
         if result: return result
-        course_name = request.POST.get('name')
-        department = request.POST.get('dept')
-        proffessor = request.POST.get('professor')
-        max_id = Course.objects.aggregate(Max('Courseid'))['Courseid__max']
-        new_id = (max_id or 0) + 1
-        new_course = Course(
-            Courseid=new_id,
-            name=course_name,
-            dept=department
-        )
-        new_course.save()
-        instructor = Instructor.objects.filter(instructor_id=proffessor)
-        instructor.course = new_course
-
+        Management.Course.create_course(request)
         return redirect('create_course')
 
 
