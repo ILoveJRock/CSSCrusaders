@@ -22,6 +22,6 @@ class LogoutTests(TestCase):
         self.assertRedirects(logout_response, '/login/')  # Assuming the user is redirected to the login page
 
         # Check if session data is cleared
-        self.assertEqual(self.client.session.get('LoggedIn'), None)
+        self.assertEqual(self.client.session.get('LoggedIn'), False)
         self.assertEqual(self.client.session.get('name'), None)
         self.assertEqual(self.client.session.get('role'), None)
