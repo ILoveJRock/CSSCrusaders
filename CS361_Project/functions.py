@@ -118,6 +118,12 @@ class Management:
             session["LoggedIn"] = False
 
     class Account:
+        @staticmethod 
+        def get_from_id(id):
+            try:
+                return Account.objects.get(account_id=id)
+            except Account.DoesNotExist:
+                return None
         @staticmethod
         def create_account(request):
             form_username = request.POST["username"]
@@ -191,6 +197,8 @@ class Management:
                 # Save the changes
                 selected_account.full_clean()
                 selected_account.save()
+                
+                return "Account information updated successfully."
             except ValidationError as e:
                 return str(e)
 

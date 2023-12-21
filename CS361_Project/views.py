@@ -159,19 +159,28 @@ class EditAccount(View):
         if result: return result
         user_id = request.GET.get('userId')
         # Get the selected user
-        try:
-            selected_user = Account.objects.get(account_id=user_id)
+        selected_user = Management.Account.get_from_id(user_id)
+        if selected_user:
+            request.session['selected_user_id'] = user_id
             return render(request, 'edit_account.html', {'user': selected_user})
-        except Account.DoesNotExist:
+        else:
             return render(request, 'error_page.html', {'error_message': f"Account with ID {user_id} does not exist."})
 
     def post(self, request):
         result = loginCheck(request, 0)
         if result: return result
-        selected_account = Account.objects.get(account_id=request.POST.get('selected_user_id'))
         
+        user_id = request.session.get('selected_user_id')
         
-        error = Management.Account.update_account(request, selected_account)
+        if user_id is None:
+            return render(request, 'error_page.html', {'error_message': "Can't edit null user"})
+
+        # Get the selected user based on the account_id
+        user = Management.Account.get_from_id(user_id)
+        if user is None:
+            return render(request, 'error_page.html', {'error_message': f"Account with ID {user_id} does not exist."})
+        
+        error = Management.Account.update_account(request, user)
         if error:
             return render(request, 'edit_account.html', {'error' : error})
         # Redirect to ManageAccount view
