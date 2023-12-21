@@ -280,7 +280,7 @@ class CreateLab(View):
     def get(self, request):
         result = loginCheck(request, 0)
         if result: return result
-        selected_course = Course.objects.get(Courseid=request.get('courseId'))
+        selected_course = Course.objects.get(Courseid=request.GET.get('courseId'))
         tas = TA.objects.filter(course=selected_course)
         return render(request, 'CreateLab.html', {"tas": tas})
 
