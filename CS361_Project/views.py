@@ -267,8 +267,8 @@ class DeleteCourse(View):
     def post(self, request):
         result = loginCheck(request, 0)
         if result: return result
-        # TODO Delete the course
-        return render(request, "ManageCourse.html")
+        Management.Course.delete_course(request)
+        return redirect("manage_course")
 
 
 class DeleteLab(View):

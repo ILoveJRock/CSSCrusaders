@@ -358,6 +358,16 @@ class Management:
             instructor = Instructor.objects.filter(instructor_id=proffessor)
             instructor.course = new_course
 
+        @staticmethod
+        def delete_course(request):
+            selected_course_id = request.POST.get('courseId')
+            try:
+                selected_course = Course.objects.get(Courseid=selected_course_id)
+                selected_course.delete()
+                messages.success(request, 'Course Deleted Successfully')
+            except Course.DoesNotExist:
+                messages.error(request, 'Course does not exist')
+
     class Notification:
         @staticmethod
         def send_notification(request):
