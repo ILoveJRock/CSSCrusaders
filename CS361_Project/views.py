@@ -18,36 +18,10 @@ class Login(View):
         # If the user is already logged in, redirect to home page
         if 'LoggedIn' in request.GET:
             return redirect('/dashboard/')
-
         return render(request, 'Login.html')
 
     def post(self, request):
-        # Get login details from post request
-        username = request.POST['username']
-        password = request.POST['password']
-        # Authenticate user w/ helper method
-        user = authenticate_user(self, username, password)
-        # If the user is authenticated, log the user in and redirect them to the ADMIN DASHBOARD page
-        if user:
-            Management.User.login(request, user)
-            if (user.role == 0):
-                return redirect('/dashboard')
-            elif (user.role == 1):
-                return redirect('/dashboard/prof')
-            else:
-                return redirect('/dashboard/ta')
-        else:
-            # If the user is not authenticated, redisplay the page with the appropriate error
-            error = 'User does not exist' if not user else "Incorrect Password"
-            return render(request, "login.html", {"error": error})
-
-    def authenticate_user(self, username, password):
-        try:
-            user = Account.objects.get(username=username)
-            if user.password == password:
-                return user
-        except Account.DoesNotExist:
-            self.missingUser = True
+        return login_post(self, request)
 
 
 class ForgotPassword(View):
@@ -63,15 +37,7 @@ class Profile(View):
     def get(self, request):
         result = loginCheck(request, 2) # Everyone logged in can view
         if result: return result
-        request.session['action'] = None
-        user = Account.objects.get(username=request.session['name'])
-        named = user.name
-        phone = user.phone
-        email = user.email
-        address = user.address
-        office_hour_location = user.office_hour_location
-        office_hour_time = user.office_hour_time
-        return render(request, 'Profile.html', {"named": named, "phone": phone, "email": email, "address": address, "office_hour_location": office_hour_location, "office_hour_time": office_hour_time, 'validForm': 'invalid'})
+        return render(request, profile_information(request))
 
     def post(self, request):
         result = loginCheck(request, 2) # Everyone logged in can view
@@ -92,17 +58,14 @@ class EditProfile(View):
         result = loginCheck(request, 2) # Everyone logged in can view
         if result: return result
         user = Account.objects.get(username=request.session['name'])
-        update_user_field(user, "phone", request.POST.get("Phone"))
-        update_user_field(user, "email", request.POST.get("Email"))
-        update_user_field(user, "address", request.POST.get("Address"))
-        update_user_field(user, "office_hour_location", request.POST.get("Location"))
-        update_user_field(user, "office_hour_time", request.POST.get("Time"))
+        Management.Profile.edit_profile(request, user)
         return redirect('profile')
 
 
 class EditPassword(View):
     def get(self, request):
-        result = loginCheck(request, 2) # Everyone logged in can view
+        result = loginCheck(request, 2) # Everyone logged in can 
+        if result: return result
         request.session['action'] = None
         return render(request, 'Profile.html', {'validForm': 'invalid'})
 
@@ -123,26 +86,12 @@ class ManageAccounts(View):
     def get(self, request):
         result = loginCheck(request, 0)
         if result: return result
-        accounts = Account.objects.all()
-        
-        selected_user_id = request.POST.get('selected_user_id')
-        selected_user = None
-        if selected_user_id:
-            try:
-                selected_user = Account.objects.get(account_id=selected_user_id)
-            except Account.DoesNotExist:
-                return render(request, 'error_page.html', {'error_message': f"Account with ID {selected_user_id} does not exist."})
-
-        
-        query = [{"id" : account.account_id, "role": account.role, "named": account.name, "phone": account.phone, "email": account.email, "address": account.address, "office_hour_location": account.office_hour_location, "office_hour_time": account.office_hour_time} for account in accounts]
-        
-        return render(request, 'Manage_Account.html', {"accounts": query, "selected_user": selected_user})
+        return Management.Account.manage_account(request)
 
 
     def post(self, request):
         result = loginCheck(request, 0)
         if result: return result
-  
         return self.get(request)
 
 
@@ -165,25 +114,16 @@ class EditAccount(View):
     def get(self, request):
         result = loginCheck(request, 0)
         if result: return result
-        user_id = request.GET.get('userId')
-        # Get the selected user
-        try:
-            selected_user = Account.objects.get(account_id=user_id)
-            return render(request, 'edit_account.html', {'user': selected_user})
-        except Account.DoesNotExist:
-            return render(request, 'error_page.html', {'error_message': f"Account with ID {user_id} does not exist."})
+        return Management.Account.edit_account_select(request)
 
     def post(self, request):
         result = loginCheck(request, 0)
         if result: return result
         selected_account = Account.objects.get(account_id=request.POST.get('selected_user_id'))
-        
-        
         error = Management.Account.update_account(request, selected_account)
-        if error:
+        if error: 
             return render(request, 'edit_account.html', {'error' : error})
-        # Redirect to ManageAccount view
-        return redirect('/manage/')
+        return redirect('/manage/') # Redirect to ManageAccount view
 
 
 class DeleteAccount(View):
@@ -236,25 +176,11 @@ class ManageCourse(View):
     def get(self, request):
         result = loginCheck(request, 0)
         if result: return result
-
-        selected_course_id = request.POST.get("selected_course_id")
-        selected_course = None
-        if selected_course_id:
-            selected_course = Course.objects.get(Courseid=selected_course_id)
-
-        courses = Course.objects.all()
-        instructors = Instructor.objects.all()
-        accounts = Account.objects.all()
-        query1 = [{"name": course.name, "dept": course.dept, "id": course.Courseid} for course in courses]
-        query2 = [{"id": instructor.instructor_id.account_id, "course": instructor.course.Courseid} for instructor in instructors]
-        query3 = [{"id": account.account_id, "name": account.name} for account in accounts]
-        query = queryFromCourses(query1, query2, query3)
-        return render(request, 'ManageCourse.html',  {"courses": query, "selected_course": selected_course})
+        return render(request, 'ManageCourse.html',  Management.Course.manage_course(request))
 
     def post(self, request):
         result = loginCheck(request, 0)
         if result: return result
-  
         return self.get(request)
 
 
@@ -269,20 +195,7 @@ class CreateCourse(View):
     def post(self, request):
         result = loginCheck(request, 0)
         if result: return result
-        course_name = request.POST.get('name')
-        department = request.POST.get('dept')
-        proffessor = request.POST.get('professor')
-        max_id = Course.objects.aggregate(Max('Courseid'))['Courseid__max']
-        new_id = (max_id or 0) + 1
-        new_course = Course(
-            Courseid=new_id,
-            name=course_name,
-            dept=department
-        )
-        new_course.save()
-        instructor = Instructor.objects.filter(instructor_id=proffessor)
-        instructor.course = new_course
-
+        Management.Course.create_course(request)
         return redirect('create_course')
 
 
