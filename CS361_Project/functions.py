@@ -358,6 +358,7 @@ class Management:
             new_course.save()
             instructor = Instructor.objects.get(instructor_id=proffessor)
             instructor.course = new_course
+            instructor.save()
 
         @staticmethod
         def delete_course(request):
