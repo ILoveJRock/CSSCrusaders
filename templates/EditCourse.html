@@ -17,15 +17,11 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        #editAccount {
-            position: fixed;
-            top: 0;
-            text-align: center;
-            width: 100%;
-            background-color: #4CAF50;
-            padding: 10px;
-            box-sizing: border-box;
-            z-index: 1;
+        .scrollable-table {
+            width: 70%;
+            max-height: 500px;
+            overflow-y: auto;
+            display: block;
         }
 
         form {
@@ -67,25 +63,88 @@
             margin-bottom: 40px;
         }
 
+        #editCourse {
+            text-align: center;
+            width: 100%; /* Take up the full width */
+            background-color: #4CAF50;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .scrollable-table {
+            width: 70%;
+            max-height: 500px;
+            overflow-y: auto;
+            display: block;
+        }
+
+        .course-overview {
+            width: 30%;
+            margin-left: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        table {
+            width: 100%;
+            max-width: 1000px;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            white-space: nowrap;
+            word-wrap: break-word;
+            overflow: hidden;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+        td{
+           background-color: #4CAF50;
+            color: white;
+        }
+
         .button-container {
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
             width: 100%;
-            max-width: 600px;
-            position: fixed;
-            bottom: 20px;
-            z-index: 1;
+            max-width: 500px;
+            margin-top: 20px;
+
         }
 
         button {
-            width: 100%;
-            padding: 10px;
+            width: calc(24% - 5px);
+            margin-right: 5px;
+            padding: 8px;
             background-color: #4CAF50;
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
             transition: background-color 0.3s;
+            text-align: center;
         }
 
         button:hover {
@@ -99,6 +158,7 @@
     </style>
 </head>
 <body>
+{% include 'NavBar.html' %}
 
 <div id="editCourse">
     <h1>Edit Course</h1>
@@ -114,22 +174,23 @@
         {% endif %}
     </div>
     <div class="form-section">
-        <label for="name">Name:</label>
-        <input type="text" id="name" name="name" value="{{ course.name }}" required maxlength="30">
+        <label for="dept">Department:</label>
+        <input type="text" id="dept" name="dept" value="{{ selected_course.dept }}" required maxlength="30">
 
-        <label for="time">Time:</label>
-        <input type="time" id="time" name="time" value="{{ course.time }}" required maxlength="30">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" value="{{ selected_course.name }}" required maxlength="30">
 
         <label for="professor">Professor:</label>
         <select id="professor" name="professor">
             {% for professor in profs %}
-                <option value="{{ professor.account_id }}">{{ professor.name }}</option>
+                <option value="{{ professor.account_id }}" {% if professor.account_id == selected_course.prof %}selected{% endif %}>{{ professor.name }}</option>
             {% endfor %}
         </select>
     </div>
     <div class="button-container">
         <button type="submit">Save Changes</button>
     </div>
+</form>
 
     <div class="container">
         <div class="scrollable-table">
@@ -139,6 +200,7 @@
                         <th>Name</th>
                         <th>Time</th>
                         <th>TA</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -149,9 +211,10 @@
                         <td>{{ section.ta }}</td>
 
                         <td>
-                            <form method="post" action="{% url 'EditCourse' %}">
+                            <form method="post" action="{% url 'select_section' %}">
                                 {% csrf_token %}
-                                <button type="submit" name="selected_section_id" value={{section.LabiId}}>Select</button>
+                                <input type="hidden" name="selected_section_id" value="{{ section.Labid }}">
+                                <button type="submit">Select</button>
                             </form>
                         </td>
                     </tr>
@@ -159,7 +222,9 @@
                 </tbody>
             </table>
         </div>
-        <div class="user-overview">
+    </div>
+
+        <div class="course-overview">
             <h2>Selected Section</h2>
             <hr>
             <p><strong>Name:</strong> {{ selected_section.name }}</p>
@@ -167,11 +232,11 @@
             <p><strong>TA:</strong> {{ selected_section.TA }}</p>
         </div>
     </div>
-</form>
+
     <div class="button-container">
         <button><a href="{% url 'edit_lab' %}?Labid={{ selected_section.Labid }}" style="color: white;">Edit Selected Section</a></button>
         <button><a href="{% url 'delete_lab' %}?Labid={{ selected_section.Labid }}" style="color: white;">Delete Selected Section</a></button>
-        <button><a href='/course/createLab' style="color: white;">Add New Section</a></button>
+        <button><a href="{% url 'create_lab' %}?courseId={{ selected_section.Courseid }}" style="color: white;">Add New Section</a></button>
     </div>
 
 </body>

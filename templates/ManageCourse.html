@@ -146,15 +146,19 @@
     <div class="course-overview">
         <h2>Selected course</h2>
         <hr>
+        <p><strong>ID:</strong> {{ selected_course.Courseid }}</p>
         <p><strong>Name:</strong> {{ selected_course.name }}</p>
         <p><strong>Dept:</strong> {{ selected_course.dept }}</p>
-        <p><strong>Instructor:</strong> {{ selected_course.instructor }}</p>
     </div>
 </div>
 
 <div class="button-container">
-    <button><a id="editLink" style="color: white;">Edit Selected Course</a></button>
-    <button><a id="deleteLink" style="color: white;">Delete Selected Course</a></button>
+    <button><a href='/course/editCourse?courseId={{ selected_course.Courseid }}' id="editLink" style="color: white;">Edit Selected Course</a></button>
+    <form action="{% url 'delete_course' %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="courseId" value="{{ selected_course.Courseid }}">
+        <button type="submit" style="color: white; width: 100%; height: 100%;" {% if not selected_course %}disabled{% endif%}>Delete Selected Course</button>
+    </form>
     <button><a href='/course/createCourse' style="color: white;">Add New Course</a></button>
 </div>
 

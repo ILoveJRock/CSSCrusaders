@@ -305,7 +305,7 @@ class Management:
                 selected_account.full_clean()
                 selected_account.save()
 
-                return "Account information updated successfully."
+
             except ValidationError as e:
                 return str(e)
 
@@ -326,6 +326,7 @@ class Management:
             selected_course = None
             if selected_course_id:
                 selected_course = Course.objects.get(Courseid=selected_course_id)
+            # Switches courses provided based on logged in level
             courses = Course.objects.all()
             instructors = Instructor.objects.all()
             accounts = Account.objects.all()
@@ -336,7 +337,7 @@ class Management:
             query2 = [
                 {
                     "id": instructor.instructor_id.account_id,
-                    "course": instructor.course.Courseid,
+                    "course": instructor.course.Courseid if instructor.course else None,
                 }
                 for instructor in instructors
             ]
@@ -355,8 +356,19 @@ class Management:
             new_id = (max_id or 0) + 1
             new_course = Course(Courseid=new_id, name=course_name, dept=department)
             new_course.save()
-            instructor = Instructor.objects.filter(instructor_id=proffessor)
+            instructor = Instructor.objects.get(instructor_id=proffessor)
             instructor.course = new_course
+            instructor.save()
+
+        @staticmethod
+        def delete_course(request):
+            selected_course_id = request.POST.get('courseId')
+            try:
+                selected_course = Course.objects.get(Courseid=selected_course_id)
+                selected_course.delete()
+                messages.success(request, 'Course Deleted Successfully')
+            except Course.DoesNotExist:
+                messages.error(request, 'Course does not exist')
 
     class Notification:
         @staticmethod
@@ -411,7 +423,6 @@ class Management:
 
         @staticmethod
         def edit_profile(request, user):
-            update_user_field(user, "name", request.POST.get("Name"))
             update_user_field(user, "phone", request.POST.get("Phone"))
             update_user_field(user, "email", request.POST.get("Email"))
             update_user_field(user, "address", request.POST.get("Address"))
@@ -422,16 +433,18 @@ class Management:
 
 
 def create_lab(request):
-    formName = request.POST["name"]
-    formTime = request.POST["time"]
-    formTA = request.POST["ta"]
-    new_lab = LabSection(name=formName, time=formTime, ta=formTA)
+    formName = request.POST['name']
+    formTime = request.POST['time']
+    formTA = request.POST['ta']
+    new_lab = LabSection(name=formName, time=formTime)
     new_lab.save()
-    course = Course.objects.get(course=request.session["course"])
+    selected_course_id = request.POST['courseId']
+    selected_course = Course.objects.get(Courseid=selected_course_id)
     ta_instance = TA.objects.get(ta_id=formTA)
-    ta_instance.section_id = new_lab.Labid
+    ta_instance.course = selected_course
+    ta_instance.section = new_lab
     ta_instance.save()
-    new_lab_course = Course_LabSection(course, new_lab)
+    new_lab_course = Course_LabSection(course=selected_course, labSection=new_lab)
     new_lab_course.save()
 
 

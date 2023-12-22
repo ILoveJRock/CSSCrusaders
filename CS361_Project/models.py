@@ -22,7 +22,7 @@ class Supervisor(models.Model):
 
 class Instructor(models.Model):
     instructor_id = models.OneToOneField("Account", on_delete=models.CASCADE, primary_key=True)
-    course = models.ForeignKey("Course", on_delete=models.SET_NULL, null=True, blank=True)
+    course = models.ForeignKey("Course", on_delete=models.SET_NULL, null=True, blank=True, related_name="instructor_courses")
     section = models.ForeignKey("Course_LabSection", on_delete=models.SET_NULL, null=True, blank=True)
 
 class TA(models.Model):
@@ -35,14 +35,14 @@ class LabSection(models.Model):
     name = models.CharField(max_length=40)
     time = models.CharField(max_length=40)
 
-
 class Course(models.Model):
     Courseid = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=40)
     dept = models.CharField(max_length=40)
+    prof = models.ForeignKey(Instructor, on_delete=models.SET_NULL, null=True, blank=True, related_name="courses")
 
 
 class Course_LabSection(models.Model):
-    course = models.OneToOneField("Course", on_delete=models.CASCADE, primary_key=True)
+    course = models.ForeignKey("Course", on_delete=models.CASCADE)
     labSection = models.ForeignKey("LabSection", on_delete=models.CASCADE)
 

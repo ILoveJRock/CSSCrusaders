@@ -10,6 +10,7 @@ from django.views.decorators.cache import cache_control
 from django.utils.decorators import method_decorator
 from django.db.models import Max
 from django.forms import Form, ModelChoiceField
+from django import forms
 
 
 
@@ -37,7 +38,22 @@ class Profile(View):
     def get(self, request):
         result = loginCheck(request, 2) # Everyone logged in can view
         if result: return result
-        return render(request, profile_information(request))
+        request.session["action"] = None
+        user = Account.objects.get(username=request.session["name"])
+        named = user.name
+        phone = user.phone
+        email = user.email
+        address = user.address
+        office_hour_location = user.office_hour_location
+        office_hour_time = user.office_hour_time
+        return render(request, 'Profile.html', {
+            "named": named,
+            "phone": phone,
+            "email": email,
+            "address": address,
+            "office_hour_location": office_hour_location,
+            "office_hour_time": office_hour_time,
+        })
 
     def post(self, request):
         result = loginCheck(request, 2) # Everyone logged in can view
@@ -174,40 +190,66 @@ class CreateCourse(View):
         result = loginCheck(request, 0)
         if result: return result
         Management.Course.create_course(request)
-        return redirect('create_course')
+        return redirect('course')
 
 
 class CreateLab(View):
+    template_name = 'CreateLab.html'
     def get(self, request):
         result = loginCheck(request, 0)
         if result: return result
-        selected_course = Course.objects.get(Courseid=request.get('courseId'))
-        tas = TA.objects.filter(course=selected_course)
-        return render(request, 'CreateLab.html', {"tas": tas})
+        selected_course_id = request.GET.get('courseId')
+
+        # Check if the course ID is provided
+        if not selected_course_id:
+            return render(request, 'error_page.html', {'error_message': "No course ID provided."})
+
+        try:
+            selected_course = Course.objects.get(Courseid=selected_course_id)
+            tas = Account.objects.filter(role=2)
+            return render(request, self.template_name, {"tas": tas, "selected_course": selected_course})
+        except Course.DoesNotExist:
+            return render(request, 'error_page.html', {'error_message': "Selected course does not exist."})
 
     def post(self, request):
         result = loginCheck(request, 0)
         if result: return result
-        if len(LabSection.objects.filter(name=request.POST["name"])) != 0:
-            return render(request, 'CreateLab.html', {"message": "There is already a lab section with that number."})
+        selected_course_id = request.POST.get('courseId')
+        if not selected_course_id:
+            return render(request, 'error_page.html', {'error_message': "No course ID provided."})
+
+        try:
+            selected_course = Course.objects.get(Courseid=selected_course_id)
+        except Course.DoesNotExist:
+            return render(request, 'error_page.html', {'error_message': "Selected course does not exist."})
+
+        if len(LabSection.objects.filter(name=request.POST.get("name"))) != 0:
+            return render(request, self.template_name, {"message": "There is already a lab section with that number.",
+                                                        "tas": Account.objects.filter(role=2),
+                                                        "selected_course": selected_course})
+
         create_lab(request)
         return render(request, 'ManageCourse.html')
 
 
 class EditCourse(View):
-    template_name = 'edit_course.html'
+    template_name = 'EditCourse.html'
 
     def get(self, request):
         result = loginCheck(request, 0)
         if result: return result
 
-        selected_section_id = request.GET.get('Labid')
-        try:
-            selected_section = Course_LabSection.objects.get(course_id=selected_section_id)
-            return render(request, self.template_name, {'selected_section': selected_section})
-        except Course_LabSection.DoesNotExist:
+        selected_course_id = request.GET.get('courseId')
+        if not selected_course_id:
             return render(request, 'error_page.html',
-                          {'error_message': f"Section with ID {selected_section_id} does not exist."})
+                          {'error_message': "No course ID provided."})
+        try:
+            selected_course = Course.objects.get(Courseid=selected_course_id)
+            instructors = Account.objects.filter(role=1)  # Fetch all Accounts with the Instructor rol
+            return render(request, self.template_name, {'selected_course': selected_course, 'profs': instructors})
+        except Course.DoesNotExist:
+            return render(request, 'error_page.html',
+                          {'error_message': f"Course with ID {selected_course_id} does not exist."})
 
     def post(self, request):
         result = loginCheck(request, 0)
@@ -215,8 +257,8 @@ class EditCourse(View):
 
         selected_section_id = request.POST.get('selected_section_id')
         try:
-            selected_section = Course_LabSection.objects.get(course_id=selected_section_id)
-        except Course_LabSection.DoesNotExist:
+            selected_section = Course.objects.get(Courseid=selected_section_id)
+        except Course.DoesNotExist:
             return render(request, 'error_page.html',
                           {'error_message': f"Section with ID {selected_section_id} does not exist."})
 
@@ -240,8 +282,8 @@ class DeleteCourse(View):
     def post(self, request):
         result = loginCheck(request, 0)
         if result: return result
-        # TODO Delete the course
-        return render(request, "ManageCourse.html")
+        Management.Course.delete_course(request)
+        return redirect("course")
 
 
 class DeleteLab(View):
@@ -360,4 +402,4 @@ class ViewContact(View):
 class EditCourseLabSectionForm(Form):
     class Meta:
         model = Course_LabSection
-        fields = ['name', 'time']
+        fields = ['labSection']
