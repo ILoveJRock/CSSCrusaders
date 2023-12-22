@@ -129,6 +129,7 @@
         <tr>
             <td>Professor </td>
             <td><select name="professor">
+                <option value="">no professor</option>
                 {% for instructor in profs %}
                     <option value="{{ instructor.account_id }}">{{ instructor.name }}</option>
                 {% endfor %}
